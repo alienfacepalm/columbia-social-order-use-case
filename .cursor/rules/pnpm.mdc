@@ -1,0 +1,20 @@
+---
+description: Use pnpm for all package management in this project
+alwaysApply: true
+---
+
+# Use pnpm
+
+This project uses **pnpm** as the package manager. Do not use npm or yarn.
+
+## Commands
+
+- **Install dependencies:** `pnpm install` (never `npm install` or `yarn`)
+- **Add dependency:** `pnpm add <pkg>` or `pnpm add -D <pkg>` for dev
+- **Run scripts:** `pnpm dev`, `pnpm build`, `pnpm preview`
+- **Remove dependency:** `pnpm remove <pkg>`
+
+## In code and docs
+
+- In README, scripts, or instructions, always reference `pnpm` (e.g. `pnpm run build`, not `npm run build`).
+- When suggesting terminal commands for installs or scripts, use `pnpm`.

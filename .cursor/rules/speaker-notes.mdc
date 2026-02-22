@@ -1,0 +1,17 @@
+---
+description: Auto-generate speaker notes for slide decks
+globs: "**/presentation.md,**/*slides*"
+alwaysApply: false
+---
+
+# Speaker notes for slides
+
+When the user asks to add speaker notes (e.g. "add speaker notes", "generate speaker notes", "annotate slides"):
+
+1. **Do not modify slide content.** Keep headings, bullets, and Mermaid diagrams as written.
+2. **For each slide**, append a **"Speaker Notes"** section directly beneath the slide content.
+3. Notes must: be conversational (30–40 min presentation), 3–6 sentences per slide, explain _why_ the slide matters, highlight trade-offs and narrative flow. For slides with Mermaid, explain the diagram and structure.
+4. **Format:** Markdown, slides separated by `---`, Speaker Notes after each slide body and before the next `---`.
+5. "Concise notes" → 1–2 sentences; "extended notes" → 6–10 sentences.
+
+Goal: presentation-ready notes for a confident, senior-level technical narrative.

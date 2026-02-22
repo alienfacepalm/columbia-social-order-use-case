@@ -1,0 +1,18 @@
+---
+description: Generate Echodyne slide deck from Markdown presentation
+globs: "**/presentation.md"
+alwaysApply: false
+---
+
+# Slide deck from Markdown
+
+When the user asks to generate slides (e.g. "generate slides", "build echodyne deck", "update echodyne slides") from a Markdown presentation:
+
+1. Treat each `## Slide X — ...` as a separate slide; top-level `# ...` as the title slide.
+2. Preserve bullets, bold, and formatting. Preserve all `mermaid` blocks exactly (do not rewrite).
+3. For each slide: title from heading, body from content. Do not invent slides.
+4. **Output:** Markdown, slides separated by `---`, Mermaid blocks inside their slide.
+
+If the user requests speaker notes: add a **Speaker Notes** section under each slide (3–6 sentences), without changing slide content.
+
+Goal: presentation-ready deck for tools that support Markdown and Mermaid.

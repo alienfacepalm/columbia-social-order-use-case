@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Build
+dist/
+
+# Env and local overrides
+.env
+.env.*
+!.env.example
+*.local
+
+# Editor and OS
+.DS_Store
+*.log
+.cache/
+
+# pnpm
+.pnpm-store/

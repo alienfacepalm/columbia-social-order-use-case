@@ -1,0 +1,18 @@
+---
+description: Generate Mermaid diagrams from text descriptions
+globs: "**/*.md,**/*.mdc"
+alwaysApply: false
+---
+
+# Mermaid diagrams
+
+When the user asks to generate a diagram (e.g. "generate mermaid", "create diagram", "diagram this"):
+
+1. Interpret the description and pick the right type: `flowchart` (pipelines, components), `sequenceDiagram` (interactions), `classDiagram` (schemas), `stateDiagram` (lifecycle), `erDiagram` (relational).
+2. Keep diagrams **minimal, readable, technically accurate**. Clear node names, no invented components.
+3. If the user already provided a `mermaid` block, do not modify it; only generate a new one if asked.
+4. Output: single `mermaid` code block; no extra commentary unless requested.
+
+**Style:** Short labels (e.g. "API", "Worker", "Queue"), consistent naming, subgraphs for grouping. Optional: `:::note`, directional emphasis (`-->`, `-.->`, `==>`).
+
+Goal: fast, accurate Mermaid for slide decks and architecture docs.

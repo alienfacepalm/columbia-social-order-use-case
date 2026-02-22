@@ -1,0 +1,39 @@
+---
+description: Kebab-case filenames, TypeScript, React and architecture best practices
+alwaysApply: true
+---
+
+# Code standards
+
+Apply to all file creation, scaffolding, refactoring, and code generation.
+
+## Filename rules (mandatory)
+
+- **Always use kebab-case** for files and directories: `user-profile.ts`, `order-service.ts`, `components/order-status/`.
+- **Never:** camelCase, PascalCase, snake_case, spaces. Convert to kebab-case automatically when the user uses another style.
+- Directories: `services/social-orders/`, `clients/rithum-api/`.
+
+## TypeScript rules (mandatory)
+
+- Always generate `.ts` or `.tsx`; never `.js` unless explicitly requested.
+- Use `interface`, explicit return types, `readonly` where appropriate; avoid `any` and implicit any.
+
+## React best practices
+
+- Use `.tsx`, functional components, named exports. Keep components under 150 lines.
+- Move logic to `hooks/`, `services/`, `clients/`. Use `useEffect`, `useCallback`, `useMemo` appropriately.
+
+## Architecture
+
+- **Structure:** `components/`, `hooks/`, `models/`, `services/`, `clients/`, `mappers/`, `utils/`, `styles/`, `pages/`, `config/` (all kebab-case).
+- Clean architecture: dependency injection, pure functions, separation of concerns, typed errors. Never mix domain logic with UI or hard-code env vars.
+
+## API / service code
+
+- Use `.ts`, typed request/response models, `async/await`, try/catch with typed errors, config for env vars, retry where appropriate. Names like `rithum-api-client.ts`, `sfcc-cartridge-adapter.ts`.
+
+## Examples
+
+- "Create UserProfile.tsx" → `user-profile.tsx`
+- "Add SocialOrderClient" → `social-order-client.ts`
+- "Create mapper for TikTok orders" → `tiktok-order-mapper.ts`
