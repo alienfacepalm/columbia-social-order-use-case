@@ -52,7 +52,7 @@ export function App(): ReactElement {
             <div className="flex flex-shrink-0 flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-2 py-2 pt-3 sm:py-3 sm:pt-4">
               <div className="flex flex-col items-start gap-0.5 sm:gap-1">
                 <img
-                  src="/logo.png"
+                  src="/columbia.png"
                   alt="Columbia Sportswear"
                   className="block h-12 w-auto sm:h-14 md:h-[6.67rem] m-0 ml-2 sm:ml-4 md:ml-[70px] align-middle brightness-0 invert"
                   width={320}
@@ -72,8 +72,8 @@ export function App(): ReactElement {
                   rel="noopener noreferrer"
                   className="text-[0.65rem] sm:text-xs font-normal leading-tight text-[#66a5e8] hover:text-[#99c4f0] underline break-all"
                 >
-                  <span className="hidden sm:inline">github.com/alienfacepalm/columbia-social-order-use-case</span>
-                  <span className="sm:hidden">GitHub repo</span>
+                  <span className="hidden sm:inline">GitHub</span>
+                  <span className="sm:hidden">GitHub</span>
                 </a>
               </div>
             </div>

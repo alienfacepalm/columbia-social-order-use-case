@@ -24,3 +24,9 @@ Edit `presentation.md` and save; the dev server will hot-reload. Slide boundarie
 ### Static assets
 
 Put logos, favicons, and other static files in **`public/`**. They are served at the site root (e.g. `public/columbia-logo.svg` → `/columbia-logo.svg`). The title slide shows the Columbia Sportswear logo from `public/columbia-logo.svg`; replace that file with the official logo if desired.
+
+### Publishing to GitHub Pages
+
+The site is built and deployed as a **GitHub Pages static site** via the workflow in **`.github/workflows/deploy-pages.yml`**. On push to `main` or `master`, it installs dependencies, runs `pnpm build`, and deploys the `dist/` output to GitHub Pages.
+
+**One-time setup:** In the repo on GitHub go to **Settings → Pages**, set **Source** to **GitHub Actions**, then push to `main`. The site will be at **`https://<owner>.github.io/<repo>/`** (e.g. `https://alienfacepalm.github.io/echodyne-presentation/`).

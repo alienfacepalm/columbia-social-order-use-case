@@ -68,7 +68,7 @@ flowchart LR
 **Functional Requirements**
 
 - Ingest TikTok Shop orders via **Rithum posting to Social-Order Adapter webhook endpoints**
-- Normalize into **canonical formats** for SFCC/SFOMS, **EOS (Enterprise Order Service)**, and SAP — **SFCC** and **SFOMS** are two systems in the same suite that work together; they pass orders into **EOS**, which orchestrates lifecycle (New → Authorized → Confirmed → Shipped → Fulfilled) and sends to SAP
+- Normalize into **canonical formats** for SFCC/SFOMS, **EOS (Enterprise Order Service — Columbia’s order API)**, and SAP — **SFCC** and **SFOMS** are two systems in the same suite that work together; they pass orders into **EOS**, which orchestrates lifecycle (New → Authorized → Confirmed → Shipped → Fulfilled) and sends to SAP
 - Maintain **order provenance** end‑to‑end
 - Support **bidirectional** status updates
 - Authenticate via **APIM**
@@ -139,7 +139,7 @@ flowchart LR
         CM --> CART["SFCC Cartridge"]
         CART --> SFCC["SFCC"]
         CART --> SFOMS["SFOMS"]
-        SFCC --> EOS["EOS (Enterprise Order Service)"]
+        SFCC --> EOS["EOS (Columbia’s Enterprise Order Service API)"]
         SFOMS --> EOS
         EOS --> SAP["SAP"]
     end
@@ -205,7 +205,7 @@ flowchart LR
 ## Slide 8 — Data Model: Provenance & Canonical Mapping (RADIO: D)
 
 - **Canonical schema** — Core entities (order, line items, status) normalized for SFCC, SFOMS, **EOS**, and SAP; isolates upstream (TikTok/Rithum) volatility.
-- **Provenance chain** — End-to-end ownership and audit: TikTok → Rithum → Azure → SFCC/SFOMS → **EOS (Enterprise Order Service)** → SAP.
+- **Provenance chain** — End-to-end ownership and audit: TikTok → Rithum → Azure → SFCC/SFOMS → **EOS (Columbia’s Enterprise Order Service API)** → SAP.
 - **Structured logging** (dot‑chaining from `LogEventNames.OrderFlow`, e.g. `order.flow.*`):
   - `order.flow.webhook.paymentcleared.received`
   - `order.flow.sfcc.create.request`
@@ -218,7 +218,9 @@ flowchart LR
     TT["TikTok"] --> R["Rithum"]
     R --> AZ["Azure"]
     AZ --> SFCC["SFCC"]
+    AZ --> SFOMS["SFOMS"]
     SFCC --> EOS["EOS"]
+    SFOMS --> EOS
     EOS --> SAP["SAP"]
 ```
 
@@ -234,10 +236,10 @@ flowchart LR
 - Rithum posts to **Social-Order Adapter** webhook endpoints
 - APIM authenticates + applies policies
 - Adapter validates + normalizes → **Azure Service Bus**
-- **Canonical mapping** → SFCC Cartridge creates orders in **SFCC**
-- **EOS (Enterprise Order Service)** receives the order from SFCC, orchestrates lifecycle (New → Authorized → Confirmed → Shipped → Fulfilled), and sends to **SAP** for fulfillment
+- **Canonical mapping** → SFCC Cartridge creates orders in **SFCC**; **SFCC** and **SFOMS** (same suite, two systems working together) pass orders into **EOS**
+- **EOS (Columbia’s Enterprise Order Service API)** receives orders from SFCC/SFOMS, orchestrates lifecycle (New → Authorized → Confirmed → Shipped → Fulfilled), and sends to **SAP** for fulfillment
 
-**Key interfaces:** Rithum webhook (POST, order payload) → Adapter; Adapter → Service Bus (message contract); Cartridge API (order create request/response); SFCC → EOS → SAP (order lifecycle).
+**Key interfaces:** Rithum webhook (POST, order payload) → Adapter; Adapter → Service Bus (message contract); Cartridge API (order create request/response); SFCC/SFOMS → EOS → SAP (order lifecycle).
 
 ```mermaid
 flowchart TB
@@ -247,7 +249,9 @@ flowchart TB
     SB --> CM["Canonical Mapping"]
     CM --> CART["SFCC Cartridge"]
     CART --> SFCC["SFCC"]
+    CART --> SFOMS["SFOMS"]
     SFCC --> EOS["EOS"]
+    SFOMS --> EOS
     EOS --> SAP["SAP"]
 ```
 
@@ -308,9 +312,9 @@ flowchart LR
 
 **Scaling** — Azure Functions auto-scale with webhook and Service Bus load; Service Bus buffers bursty TikTok traffic so we don’t over-provision or drop messages.
 
-**Data synchronization** — Bidirectional flow: Rithum → adapter → SFCC → EOS → SAP (orders) and EOS/SAP (lifecycle events) → Service Bus → adapter → Rithum (status). Canonical mapping and idempotent order creation keep systems in sync; EOS is the order-lifecycle authority between SFCC and SAP; provenance chain supports reconciliation.
+**Data synchronization** — Bidirectional flow: Rithum → adapter → SFCC/SFOMS → EOS → SAP (orders) and EOS/SAP (lifecycle events) → Service Bus → adapter → Rithum (status). Canonical mapping and idempotent order creation keep systems in sync; SFCC and SFOMS (same suite) pass orders into EOS; EOS is the order-lifecycle authority into SAP; provenance chain supports reconciliation.
 
-**Security** — APIM as single secure boundary; auth and policy at the edge; no raw TikTok credentials in our stack; least-privilege for adapter → Rithum and SFCC.
+**Security** — APIM as single secure boundary; auth and policy at the edge; no raw TikTok credentials in our stack; least-privilege for adapter → Rithum and SFCC/SFOMS.
 
 **Fault tolerance** — Retry + exponential backoff; dead-letter queues for failed messages; idempotent order creation to avoid duplicates; health checks and circuit breakers; stateless functions so failures don’t leave bad in-memory state.
 
@@ -344,8 +348,8 @@ flowchart LR
 - **APIs** — Versioned Rithum webhook and Rithum API contracts; SFCC cartridge API; clear request/response and error contracts.
 - **Version control & reproducibility** — Cartridge and adapter in Git; ADRs for major decisions; release tags and deployment automation.
 - **Data consistency** — Canonical mapping, idempotent order creation, and provenance chain so we can reconcile and debug across systems.
-- **Observability** — Unified logs (Loki), Grafana dashboards, structured logging; correlation IDs across Rithum → Azure → SFCC → EOS → SAP.
-- **External systems** — Rithum (orders, status), TikTok (source of truth for shop), SFCC (order creation), **EOS (Enterprise Order Service, order lifecycle and status)**, SAP (fulfillment). No file storage or push notifications in this flow; order/status flow only.
+- **Observability** — Unified logs (Loki), Grafana dashboards, structured logging; correlation IDs across Rithum → Azure → SFCC/SFOMS → EOS → SAP.
+- **External systems** — Rithum (orders, status), TikTok (source of truth for shop), **SFCC and SFOMS** (same suite, two systems; order creation and handoff), **EOS (Columbia’s Enterprise Order Service API, order lifecycle and status)**, SAP (fulfillment). No file storage or push notifications in this flow; order/status flow only.
 
 <!-- STAR: A — Cross-functional integration per prompt -->
 <!-- Pacing: 3 minutes -->
@@ -356,7 +360,7 @@ flowchart LR
 
 - **Guiding design decisions** — Led choice of Rithum over direct TikTok integration; drove canonical schema and single adapter for both downstream and upstream flows.
 - **Managing trade-offs** — Documented ADRs (e.g. Rithum vs direct); balanced latency vs consistency and observability cost vs depth with stakeholders.
-- **Leading implementation** — Owned adapter and cartridge design; coordinated with commerce, SAP, SFCC, and Rithum teams on contracts and rollout.
+- **Leading implementation** — Owned adapter and cartridge design; coordinated with commerce, SAP, SFCC/SFOMS, and Rithum teams on contracts and rollout.
 - **Delivery approach** — Iterative delivery with clear milestones; canary deployments and rollback so we could ship without blocking fulfillment.
 
 <!-- STAR: A — Team leadership and delivery per prompt -->
@@ -400,7 +404,7 @@ flowchart LR
 ## Slide 17 — Impact & Reflections (Result)
 
 - **Technical impact** — Reliable, scalable adapter pipeline; full order provenance TikTok → SAP → TikTok; faster debugging via Loki; reduced operational overhead.
-- **Organizational impact** — New social channels (e.g. Instagram) can be added with minimal work; clearer ownership between Columbia, Rithum, and SFCC/SAP.
+- **Organizational impact** — New social channels (e.g. Instagram) can be added with minimal work; clearer ownership between Columbia, Rithum, SFCC/SFOMS, and SAP.
 - **Reflections** — Canonical schema and one adapter paid off for maintainability; investing in observability early made incidents and contract issues easier to diagnose.
 
 <!-- STAR: R — Technical and organizational impact; reflections -->

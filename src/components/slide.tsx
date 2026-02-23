@@ -58,8 +58,8 @@ export function Slide({ slide, slideIndex }: SlideProps): ReactElement {
   if (isTitleSlide) {
     const headingNodes = slide.content.filter((n): n is typeof n & { type: 'heading' } => n.type === 'heading')
     return (
-      <section className="relative flex flex-1 w-full min-h-0 overflow-hidden px-4 sm:px-8 py-6 sm:py-12 rounded-xl flex-col items-center justify-center max-w-4xl gap-0">
-        <div className="relative z-10 flex flex-shrink-0 flex-col items-center text-center">
+      <section className="relative flex flex-1 w-full min-h-0 overflow-hidden px-4 sm:px-8 py-6 sm:py-12 rounded-xl flex-col sm:flex-row items-center sm:items-center justify-center gap-6 sm:gap-10 md:gap-12 max-w-5xl">
+        <div className="relative z-10 flex flex-shrink-0 flex-col items-center sm:items-start text-center sm:text-left min-w-0 flex-1">
           <h1 className="slide-title-h1 text-3xl sm:text-4xl md:text-5xl font-semibold tracking-wide text-white m-0 mb-2 sm:mb-3">
             {slide.title}
           </h1>
@@ -91,7 +91,7 @@ export function Slide({ slide, slideIndex }: SlideProps): ReactElement {
         <img
           src="/title.png"
           alt="Presentation title"
-          className="relative z-0 block w-full max-w-2xl flex-shrink-0 object-contain max-h-[50vh] sm:max-h-[65vh] scale-[0.81]"
+          className="relative z-0 block flex-shrink-0 object-contain w-full max-w-[280px] sm:max-w-[320px] md:max-w-[380px] max-h-[40vh] sm:max-h-[65vh]"
         />
       </section>
     )
