@@ -3,6 +3,12 @@ import { createPortal } from 'react-dom'
 import type { ReactElement } from 'react'
 import mermaid from 'mermaid'
 
+import type {
+  IMermaidSlideProps,
+  IDragState,
+  IMermaidDiagramControlsProps,
+  IMermaidFullscreenOverlayProps,
+} from '../../typings/mermaid'
 import { useMermaidRender } from '../hooks/use-mermaid-render'
 import { FullscreenIcon, ZoomInIcon, ZoomOutIcon } from './mermaid-slide-icons'
 
@@ -26,30 +32,9 @@ mermaid.initialize({
   },
 })
 
-export interface IMermaidSlideProps {
-  readonly code: string
-  readonly id: string
-  readonly fullSize?: boolean
-  readonly constrainHeight?: boolean
-}
-
 const ZOOM_MIN = 50
 const ZOOM_MAX = 250
 const ZOOM_STEP = 25
-
-interface IDragState {
-  readonly startX: number
-  readonly startY: number
-  readonly startScrollLeft: number
-  readonly startScrollTop: number
-}
-
-interface IMermaidDiagramControlsProps {
-  readonly hasSvg: boolean
-  readonly zoom: number
-  readonly setZoom: (fn: (z: number) => number) => void
-  readonly onFullscreen: () => void
-}
 
 function MermaidDiagramControls({
   hasSvg,
@@ -88,14 +73,6 @@ function MermaidDiagramControls({
       </button>
     </div>
   )
-}
-
-interface IMermaidFullscreenOverlayProps {
-  readonly svg: string
-  readonly diagramSize: { width: number; height: number } | null
-  readonly fullscreenScale: number
-  readonly fullscreenWrapRef: React.RefObject<HTMLDivElement>
-  readonly onClose: () => void
 }
 
 function MermaidFullscreenOverlay({

@@ -1,12 +1,8 @@
 import type { ReactElement } from 'react'
 import { createPortal } from 'react-dom'
 
+import type { ISpeakerTimerProps } from '../../typings/speaker-timer'
 import { useSpeakerTimer } from '../hooks/use-speaker-timer'
-
-export interface ISpeakerTimerProps {
-  readonly durationSeconds: number
-  readonly slideIndex: number
-}
 
 function formatTime(seconds: number): string {
   const m = Math.floor(seconds / 60)

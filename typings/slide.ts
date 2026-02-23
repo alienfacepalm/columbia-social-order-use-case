@@ -21,3 +21,25 @@ export interface ISlide {
   /** Speaker timer: seconds to spend on this slide (from Pacing comments or default). */
   readonly durationSeconds: number
 }
+
+export interface ISlideProps {
+  readonly slide: ISlide
+  readonly slideIndex: number
+}
+
+export interface ISlideNodeProps {
+  readonly node: TSlideContentNode
+  readonly slideIndex: number
+  readonly nodeIndex: number
+  readonly fullSizeDiagram: boolean
+  readonly constrainDiagramHeight: boolean
+}
+
+export interface ISlideNavProps {
+  readonly slides: readonly ISlide[]
+  readonly currentIndex: number
+  readonly onPrevious: () => void
+  readonly onNext: () => void
+  readonly onGoTo: (index: number) => void
+  readonly isMobile: boolean
+}

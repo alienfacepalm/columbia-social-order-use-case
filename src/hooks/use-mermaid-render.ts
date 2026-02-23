@@ -2,25 +2,9 @@ import type { Dispatch, SetStateAction } from 'react'
 import { useLayoutEffect, useId, useRef, useState } from 'react'
 import mermaid from 'mermaid'
 
+import type { IDiagramSize, IMermaidRenderResult, IUseMermaidRenderReturn } from '../../typings/mermaid'
+
 const renderIdRef = { current: 0 }
-
-export interface IMermaidRenderResult {
-  readonly svg: string
-  readonly bindFunctions: ((element: Element) => void) | undefined
-}
-
-export interface IDiagramSize {
-  readonly width: number
-  readonly height: number
-}
-
-export interface IUseMermaidRenderReturn {
-  readonly result: IMermaidRenderResult | null
-  readonly error: string | null
-  readonly svgRef: React.RefObject<HTMLDivElement>
-  readonly diagramSize: IDiagramSize | null
-  readonly setDiagramSize: Dispatch<SetStateAction<IDiagramSize | null>>
-}
 
 function measureSvgFromRef(svgRef: React.RefObject<HTMLDivElement>): IDiagramSize | null {
   const svg = svgRef.current?.querySelector('svg')

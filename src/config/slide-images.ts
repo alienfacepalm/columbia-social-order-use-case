@@ -1,12 +1,4 @@
-/** Size variant so illustrations vary without breaking layout. All fit in same reserved space. */
-export type TSlideImageSize = 's' | 'm' | 'l'
-
-/** Per-slide illustration config: path, alt, and size. Position alternates in Slide component. */
-export interface ISlideImageConfig {
-  readonly src: string
-  readonly alt: string
-  readonly size: TSlideImageSize
-}
+import type { ISlideImageConfig, TSlideImageSize } from '../../typings/slide-images'
 
 /** Only non-diagram slides get an image. Order matches slide indices: 1, 3, 12, 13, 15, 16. */
 const SLIDE_IMAGES: readonly ISlideImageConfig[] = [

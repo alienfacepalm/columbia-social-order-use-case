@@ -1,18 +1,14 @@
 import type { ReactElement } from 'react'
 import { useMemo } from 'react'
 
-import type { ISlide, TSlideContentNode } from '../models/slide'
+import type { ISlideProps } from '../../typings/slide'
+import type { TSlideContentNode } from '../models/slide'
 import { assetUrl } from '../config/app'
 import { getSlideImage, getSlideImagePosition, IMAGE_SIZE_PX } from '../config/slide-images'
 import { usePresentationMode } from '../contexts/presentation-mode-context'
 import { SlideNode } from './slide-node'
 import { parseInline } from '../utils/parse-presentation'
 import { renderInline } from '../utils/render-inline'
-
-export interface ISlideProps {
-  readonly slide: ISlide
-  readonly slideIndex: number
-}
 
 function hasDiagram(content: readonly TSlideContentNode[]): boolean {
   return content.some((node) => node.type === 'mermaid')

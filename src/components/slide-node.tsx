@@ -1,16 +1,9 @@
 import type { ReactElement } from 'react'
 
+import type { ISlideNodeProps } from '../../typings/slide'
 import type { TSlideContentNode } from '../models/slide'
 import { renderInline } from '../utils/render-inline'
 import { MermaidSlide } from './mermaid-slide'
-
-export interface ISlideNodeProps {
-  readonly node: TSlideContentNode
-  readonly slideIndex: number
-  readonly nodeIndex: number
-  readonly fullSizeDiagram: boolean
-  readonly constrainDiagramHeight: boolean
-}
 
 export function SlideNode({
   node,

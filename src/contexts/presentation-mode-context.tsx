@@ -1,8 +1,11 @@
-import type { ReactNode } from 'react'
 import { createContext, useCallback, useContext, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 
-export type TPresentationMode = 'simple' | 'advanced'
+import type {
+  TPresentationMode,
+  IPresentationModeContextValue,
+  IPresentationModeProviderProps,
+} from '../../typings/presentation-mode'
 
 const STORAGE_KEY = 'echodyne-presentation-mode'
 
@@ -17,13 +20,6 @@ function getStoredMode(): TPresentationMode {
   return 'advanced'
 }
 
-interface IPresentationModeContextValue {
-  mode: TPresentationMode
-  setMode: (mode: TPresentationMode) => void
-  toggle: () => void
-  isSimple: boolean
-}
-
 const PresentationModeContext = createContext<IPresentationModeContextValue | null>(null)
 
 export function usePresentationMode(): IPresentationModeContextValue {
@@ -34,11 +30,9 @@ export function usePresentationMode(): IPresentationModeContextValue {
   return value
 }
 
-interface IPresentationModeProviderProps {
-  children: ReactNode
-}
-
-export function PresentationModeProvider({ children }: IPresentationModeProviderProps): ReactNode {
+export function PresentationModeProvider({
+  children,
+}: IPresentationModeProviderProps): React.ReactNode {
   const { mode: paramMode, slideNum } = useParams<{ mode: string; slideNum?: string }>()
   const navigate = useNavigate()
 

@@ -1,17 +1,7 @@
 import { useCallback, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 
-export interface IUseSlideNavOptions {
-  readonly total: number
-}
-
-export interface IUseSlideNavReturn {
-  readonly index: number
-  readonly go: (delta: number) => void
-  readonly goTo: (slideIndex: number) => void
-  readonly goToStart: () => void
-  readonly goToEnd: () => void
-}
+import type { IUseSlideNavOptions, IUseSlideNavReturn } from '../../typings/slide-nav'
 
 function parseSlideIndex(slideNum: string | undefined, total: number): number {
   if (slideNum == null || slideNum === '') return 0

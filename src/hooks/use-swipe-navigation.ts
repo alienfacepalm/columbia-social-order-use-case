@@ -1,16 +1,10 @@
 import { useRef, useCallback } from 'react'
 
+import type {
+  IUseSwipeNavigationOptions,
+  IUseSwipeNavigationReturn,
+} from '../../typings/swipe-navigation'
 import { SWIPE_THRESHOLD_PX } from '../config/app'
-
-export interface IUseSwipeNavigationOptions {
-  readonly onSwipeLeft: () => void
-  readonly onSwipeRight: () => void
-}
-
-export interface IUseSwipeNavigationReturn {
-  readonly onTouchStart: (e: React.TouchEvent) => void
-  readonly onTouchEnd: (e: React.TouchEvent) => void
-}
 
 /**
  * Handles touch swipe left/right and invokes callbacks when threshold is exceeded.

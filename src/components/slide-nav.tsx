@@ -1,20 +1,12 @@
 import type { ReactElement } from 'react'
 
+import type { ISlideNavProps } from '../../typings/slide'
 import type { ISlide } from '../models/slide'
-import { truncateTitle } from '../utils/truncate-title'
 import { MOBILE_TITLE_MAX_LENGTH } from '../config/app'
+import { truncateTitle } from '../utils/truncate-title'
 
 const NAV_BUTTON_CLASS =
   'flex min-h-[44px] min-w-[44px] h-11 w-11 sm:h-10 sm:w-10 items-center justify-center rounded-md border border-[#66a5e8] bg-[rgba(43,65,106,0.8)] text-2xl leading-none text-white cursor-pointer hover:bg-[#3385e2] hover:border-[#66a5e8] disabled:opacity-40 disabled:cursor-not-allowed touch-manipulation'
-
-export interface ISlideNavProps {
-  readonly slides: readonly ISlide[]
-  readonly currentIndex: number
-  readonly onPrevious: () => void
-  readonly onNext: () => void
-  readonly onGoTo: (index: number) => void
-  readonly isMobile: boolean
-}
 
 export function SlideNav({
   slides,
