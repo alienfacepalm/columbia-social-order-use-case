@@ -14,13 +14,13 @@ export function parsePresentation(raw: string): ISlide[] {
     const block = blocks[i]
     const lines = block.split('\n')
 
-    let durationSeconds = 75
+    let durationSeconds = 60
     const pacingMatch = block.match(pacingRegex)
     if (pacingMatch) {
       const low = parseInt(pacingMatch[1], 10)
       const high = pacingMatch[2] ? parseInt(pacingMatch[2], 10) : low
       const minutes = Math.max(low, high)
-      durationSeconds = Math.round(minutes * 1.25 * 60)
+      durationSeconds = minutes * 60
     }
 
     let title = ''
@@ -62,6 +62,21 @@ export function parsePresentation(raw: string): ISlide[] {
   }
 
   return slides
+}
+
+/**
+ * Merges advanced slides with simple-version slides by index.
+ * Each advanced slide gets contentSimple from the corresponding simple slide when available.
+ */
+export function mergePresentationWithSimple(
+  advanced: ISlide[],
+  simple: ISlide[],
+): ISlide[] {
+  return advanced.map((slide, i) => {
+    const simpleSlide = simple[i]
+    const contentSimple = simpleSlide ? simpleSlide.content : undefined
+    return contentSimple ? { ...slide, contentSimple } : slide
+  })
 }
 
 function parseBody(body: string, mermaidCharts: readonly string[]): TSlideContentNode[] {

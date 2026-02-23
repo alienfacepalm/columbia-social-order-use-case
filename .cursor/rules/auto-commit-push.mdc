@@ -1,0 +1,23 @@
+---
+description: Auto-commit-push script must run unit tests; push only if they pass
+alwaysApply: true
+---
+
+# Auto-commit-push script
+
+The **auto-commit-push** script (`scripts/auto-commit-push.sh`, `pnpm auto-save` / `pnpm auto-save:watch`) must:
+
+1. **Run unit tests** with `pnpm test` before committing or pushing.
+2. **Require tests to pass** — if `pnpm test` fails, the script must not commit or push; it must exit with a non-zero status and report the failure.
+
+## Behavior
+
+- Run `pnpm test` before any `git add` / `git commit` / `git push`.
+- If tests fail: do not stage, commit, or push; print a clear message and exit with failure.
+- If tests pass: proceed with the existing logic (check for changes, then commit and push if there are changes).
+
+## When editing the script
+
+- Never remove or bypass the test step.
+- Keep the test command as `pnpm test` (project uses pnpm and Vitest).
+- Preserve this behavior for both one-shot and watch (interval) modes.

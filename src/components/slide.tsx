@@ -1,8 +1,10 @@
 import type { ReactElement } from 'react'
+import { useMemo } from 'react'
 
-import type { ISlide } from '../models/slide'
+import type { ISlide, TSlideContentNode } from '../models/slide'
 import { assetUrl } from '../config/app'
 import { getSlideImage, getSlideImagePosition, IMAGE_SIZE_PX } from '../config/slide-images'
+import { usePresentationMode } from '../contexts/presentation-mode-context'
 import { SlideNode } from './slide-node'
 import { parseInline } from '../utils/parse-presentation'
 import { renderInline } from '../utils/render-inline'
@@ -12,20 +14,28 @@ export interface ISlideProps {
   readonly slideIndex: number
 }
 
-function hasDiagram(slide: ISlide): boolean {
-  return slide.content.some((node) => node.type === 'mermaid')
+function hasDiagram(content: readonly TSlideContentNode[]): boolean {
+  return content.some((node) => node.type === 'mermaid')
 }
 
 /** Use full-size diagram only when slide has no list (diagram-only or diagram + short text). */
-function getFullSizeDiagram(slide: ISlide): boolean {
-  return hasDiagram(slide) && !slide.content.some((node) => node.type === 'ul')
+function getFullSizeDiagram(content: readonly TSlideContentNode[]): boolean {
+  return hasDiagram(content) && !content.some((node) => node.type === 'ul')
 }
 
 export function Slide({ slide, slideIndex }: ISlideProps): ReactElement {
-  const isDiagramSlide = hasDiagram(slide)
+  const { isSimple } = usePresentationMode()
+  const content: readonly TSlideContentNode[] = useMemo(
+    () =>
+      isSimple && slide.contentSimple && slide.contentSimple.length > 0
+        ? slide.contentSimple
+        : slide.content,
+    [isSimple, slide.content, slide.contentSimple],
+  )
+  const isDiagramSlide = hasDiagram(content)
   const imageConfig = getSlideImage(slideIndex, isDiagramSlide)
   const imagePosition = getSlideImagePosition(slideIndex)
-  const fullSizeDiagram = getFullSizeDiagram(slide)
+  const fullSizeDiagram = getFullSizeDiagram(content)
   const isTitleSlide = slideIndex === 0
 
   if (isTitleSlide) {
@@ -99,7 +109,7 @@ export function Slide({ slide, slideIndex }: ISlideProps): ReactElement {
               : 'flex-1 min-w-0'
           }
         >
-          {slide.content.map((node, i) => (
+          {content.map((node, i) => (
             <SlideNode
               key={i}
               node={node}

@@ -8,6 +8,11 @@ set -e
 cd "$(dirname "$0")/.."
 
 do_commit_push() {
+  echo "[$(date '+%H:%M:%S')] Running unit tests..."
+  if ! pnpm test; then
+    echo "[$(date '+%H:%M:%S')] Unit tests failed. Aborting commit/push."
+    exit 1
+  fi
   if [[ -n "$(git status --porcelain)" ]]; then
     git add .
     git commit -m "Auto-save: $(date '+%Y-%m-%d %H:%M:%S')"

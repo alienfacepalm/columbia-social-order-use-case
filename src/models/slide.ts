@@ -15,6 +15,8 @@ export type TSlideContentNode =
 export interface ISlide {
   readonly title: string
   readonly content: readonly TSlideContentNode[]
+  /** Simplified content for "simple" mode; when set, used when mode is simple. */
+  readonly contentSimple?: readonly TSlideContentNode[]
   readonly index: number
   /** Speaker timer: seconds to spend on this slide (from Pacing comments or default). */
   readonly durationSeconds: number

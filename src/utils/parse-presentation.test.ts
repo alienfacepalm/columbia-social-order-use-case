@@ -135,8 +135,7 @@ Content here.
 <!-- Pacing: 2 minutes -->`
     const slides = parsePresentation(raw)
     expect(slides).toHaveLength(1)
-    // 2 minutes * 1.25 buffer = 2.5 minutes
-    expect(slides[0].durationSeconds).toBe(150)
+    expect(slides[0].durationSeconds).toBe(120)
   })
 
   it('uses upper bound for Pacing range (e.g. 2–3 minutes)', () => {
@@ -145,8 +144,7 @@ Body
 <!-- Pacing: 2–3 minutes -->`
     const slides = parsePresentation(raw)
     expect(slides).toHaveLength(1)
-    // Upper bound 3 minutes * 1.25 buffer = 3.75 minutes, rounded to nearest second
-    expect(slides[0].durationSeconds).toBe(225)
+    expect(slides[0].durationSeconds).toBe(180)
   })
 
   it('defaults durationSeconds to 60 when no Pacing comment', () => {
@@ -154,7 +152,6 @@ Body
 Body`
     const slides = parsePresentation(raw)
     expect(slides).toHaveLength(1)
-    // Default base 1 minute * 1.25 buffer = 1.25 minutes
-    expect(slides[0].durationSeconds).toBe(75)
+    expect(slides[0].durationSeconds).toBe(60)
   })
 })

@@ -5,13 +5,18 @@ import { Slide } from './slide'
 import { PresentationHeader } from './presentation-header'
 import { SlideNav } from './slide-nav'
 import { SpeakerTimer } from './speaker-timer'
+import { PresentationModeProvider } from '../contexts/presentation-mode-context'
 import { useSlideNav } from '../hooks/use-slide-nav'
 import { useMediaQuery } from '../hooks/use-media-query'
 import { useSwipeNavigation } from '../hooks/use-swipe-navigation'
-import { parsePresentation } from '../utils/parse-presentation'
+import { parsePresentation, mergePresentationWithSimple } from '../utils/parse-presentation'
 import presentationRaw from '../../presentation.md?raw'
+import presentationSimpleRaw from '../../presentation-simple.md?raw'
 
-const slides = parsePresentation(presentationRaw)
+const slides = mergePresentationWithSimple(
+  parsePresentation(presentationRaw),
+  parsePresentation(presentationSimpleRaw),
+)
 
 export function App(): ReactElement {
   const { index, go, goTo } = useSlideNav({ total: slides.length })
@@ -23,6 +28,7 @@ export function App(): ReactElement {
   })
 
   return (
+    <PresentationModeProvider>
     <div
       className="flex h-full w-full max-w-full min-w-0 flex-col bg-[linear-gradient(135deg,#1d3356_0%,#1d3356_45%,#3385e2_100%)] text-white overflow-x-hidden overflow-y-hidden"
     >
@@ -59,5 +65,6 @@ export function App(): ReactElement {
         isMobile={isMobile}
       />
     </div>
+    </PresentationModeProvider>
   )
 }
