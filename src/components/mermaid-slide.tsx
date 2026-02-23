@@ -209,24 +209,16 @@ export function MermaidSlide({ code, id, fullSize = false }: MermaidSlideProps):
     result?.svg != null ? (
       <div
         ref={ref}
-        className={
-          fullSize
-            ? 'inline-flex flex-shrink-0 items-center justify-center [&_svg]:block [&_svg]:min-h-[280px]'
-            : 'flex items-center justify-center [&_svg]:max-w-full [&_svg]:max-h-full [&_svg]:h-auto [&_svg]:w-auto [&_svg]:min-h-[280px]'
-        }
-        style={
-          fullSize
-            ? {
-                zoom: zoom / 100,
-                ...(diagramSize && {
-                  width: diagramSize.width,
-                  height: diagramSize.height,
-                  minWidth: diagramSize.width,
-                  minHeight: diagramSize.height,
-                }),
-              }
-            : undefined
-        }
+        className="inline-flex flex-shrink-0 items-center justify-center [&_svg]:block [&_svg]:min-h-[280px]"
+        style={{
+          zoom: zoom / 100,
+          ...(diagramSize && {
+            width: diagramSize.width,
+            height: diagramSize.height,
+            minWidth: diagramSize.width,
+            minHeight: diagramSize.height,
+          }),
+        }}
         data-mermaid-id={id}
         dangerouslySetInnerHTML={{ __html: result.svg }}
       />
@@ -240,52 +232,65 @@ export function MermaidSlide({ code, id, fullSize = false }: MermaidSlideProps):
       </div>
     )
 
+  const controls = (
+    <div className="flex flex-shrink-0 items-center justify-end gap-1 pb-2">
+      <span className="text-xs text-white/70">Zoom</span>
+      <button
+        type="button"
+        onClick={() => setZoom((z) => Math.max(ZOOM_MIN, z - ZOOM_STEP))}
+        disabled={zoom <= ZOOM_MIN}
+        className="min-w-[2rem] rounded px-1.5 py-0.5 text-sm font-medium border bg-transparent border-white/30 text-white/80 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+        aria-label="Zoom out"
+      >
+        −
+      </button>
+      <span className="min-w-[2.5rem] text-center text-xs text-white/90 tabular-nums">
+        {zoom}%
+      </span>
+      <button
+        type="button"
+        onClick={() => setZoom((z) => Math.min(ZOOM_MAX, z + ZOOM_STEP))}
+        disabled={zoom >= ZOOM_MAX}
+        className="min-w-[2rem] rounded px-1.5 py-0.5 text-sm font-medium border bg-transparent border-white/30 text-white/80 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+        aria-label="Zoom in"
+      >
+        +
+      </button>
+    </div>
+  )
+
+  const diagramContainer = (
+    <div
+      ref={containerRef}
+      className={
+        fullSize
+          ? 'flex-1 min-h-[320px] overflow-auto select-none cursor-grab active:cursor-grabbing'
+          : 'min-h-[320px] overflow-auto select-none cursor-grab active:cursor-grabbing'
+      }
+      style={{ userSelect: isDragging ? 'none' : undefined }}
+      onMouseDown={onContainerMouseDown}
+      onMouseMove={onContainerMouseMove}
+      onMouseUp={handlePanEnd}
+      onMouseLeave={handlePanEnd}
+      onTouchStart={onContainerTouchStart}
+    >
+      {diagramContent}
+    </div>
+  )
+
   if (fullSize) {
     return (
       <div className="flex flex-1 min-h-0 min-w-0 flex-col">
-        <div className="flex flex-shrink-0 items-center justify-end gap-1 pb-2">
-          <span className="text-xs text-white/70">Zoom</span>
-          <button
-            type="button"
-            onClick={() => setZoom((z) => Math.max(ZOOM_MIN, z - ZOOM_STEP))}
-            disabled={zoom <= ZOOM_MIN}
-            className="min-w-[2rem] rounded px-1.5 py-0.5 text-sm font-medium border bg-transparent border-white/30 text-white/80 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-            aria-label="Zoom out"
-          >
-            −
-          </button>
-          <span className="min-w-[2.5rem] text-center text-xs text-white/90 tabular-nums">
-            {zoom}%
-          </span>
-          <button
-            type="button"
-            onClick={() => setZoom((z) => Math.min(ZOOM_MAX, z + ZOOM_STEP))}
-            disabled={zoom >= ZOOM_MAX}
-            className="min-w-[2rem] rounded px-1.5 py-0.5 text-sm font-medium border bg-transparent border-white/30 text-white/80 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-            aria-label="Zoom in"
-          >
-            +
-          </button>
-        </div>
-        <div
-          ref={containerRef}
-          className="flex-1 min-h-[320px] overflow-auto select-none cursor-grab active:cursor-grabbing"
-          style={{ userSelect: isDragging ? 'none' : undefined }}
-          onMouseDown={onContainerMouseDown}
-          onMouseMove={onContainerMouseMove}
-          onMouseUp={handlePanEnd}
-          onMouseLeave={handlePanEnd}
-          onTouchStart={onContainerTouchStart}
-        >
-          {diagramContent}
-        </div>
+        {controls}
+        {diagramContainer}
       </div>
     )
   }
 
   return (
-    <div className="my-4 flex min-h-[280px] items-center justify-center">
-      {diagramContent}
+    <div className="my-4 flex min-h-0 flex-col">
+      {controls}
+      {diagramContainer}
     </div>
   )
 }

@@ -32,6 +32,12 @@ Brandon Pliska — Senior Full Stack Engineer Candidate
 
 Columbia wanted customers to purchase products directly inside [TikTok](copilot-action://composer-send?text=What%20is%20TikTok%20Shop) using their existing [TikTok accounts](copilot-action://composer-send?text=How%20do%20TikTok%20accounts%20work%20for%20commerce), and needed those orders to flow reliably into their [SFCC backend](copilot-action://composer-send?text=Explain%20Salesforce%20Commerce%20Cloud%20order%20flows).
 
+```mermaid
+flowchart LR
+    TT["TikTok Shop"] -->|"Purchase"| Goal["Orders flow"]
+    Goal --> SFCC["Columbia / SFCC"]
+```
+
 ### Objectives
 
 - **[Build a robust ingestion + processing pipeline](copilot-action://composer-send?text=How%20do%20you%20design%20a%20robust%20ingestion%20pipeline%3F)**  
@@ -106,8 +112,6 @@ flowchart LR
         R2["Retries + DLQ"]
         R3["Versioned API"]
     end
-    direct -->|Rejected| X
-    rithum -->|Chosen| Y
 ```
 
 <!-- STAR: T/A -->
@@ -170,6 +174,14 @@ flowchart LR
 - **Service Bus triggers** — Downstream (e.g. SAP/SFOMS) events are published to Service Bus; the same Function App consumes them and calls back to the **Rithum API** so Rithum stays in sync with Columbia’s fulfillment state.
 
 Result: one adapter that ingests from Rithum and pushes status back to Rithum, with automatic scale for both webhook and Service Bus traffic.
+
+```mermaid
+flowchart LR
+    WH["Webhooks"] --> FA["Function App"]
+    SB["Service Bus"] --> FA
+    FA --> Down["Downstream"]
+    FA --> RAPI["Rithum API"]
+```
 
 <!-- STAR: A -->
 <!-- RADIO: I -->
@@ -265,6 +277,14 @@ flowchart LR
 - Grafana dashboards gave a single pane of glass
 - Structured logging enabled provenance queries
 
+```mermaid
+flowchart LR
+    Azure["Azure"] --> Loki["Loki"]
+    SFCC["SFCC"] --> Loki
+    Other["AWS, GCP, etc."] --> Loki
+    Loki --> Grafana["Grafana"]
+```
+
 <!-- STAR: A -->
 <!-- RADIO: O -->
 <!-- Pacing: 3 minutes -->
@@ -278,6 +298,13 @@ flowchart LR
 - Idempotent order creation
 - Health checks + circuit breakers
 - Autoscaling
+
+```mermaid
+flowchart LR
+    Req["Request"] --> Retry["Retry / Backoff"]
+    Retry --> OK["Success"]
+    Retry --> DLQ["DLQ"]
+```
 
 <!-- STAR: A -->
 <!-- RADIO: O -->
@@ -317,6 +344,14 @@ flowchart LR
 - Coupling vs maintainability
 - Observability cost vs depth
 
+```mermaid
+flowchart LR
+    T1["Latency vs accuracy"]
+    T2["Batch vs streaming"]
+    T3["Coupling vs maintainability"]
+    T4["Observability vs depth"]
+```
+
 <!-- STAR: A -->
 <!-- RADIO: Summary -->
 <!-- Pacing: 2 minutes -->
@@ -347,6 +382,15 @@ This work demonstrates:
 - Observability + provenance
 - Cross‑system integration
 - Architectural judgment
+
+```mermaid
+flowchart LR
+    A["End-to-end design"] --> E["Echodyne"]
+    B["Async pipelines"] --> E
+    C["Real-time reliability"] --> E
+    D["Observability"] --> E
+    F["Cross-system integration"] --> E
+```
 
 <!-- STAR: R -->
 <!-- RADIO: Summary -->
