@@ -8,6 +8,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "slide-images:transparent": "node scripts/make-slide-images-transparent.mjs",
+    "slide-images:rembg": ".venv/bin/python scripts/remove-slide-backgrounds.py",
     "auto-save": "./scripts/auto-commit-push.sh",
     "auto-save:watch": "./scripts/auto-commit-push.sh 60"
   },
@@ -23,6 +25,7 @@
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.24",
     "postcss": "^8.5.6",
+    "sharp": "^0.34.5",
     "tailwindcss": "^4.2.0",
     "typescript": "~5.6.3",
     "vite": "^6.0.1"

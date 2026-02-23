@@ -28,7 +28,7 @@ Brandon Pliska — Senior Full Stack Engineer Candidate
 
 ---
 
-## Slide 2 – Problem Framing (Revised)
+## Slide 2 – Problem Framing
 
 Columbia wanted customers to purchase products directly inside [TikTok](copilot-action://composer-send?text=What%20is%20TikTok%20Shop) using their existing [TikTok accounts](copilot-action://composer-send?text=How%20do%20TikTok%20accounts%20work%20for%20commerce), and needed those orders to flow reliably into their [SFCC backend](copilot-action://composer-send?text=Explain%20Salesforce%20Commerce%20Cloud%20order%20flows).
 
@@ -117,6 +117,8 @@ flowchart LR
     SAP --> SB2["Service Bus Upstream"]
     SB2 --> AF2["Function App"]
     AF2 --> RAPI["Rithum API"]
+    RAPI --> TTAPI["TikTok API"]
+    TTAPI --> TTV["User sees updates in TikTok"]
 
     L["Loki"]
     K["KQL"]
