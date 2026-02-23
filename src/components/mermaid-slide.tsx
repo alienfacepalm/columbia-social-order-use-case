@@ -16,6 +16,8 @@ mermaid.initialize({
     primaryBorderColor: '#4a5568',
     lineColor: '#a0aec0',
     fontSize: '18px',
+    /** Edge label boxes (arrow labels) — use palette blue instead of gray */
+    edgeLabelBackground: '#2d4a6f',
   },
   flowchart: {
     nodeSpacing: 70,

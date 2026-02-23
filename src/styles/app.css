@@ -98,3 +98,8 @@
     drop-shadow(0 0 16px rgba(29, 51, 86, 0.7))
     drop-shadow(0 0 28px rgba(29, 51, 86, 0.5));
 }
+
+/* Mermaid flowchart: edge label boxes use palette blue instead of gray */
+.edgeLabel .labelBkg {
+  fill: #2d4a6f !important;
+}
