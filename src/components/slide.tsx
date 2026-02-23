@@ -59,7 +59,7 @@ export function Slide({ slide, slideIndex }: SlideProps): ReactElement {
     return (
       <section className="relative flex flex-1 w-full min-h-0 overflow-auto mt-4 sm:mt-8 px-4 sm:px-8 py-6 sm:py-12 rounded-xl flex-col items-center justify-center max-w-4xl">
         <p className="text-base sm:text-lg md:text-xl font-medium tracking-wide text-white/95 text-center m-0 mb-3 sm:mb-4">
-          Columbia Sportswear: Social-Order Initiative
+          Columbia Sportswear: Social-Order Adapter
         </p>
         <img
           src="/title.png"

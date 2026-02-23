@@ -1,6 +1,6 @@
 # Echodyne Presentation
 
-Technical presentation: **High-Reliability Real-Time System Design** — use case **Columbia Sportswear** (Social-Order Commerce Integration).
+Technical presentation: **High-Reliability Real-Time System Design** — use case **Columbia Sportswear** (Social-Order Adapter — commerce integration).
 
 ## Slides (React SPA)
 

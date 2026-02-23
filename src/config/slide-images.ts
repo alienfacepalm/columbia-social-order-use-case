@@ -9,23 +9,22 @@ export interface SlideImageConfig {
 }
 
 const SLIDE_IMAGES: readonly SlideImageConfig[] = [
-  { src: '/slide-images/slide-0.png', alt: 'High-reliability real-time system', size: 'l' },
   { src: '/slide-images/slide-1.png', alt: 'Title slide', size: 'm' },
   { src: '/slide-images/slide-2.png', alt: 'Problem framing: TikTok and commerce', size: 'l' },
   { src: '/slide-images/slide-3.png', alt: 'Requirements and pipeline', size: 's' },
   { src: '/slide-images/slide-4.png', alt: 'Rithum vs direct integration', size: 'm' },
   { src: '/slide-images/slide-5.png', alt: 'Architecture flow', size: 'l' },
-  { src: '/slide-images/slide-6.png', alt: 'Downstream order creation', size: 'm' },
-  { src: '/slide-images/slide-7.png', alt: 'Upstream status sync', size: 's' },
-  { src: '/slide-images/slide-8.png', alt: 'Data provenance and mapping', size: 'm' },
-  { src: '/slide-images/slide-9.png', alt: 'Observability and dashboards', size: 'l' },
-  { src: '/slide-images/slide-10.png', alt: 'Fault tolerance and reliability', size: 's' },
-  { src: '/slide-images/slide-11.png', alt: 'Deployment and canary', size: 'm' },
-  { src: '/slide-images/slide-12.png', alt: 'Cross-functional collaboration', size: 'l' },
-  { src: '/slide-images/slide-13.png', alt: 'Trade-offs and balance', size: 's' },
-  { src: '/slide-images/slide-14.png', alt: 'Impact and success', size: 'm' },
-  { src: '/slide-images/slide-15.png', alt: 'Echodyne and system design', size: 'l' },
-  { src: '/slide-images/slide-16.png', alt: 'Closing and thank you', size: 'm' },
+  { src: '/slide-images/slide-6.png', alt: 'Azure Function App: Auto-Scaling & Social-Order Adapter', size: 'm' },
+  { src: '/slide-images/slide-7.png', alt: 'Downstream order creation', size: 'm' },
+  { src: '/slide-images/slide-8.png', alt: 'Upstream status sync', size: 's' },
+  { src: '/slide-images/slide-9.png', alt: 'Data provenance and canonical mapping', size: 'm' },
+  { src: '/slide-images/slide-10.png', alt: 'Observability: Grafana, Loki, KQL', size: 'l' },
+  { src: '/slide-images/slide-11.png', alt: 'Fault tolerance and reliability', size: 's' },
+  { src: '/slide-images/slide-12.png', alt: 'Deployment model (Commerce)', size: 'm' },
+  { src: '/slide-images/slide-13.png', alt: 'Cross-functional integration', size: 'l' },
+  { src: '/slide-images/slide-14.png', alt: 'Key trade-offs', size: 's' },
+  { src: '/slide-images/slide-15.png', alt: 'Impact', size: 'm' },
+  { src: '/slide-images/slide-16.png', alt: 'Closing / Thank you', size: 'l' },
 ]
 
 /** Width in px for each size; height scales with object-contain inside fixed container. */
@@ -35,8 +34,10 @@ export const IMAGE_SIZE_PX: Record<SlideImageSize, number> = {
   l: 260,
 } as const
 
+/** Returns image config for slide index 1..16; index 0 (title) has no sidebar image. */
 export function getSlideImage(slideIndex: number): SlideImageConfig | null {
-  return slideIndex >= 0 && slideIndex < SLIDE_IMAGES.length ? SLIDE_IMAGES[slideIndex] ?? null : null
+  if (slideIndex < 1 || slideIndex >= 1 + SLIDE_IMAGES.length) return null
+  return SLIDE_IMAGES[slideIndex - 1] ?? null
 }
 
 /** Even = right, odd = left */

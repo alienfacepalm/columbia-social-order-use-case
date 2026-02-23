@@ -1,4 +1,5 @@
-import { useCallback, useId, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import type { ReactElement } from 'react'
 import mermaid from 'mermaid'
 
@@ -34,6 +35,62 @@ const ZOOM_STEP = 25
 
 const renderIdRef = { current: 0 }
 
+function FullscreenIcon({ className }: { className?: string }): ReactElement {
+  return (
+    <svg
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+    </svg>
+  )
+}
+
+function ZoomOutIcon({ className }: { className?: string }): ReactElement {
+  return (
+    <svg
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <circle cx={11} cy={11} r={8} />
+      <path d="m21 21-4.35-4.35M8 11h6" />
+    </svg>
+  )
+}
+
+function ZoomInIcon({ className }: { className?: string }): ReactElement {
+  return (
+    <svg
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <circle cx={11} cy={11} r={8} />
+      <path d="m21 21-4.35-4.35M11 8v6M8 11h6" />
+    </svg>
+  )
+}
+
 interface DragState {
   startX: number
   startY: number
@@ -47,6 +104,7 @@ export function MermaidSlide({ code, id, fullSize = false }: MermaidSlideProps):
   const dragRef = useRef<DragState | null>(null)
   const uniqueId = useId()
   const [zoom, setZoom] = useState<number>(100)
+  const [isFullscreen, setIsFullscreen] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const [result, setResult] = useState<{
     svg: string
@@ -196,6 +254,19 @@ export function MermaidSlide({ code, id, fullSize = false }: MermaidSlideProps):
     }
   }, [isDragging, handlePanMove, handlePanEnd])
 
+  useEffect(() => {
+    if (!isFullscreen) return
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsFullscreen(false)
+    }
+    document.addEventListener('keydown', onKeyDown)
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      document.body.style.overflow = ''
+    }
+  }, [isFullscreen])
+
   if (error) {
     return (
       <div className="text-[#f85149] text-sm space-y-1">
@@ -234,27 +305,32 @@ export function MermaidSlide({ code, id, fullSize = false }: MermaidSlideProps):
 
   const controls = (
     <div className="flex flex-shrink-0 items-center justify-end gap-1 pb-2">
-      <span className="text-xs text-white/70">Zoom</span>
+      <button
+        type="button"
+        onClick={() => setIsFullscreen(true)}
+        disabled={result?.svg == null}
+        className="rounded p-1 border bg-transparent border-white/30 text-white/80 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent inline-flex items-center justify-center"
+        aria-label="View diagram fullscreen"
+      >
+        <FullscreenIcon className="w-4 h-4" />
+      </button>
       <button
         type="button"
         onClick={() => setZoom((z) => Math.max(ZOOM_MIN, z - ZOOM_STEP))}
         disabled={zoom <= ZOOM_MIN}
-        className="min-w-[2rem] rounded px-1.5 py-0.5 text-sm font-medium border bg-transparent border-white/30 text-white/80 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+        className="rounded p-1 border bg-transparent border-white/30 text-white/80 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent inline-flex items-center justify-center"
         aria-label="Zoom out"
       >
-        −
+        <ZoomOutIcon className="w-4 h-4" />
       </button>
-      <span className="min-w-[2.5rem] text-center text-xs text-white/90 tabular-nums">
-        {zoom}%
-      </span>
       <button
         type="button"
         onClick={() => setZoom((z) => Math.min(ZOOM_MAX, z + ZOOM_STEP))}
         disabled={zoom >= ZOOM_MAX}
-        className="min-w-[2rem] rounded px-1.5 py-0.5 text-sm font-medium border bg-transparent border-white/30 text-white/80 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+        className="rounded p-1 border bg-transparent border-white/30 text-white/80 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent inline-flex items-center justify-center"
         aria-label="Zoom in"
       >
-        +
+        <ZoomInIcon className="w-4 h-4" />
       </button>
     </div>
   )
@@ -278,11 +354,63 @@ export function MermaidSlide({ code, id, fullSize = false }: MermaidSlideProps):
     </div>
   )
 
+  const fullscreenOverlay =
+    isFullscreen &&
+    result?.svg != null &&
+    typeof document !== 'undefined' &&
+    document.body != null
+      ? createPortal(
+          <div
+            className="fixed inset-0 z-[100] flex flex-col bg-black/95 backdrop-blur-sm"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Diagram fullscreen"
+            onClick={() => setIsFullscreen(false)}
+          >
+            <div
+              className="flex flex-shrink-0 items-center justify-end gap-2 p-3 border-b border-white/10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span className="text-sm text-white/70 mr-auto">Diagram — Esc or click outside to close</span>
+              <button
+                type="button"
+                onClick={() => setIsFullscreen(false)}
+                className="rounded-lg px-3 py-1.5 text-sm font-medium border border-white/30 bg-white/10 text-white hover:bg-white/20 transition-colors"
+                aria-label="Close fullscreen"
+              >
+                Close
+              </button>
+            </div>
+            <div
+              className="flex-1 min-h-0 overflow-auto flex items-center justify-center p-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div
+                className="inline-flex [&_svg]:block"
+                style={
+                  diagramSize
+                    ? {
+                        width: diagramSize.width,
+                        height: diagramSize.height,
+                        minWidth: diagramSize.width,
+                        minHeight: diagramSize.height,
+                      }
+                    : undefined
+                }
+                dangerouslySetInnerHTML={{ __html: result.svg }}
+              />
+            </div>
+          </div>,
+          document.body
+        )
+      : null
+
   if (fullSize) {
     return (
       <div className="flex flex-1 min-h-0 min-w-0 flex-col">
         {controls}
         {diagramContainer}
+        {fullscreenOverlay}
       </div>
     )
   }
@@ -291,6 +419,7 @@ export function MermaidSlide({ code, id, fullSize = false }: MermaidSlideProps):
     <div className="my-4 flex min-h-0 flex-col">
       {controls}
       {diagramContainer}
+      {fullscreenOverlay}
     </div>
   )
 }

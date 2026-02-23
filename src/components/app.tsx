@@ -59,7 +59,7 @@ export function App(): ReactElement {
                   height={68}
                 />
                 <span className="text-[0.7rem] sm:text-[0.8rem] font-medium uppercase tracking-[0.1em] leading-tight text-white/95">
-                  Social Order Use Case
+                  Social-Order Adapter Use Case
                 </span>
               </div>
               <div className="flex flex-col items-start sm:items-end gap-0.5 sm:gap-1">

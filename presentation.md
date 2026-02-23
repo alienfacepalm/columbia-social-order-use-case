@@ -6,11 +6,11 @@ HYBRID FORMAT NOTES
 - Pacing target: ~40 minutes
 -->
 
-# Social-Order
+# Social-Order Adapter
 
 ## High‑Reliability Real‑Time System Design
 
-### Columbia Social‑Order Commerce Pipeline
+### Columbia: Social‑Order Adapter — Commerce Pipeline
 
 ### Brandon Pliska — Senior Full Stack Engineer Candidate
 
@@ -19,7 +19,7 @@ HYBRID FORMAT NOTES
 ## Slide 1 — Welcome
 
 **High‑Reliability Real‑Time System Design**  
-Columbia Social‑Order Commerce Pipeline  
+Columbia: Social‑Order Adapter — Commerce Pipeline  
 Brandon Pliska — Senior Full Stack Engineer Candidate
 
 <!-- STAR: S — Introduce the situation -->
@@ -30,13 +30,7 @@ Brandon Pliska — Senior Full Stack Engineer Candidate
 
 ## Slide 2 – Problem Framing
 
-Columbia wanted customers to purchase products directly inside [TikTok](copilot-action://composer-send?text=What%20is%20TikTok%20Shop) using their existing [TikTok accounts](copilot-action://composer-send?text=How%20do%20TikTok%20accounts%20work%20for%20commerce), and needed those orders to flow reliably into their [SFCC backend](copilot-action://composer-send?text=Explain%20Salesforce%20Commerce%20Cloud%20order%20flows).
-
-```mermaid
-flowchart LR
-    TT["TikTok Shop"] -->|"Purchase"| Goal["Orders flow"]
-    Goal --> SFCC["Columbia / SFCC"]
-```
+Columbia’s directive was to support **multiple social networks** for in-app commerce; [TikTok](copilot-action://composer-send?text=What%20is%20TikTok%20Shop) Shop was the **first**. Customers would purchase inside each platform (e.g. TikTok) using their existing accounts, and those orders had to flow reliably into Columbia’s [SFCC backend](copilot-action://composer-send?text=Explain%20Salesforce%20Commerce%20Cloud%20order%20flows).
 
 ### Objectives
 
@@ -49,18 +43,24 @@ flowchart LR
 - **[Maintain predictable behavior under inconsistent inputs](copilot-action://composer-send?text=How%20to%20design%20predictable%20behavior%20with%20inconsistent%20inputs)**  
   Gracefully handle malformed, partial, or delayed TikTok payloads while preserving order integrity and provenance.
 
+```mermaid
+flowchart LR
+    TT["TikTok Shop"] -->|"Purchase"| Goal["Orders flow"]
+    Goal --> SFCC["Columbia / SFCC"]
+```
+
 <!-- STAR: S -->
 <!-- RADIO: R -->
 <!-- Pacing: 2 minutes -->
 
 ---
 
-## Slide 3 — Requirements (Social‑Order Pipeline)
+## Slide 3 — Requirements (Social‑Order Adapter)
 
 **Functional Requirements**
 
-- Ingest TikTok Shop orders via **Rithum posting to Function App webhook endpoints**
-- Normalize into **canonical formats** for SFCC/SFOMS/SAP
+- Ingest TikTok Shop orders via **Rithum posting to Social-Order Adapter webhook endpoints**
+- Normalize into **canonical formats** for SFCC / SFOMS (EOS) / SAP
 - Maintain **order provenance** end‑to‑end
 - Support **bidirectional** status updates
 - Authenticate via **APIM**
@@ -87,14 +87,14 @@ We evaluated two options:
 
 - Fragile
 - High maintenance
-- No canonical schema
+- TikTok has a **specific API format** — we’d support it (and each future network) directly; no single canonical schema across social platforms
 - No retries/backoff
 - Tight coupling
 
 **Rithum Middleware**
 
 - Better pricing
-- Canonical order schema
+- **Canonical order schema** — one model for TikTok and future networks (Instagram, YouTube, etc.)
 - Built‑in retries + DLQs
 - Future‑proof (Instagram, YouTube, etc.)
 - Versioned API contracts
@@ -104,7 +104,7 @@ We evaluated two options:
 flowchart LR
     subgraph direct["Direct SFCC to TikTok"]
         D1[Fragile]
-        D2[No schema]
+        D2["Per-network API only"]
         D3[Tight coupling]
     end
     subgraph rithum["Rithum Middleware"]
@@ -120,40 +120,44 @@ flowchart LR
 
 ---
 
-## Slide 5 — Social‑Order Architecture Diagram
+## Slide 5 — Social‑Order Adapter Architecture Diagram
 
 ```mermaid
 flowchart LR
-    TT["TikTok Shop Webhooks"] --> R["Rithum Middleware"]
-    R --> APIM["Azure API Management"]
-    APIM --> AF["Azure Function App"]
-    AF --> SB1["Azure Service Bus"]
-    SB1 --> CM["Canonical Mapping"]
-    CM --> CART["SFCC Cartridge"]
-    CART --> SFCC["Commerce Cloud"]
-    SFCC --> SFOMS["SFOMS"]
-    SFOMS --> SAP["SAP"]
+    subgraph inbound["Inbound: TikTok → Columbia"]
+        TT["TikTok Shop"] --> R["Rithum Middleware"]
+        R --> APIM["Azure API Management"]
+        APIM --> AF["Social-Order Adapter"]
+        AF --> SB1["Azure Service Bus"]
+        SB1 --> CM["Canonical Mapping"]
+        CM --> CART["SFCC Cartridge"]
+        CART --> SFCC["Commerce Cloud"]
+        SFCC --> SFOMS["SFOMS (EOS)"]
+        SFOMS --> SAP["SAP"]
+    end
 
-    SAP --> SB2["Service Bus Upstream"]
-    SB2 --> AF2["Function App"]
-    AF2 --> RAPI["Rithum API"]
-    RAPI --> TTAPI["TikTok API"]
-    TTAPI --> TTV["User sees updates in TikTok"]
+    subgraph upstream["Upstream: Columbia → TikTok"]
+        SAP --> SB2["Service Bus Upstream"]
+        SB2 --> AF2["Social-Order Adapter"]
+        AF2 --> RAPI["Rithum API"]
+        RAPI --> TTAPI["TikTok API"]
+        TTAPI --> TTV["User sees updates in TikTok"]
+    end
 
-    L["Loki"]
-    K["KQL"]
-    G["Grafana"]
-
-    AF --> L
-    AF --> K
-    APIM --> K
-    SB1 --> L
-    SB2 --> L
-    SFCC --> L
-    SFOMS --> L
-    SAP --> L
-    L --> G
-    K --> G
+    subgraph observability["Observability"]
+        AM["Azure Monitor Logs"]
+        Loki["Loki"]
+        KQL["KQL"]
+        Grafana["Grafana"]
+        AF --> AM
+        AF --> KQL
+        APIM --> KQL
+        SB1 --> AM
+        SB2 --> AM
+        AM --> Loki
+        Loki --> Grafana
+        KQL --> Grafana
+    end
 ```
 
 <!-- STAR: A -->
@@ -170,6 +174,8 @@ flowchart LR
 
 **Social-Order Adapter (single Function App)**
 
+The adapter controls **downstream** (Rithum → Columbia) and **upstream** (Columbia → Rithum) flows between Rithum and Columbia.
+
 - **APIM-secured webhook endpoints** — Rithum posts order and update payloads here; APIM handles auth and policy.
 - **Service Bus triggers** — Downstream (e.g. SAP/SFOMS) events are published to Service Bus; the same Function App consumes them and calls back to the **Rithum API** so Rithum stays in sync with Columbia’s fulfillment state.
 
@@ -177,7 +183,7 @@ Result: one adapter that ingests from Rithum and pushes status back to Rithum, w
 
 ```mermaid
 flowchart LR
-    WH["Webhooks"] --> FA["Function App"]
+    WH["Webhooks"] --> FA["Social-Order Adapter"]
     SB["Service Bus"] --> FA
     FA --> Down["Downstream"]
     FA --> RAPI["Rithum API"]
@@ -193,22 +199,21 @@ flowchart LR
 
 **Flow**
 
-- Rithum posts to Function App webhook endpoints
+- Rithum posts to **Social-Order Adapter** webhook endpoints
 - APIM authenticates + applies policies
-- Function App validates + normalizes
-- Publishes to **Azure Service Bus**
-- SFCC Cartridge creates orders
-- SFOMS orchestrates lifecycle
-- SAP fulfills
+- Adapter validates + normalizes → **Azure Service Bus**
+- **Canonical mapping** → SFCC Cartridge creates orders
+- SFOMS orchestrates lifecycle → SAP fulfills
 
 ```mermaid
-flowchart LR
+flowchart TB
     R["Rithum"] --> APIM["APIM"]
-    APIM --> FA["Function App"]
+    APIM --> FA["Social-Order Adapter"]
     FA --> SB["Service Bus"]
-    SB --> CART["SFCC Cartridge"]
+    SB --> CM["Canonical Mapping"]
+    CM --> CART["SFCC Cartridge"]
     CART --> SFCC["SFCC"]
-    SFCC --> SFOMS["SFOMS"]
+    SFCC --> SFOMS["SFOMS (EOS)"]
     SFOMS --> SAP["SAP"]
 ```
 
@@ -223,15 +228,15 @@ flowchart LR
 **Flow**
 
 - SAP emits fulfillment events
-- SFOMS updates lifecycle
+- SFOMS (EOS) updates lifecycle
 - Events published to **Service Bus (Upstream)**
-- Function App transforms + updates Rithum API
+- **Social-Order Adapter** transforms + updates Rithum API
 
 ```mermaid
 flowchart LR
-    SAP["SAP"] --> SFOMS["SFOMS"]
+    SAP["SAP"] --> SFOMS["SFOMS (EOS)"]
     SFOMS --> SB["Service Bus Upstream"]
-    SB --> FA["Function App"]
+    SB --> FA["Social-Order Adapter"]
     FA --> RAPI["Rithum API"]
     RAPI --> TT["TikTok"]
 ```
@@ -246,18 +251,18 @@ flowchart LR
 
 - Canonical schema isolates upstream volatility
 - Provenance chain:
-  - TikTok → Rithum → Azure → SFCC → SFOMS → SAP
-- Structured logging with dot‑chaining:
-  - `order.provenance.tiktok.id=...`
-  - `order.sfcc.create.request=true`
-  - `order.sap.fulfillment.status=created`
+  - TikTok → Rithum → Azure → SFCC → SFOMS (EOS) → SAP
+- Structured logging with dot‑chaining (e.g. `order.flow.*`):
+  - `order.flow.rithum.webhook.received`
+  - `order.flow.sfcc.create.request`
+  - `order.flow.sap.fulfillment.status`
 
 ```mermaid
 flowchart LR
     TT["TikTok"] --> R["Rithum"]
     R --> AZ["Azure"]
     AZ --> SFCC["SFCC"]
-    SFCC --> SFOMS["SFOMS"]
+    SFCC --> SFOMS["SFOMS (EOS)"]
     SFOMS --> SAP["SAP"]
 ```
 
@@ -277,11 +282,13 @@ flowchart LR
 - Grafana dashboards gave a single pane of glass
 - Structured logging enabled provenance queries
 
+**Log flow:** SFCC and downstream systems are observed via the **Social-Order Adapter**; the adapter (and Azure) emit to **Azure Monitor Logs**, which feed **Loki** for unified querying.
+
 ```mermaid
 flowchart LR
-    Azure["Azure"] --> Loki["Loki"]
-    SFCC["SFCC"] --> Loki
-    Other["AWS, GCP, etc."] --> Loki
+    SFCC["SFCC / Cartridge"] --> Adapter["Social-Order Adapter"]
+    Adapter --> AM["Azure Monitor Logs"]
+    AM --> Loki["Loki"]
     Loki --> Grafana["Grafana"]
 ```
 
@@ -360,7 +367,7 @@ flowchart LR
 
 ## Slide 15 — Impact
 
-- Reliable, scalable, future‑proof pipeline
+- Reliable, scalable, future‑proof adapter pipeline
 - Full provenance from TikTok → SAP → TikTok
 - Faster debugging via Loki
 - Reduced operational overhead
@@ -372,33 +379,7 @@ flowchart LR
 
 ---
 
-## Slide 16 — Why This Maps to Echodyne
-
-This work demonstrates:
-
-- End‑to‑end system design
-- Async pipelines
-- Real‑time reliability
-- Observability + provenance
-- Cross‑system integration
-- Architectural judgment
-
-```mermaid
-flowchart LR
-    A["End-to-end design"] --> E["Echodyne"]
-    B["Async pipelines"] --> E
-    C["Real-time reliability"] --> E
-    D["Observability"] --> E
-    F["Cross-system integration"] --> E
-```
-
-<!-- STAR: R -->
-<!-- RADIO: Summary -->
-<!-- Pacing: 2 minutes -->
-
----
-
-## Slide 17 — Closing
+## Slide 16 — Closing
 
 I build systems that perform under real‑world constraints.  
 I'd bring the same rigor, clarity, and reliability to Echodyne's radar software platform.
@@ -408,4 +389,7 @@ I'd bring the same rigor, clarity, and reliability to Echodyne's radar software 
 
 ---
 
-# END OF DECK
+## Slide 17 — Thank You
+
+Thank you for your time and consideration.  
+I look forward to the possibility of contributing to Echodyne.
