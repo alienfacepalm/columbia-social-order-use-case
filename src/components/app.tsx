@@ -52,7 +52,7 @@ export function App(): ReactElement {
             <div className="flex flex-shrink-0 flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-2 py-2 pt-3 sm:py-3 sm:pt-4">
               <div className="flex flex-col items-start gap-0.5 sm:gap-1">
                 <img
-                  src="/columbia.png"
+                  src={`${import.meta.env.BASE_URL}columbia.png`}
                   alt="Columbia Sportswear"
                   className="block h-12 w-auto sm:h-14 md:h-[6.67rem] m-0 ml-2 sm:ml-4 md:ml-[70px] align-middle brightness-0 invert"
                   width={320}

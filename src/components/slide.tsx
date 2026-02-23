@@ -89,7 +89,7 @@ export function Slide({ slide, slideIndex }: SlideProps): ReactElement {
           })}
         </div>
         <img
-          src="/title.png"
+          src={`${import.meta.env.BASE_URL}title.png`}
           alt="Presentation title"
           className="relative z-0 block flex-shrink-0 object-contain w-full max-w-[280px] sm:max-w-[320px] md:max-w-[380px] max-h-[40vh] sm:max-h-[65vh]"
         />
@@ -141,7 +141,7 @@ export function Slide({ slide, slideIndex }: SlideProps): ReactElement {
         {imageConfig && (
           <div className="slide-illustration-wrap flex-shrink-0 w-full max-w-[280px] md:w-[280px] min-h-[160px] sm:min-h-[200px] flex items-center justify-center">
             <img
-              src={imageConfig.src}
+              src={`${import.meta.env.BASE_URL}${imageConfig.src.replace(/^\//, '')}`}
               alt={imageConfig.alt}
               className={`slide-illustration object-contain object-center w-auto h-auto max-h-[160px] sm:max-h-[200px] ${
                 imageConfig.size === 's' ? 'max-w-[130px]' : imageConfig.size === 'm' ? 'max-w-[200px]' : 'max-w-[260px]'

@@ -338,7 +338,53 @@ flowchart LR
 
 ---
 
-## Slide 14 — Cross‑Functional Integration (RADIO: I + O)
+## Slide 14 — QA and Testing
+
+We applied a **layered testing strategy** so the adapter and cartridge behave predictably under real and synthetic payloads.
+
+**Unit tests (MSTest, .NET 8)**
+
+- **Processors:** OrderProcessor, ReturnOrderProcessor, ShipmentProcessor — lock tokens, message handling, and error paths with **Moq** and **FluentAssertions**
+- **Services:** EnterpriseOrderService (EOS GET/PUT, return-state logic), OrderTransformationService, OrderUtilityService (e.g. state-code mapping), OrderSummaryService, EOSToRithumSyncService — **HTTP mocked** via Moq.Contrib.HttpClient; **JSON testdata** for SalesInvoice, ReturnOrder, ReturnInvoice
+- **Coverage:** coverlet + ReportGenerator; testdata copied into output for file-based scenarios
+
+**Validation**
+
+- **ValidationService** — order, order number, email, phone, address, order item; allowlisted **order statuses** (New, Authorized, Confirmed, Shipped, etc.) and **order types** (SalesOrder, Return, Exchange); structured **ValidationResult** for clear failures
+
+**Integration and Service Bus**
+
+- **Integration:** Shell and PowerShell scripts plus C# helpers; **EOS test payloads** (new, authorized, confirmed, invoiced, shipped) and **output-examples** for API/order responses
+- **Service Bus:** LocalServiceBusTester app, **servicebus-test-payloads.json**, and scripts to drive OrderProcessor, ReturnOrderProcessor, and ShipmentProcessor against queues for end-to-end behavior
+
+**Outcome**
+
+- Unit tests guard mapping, validation, and EOS/Rithum boundaries; integration and Service Bus tests validate flows before deployment; canary and rollback (Slide 13) reduce risk when shipping changes.
+
+```mermaid
+flowchart LR
+    subgraph unit["Unit"]
+        U1["Processors"]
+        U2["Services"]
+        U3["Validation"]
+    end
+    subgraph integration["Integration"]
+        I1["EOS payloads"]
+        I2["Scripts"]
+    end
+    subgraph servicebus["Service Bus"]
+        SB["LocalServiceBusTester"]
+    end
+    unit --> integration
+    integration --> servicebus
+```
+
+<!-- RADIO: O — Quality and reliability -->
+<!-- Pacing: 2–3 minutes -->
+
+---
+
+## Slide 15 — Cross-Functional Integration (RADIO: I + O)
 
 - **Authentication** — APIM as secure boundary; API keys and policies for Rithum webhooks; no customer SSO in this pipeline (TikTok/Columbia handle identity).
 - **APIs** — Versioned Rithum webhook and Rithum API contracts; SFCC cartridge API; clear request/response and error contracts.
@@ -352,7 +398,7 @@ flowchart LR
 
 ---
 
-## Slide 15 — Team Leadership & Delivery (Action)
+## Slide 16 — Team Leadership & Delivery (Action)
 
 - **Guiding design decisions** — Led choice of Rithum over direct TikTok integration; drove canonical schema and single adapter for both downstream and upstream flows.
 - **Managing trade-offs** — Documented ADRs (e.g. Rithum vs direct); balanced latency vs consistency and observability cost vs depth with stakeholders.
@@ -364,7 +410,7 @@ flowchart LR
 
 ---
 
-## Slide 16 — Risks, Trade‑Offs & Scaling Strategies (RADIO: O)
+## Slide 17 — Risks, Trade‑Offs & Scaling Strategies (RADIO: O)
 
 **Risks & mitigations**
 
@@ -397,7 +443,7 @@ flowchart LR
 
 ---
 
-## Slide 17 — Impact & Reflections (Result)
+## Slide 18 — Impact & Reflections (Result)
 
 - **Technical impact** — Reliable, scalable adapter pipeline; full order provenance TikTok → SAP → TikTok; faster debugging via Loki; reduced operational overhead.
 - **Organizational impact** — New social channels (e.g. Instagram) can be added with minimal work; clearer ownership between Columbia, Rithum, SFCC/SFOMS, and SAP.
@@ -408,7 +454,7 @@ flowchart LR
 
 ---
 
-## Slide 18 — Closing
+## Slide 19 — Closing
 
 I build systems that perform under real‑world constraints.  
 I'd bring the same rigor, clarity, and reliability to Echodyne's radar software platform.
@@ -418,7 +464,7 @@ I'd bring the same rigor, clarity, and reliability to Echodyne's radar software 
 
 ---
 
-## Slide 19 — Thank You
+## Slide 20 — Thank You
 
 Thank you for your time and consideration.  
 I look forward to the possibility of contributing to Echodyne.
