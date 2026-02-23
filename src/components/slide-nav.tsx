@@ -1,13 +1,14 @@
 import type { ReactElement } from 'react'
-import type { Slide } from '../models/slide'
+
+import type { ISlide } from '../models/slide'
 import { truncateTitle } from '../utils/truncate-title'
 import { MOBILE_TITLE_MAX_LENGTH } from '../config/app'
 
 const NAV_BUTTON_CLASS =
   'flex min-h-[44px] min-w-[44px] h-11 w-11 sm:h-10 sm:w-10 items-center justify-center rounded-md border border-[#66a5e8] bg-[rgba(43,65,106,0.8)] text-2xl leading-none text-white cursor-pointer hover:bg-[#3385e2] hover:border-[#66a5e8] disabled:opacity-40 disabled:cursor-not-allowed touch-manipulation'
 
-export interface SlideNavProps {
-  readonly slides: readonly Slide[]
+export interface ISlideNavProps {
+  readonly slides: readonly ISlide[]
   readonly currentIndex: number
   readonly onPrevious: () => void
   readonly onNext: () => void
@@ -22,7 +23,7 @@ export function SlideNav({
   onNext,
   onGoTo,
   isMobile,
-}: SlideNavProps): ReactElement {
+}: ISlideNavProps): ReactElement {
   return (
     <nav className="flex flex-shrink-0 items-center justify-center flex-wrap gap-2 sm:gap-4 bg-[#1d3356] border-t border-[rgba(102,165,232,0.4)] p-2 sm:p-3 safe-area-pb">
       <button

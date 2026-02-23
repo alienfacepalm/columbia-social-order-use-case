@@ -14,11 +14,11 @@ function slideToHash(index: number): string {
   return `#${HASH_PREFIX}${index + 1}`
 }
 
-export interface UseSlideNavOptions {
+export interface IUseSlideNavOptions {
   readonly total: number
 }
 
-export interface UseSlideNavReturn {
+export interface IUseSlideNavReturn {
   readonly index: number
   readonly go: (delta: number) => void
   readonly goTo: (slideIndex: number) => void
@@ -26,7 +26,7 @@ export interface UseSlideNavReturn {
   readonly goToEnd: () => void
 }
 
-export function useSlideNav({ total }: UseSlideNavOptions): UseSlideNavReturn {
+export function useSlideNav({ total }: IUseSlideNavOptions): IUseSlideNavReturn {
   const [current, setCurrent] = useState(() => parseSlideFromHash(total))
   const index = Math.max(0, Math.min(current, total - 1))
 

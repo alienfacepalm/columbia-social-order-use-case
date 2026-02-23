@@ -1,11 +1,11 @@
-import type { InlineSpan, Slide, SlideContentNode } from '../models/slide'
+import type { TInlineSpan, ISlide, TSlideContentNode } from '../models/slide'
 
 /**
  * Parses presentation.md content into slide objects.
  * Splits by ---, extracts ## title and body, and pulls out mermaid code blocks.
  */
-export function parsePresentation(raw: string): Slide[] {
-  const slides: Slide[] = []
+export function parsePresentation(raw: string): ISlide[] {
+  const slides: ISlide[] = []
   const blocks = raw.split(/\n---\n/).map((b) => b.trim()).filter(Boolean)
 
   for (let i = 0; i < blocks.length; i++) {
@@ -53,8 +53,8 @@ export function parsePresentation(raw: string): Slide[] {
   return slides
 }
 
-function parseBody(body: string, mermaidCharts: readonly string[]): SlideContentNode[] {
-  const nodes: SlideContentNode[] = []
+function parseBody(body: string, mermaidCharts: readonly string[]): TSlideContentNode[] {
+  const nodes: TSlideContentNode[] = []
   const parts = body.split(/(\{\{MERMAID:\d+\}\})/g)
 
   for (const part of parts) {
@@ -91,7 +91,7 @@ function parseBody(body: string, mermaidCharts: readonly string[]): SlideContent
       }
       const trimmedLine = line.trimStart()
       if (trimmedLine.startsWith('- ')) {
-        const items: InlineSpan[][] = []
+        const items: TInlineSpan[][] = []
         while (i < lines.length && lines[i].trimStart().startsWith('- ')) {
           items.push(parseInline(lines[i].trimStart().slice(2)))
           i++
@@ -115,8 +115,8 @@ function parseBody(body: string, mermaidCharts: readonly string[]): SlideContent
 }
 
 /** Parse a segment that may contain [text](url) links (no **) */
-function parseLinkSegment(segment: string): InlineSpan[] {
-  const out: InlineSpan[] = []
+function parseLinkSegment(segment: string): TInlineSpan[] {
+  const out: TInlineSpan[] = []
   const linkRegex = /\[([^\]]*)\]\(([^)]*)\)/g
   let lastIndex = 0
   let m: RegExpExecArray | null
@@ -134,8 +134,8 @@ function parseLinkSegment(segment: string): InlineSpan[] {
 }
 
 /** Inline: **bold**, [link](url), and plain text */
-export function parseInline(text: string): InlineSpan[] {
-  const out: InlineSpan[] = []
+export function parseInline(text: string): TInlineSpan[] {
+  const out: TInlineSpan[] = []
   const boldRegex = /\*\*([^*]+)\*\*/g
   let lastIndex = 0
   let m: RegExpExecArray | null

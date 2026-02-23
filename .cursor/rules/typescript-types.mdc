@@ -1,0 +1,65 @@
+---
+description: TypeScript type rules — no any, I-prefix for interfaces, T-prefix for types
+globs: "**/*.ts,**/*.tsx"
+alwaysApply: false
+---
+
+# TypeScript type conventions
+
+Apply when writing or editing TypeScript (`.ts`, `.tsx`).
+
+## No `any`
+
+- **Never use `any`.** Use precise types, `unknown`, or generics instead.
+- Prefer `unknown` when the shape is truly unknown; narrow with type guards before use.
+
+```typescript
+// ❌ BAD
+function handle(data: any) {}
+const value: any = fetchSomething();
+
+// ✅ GOOD
+function handle(data: unknown) {
+  if (typeof data === 'object' && data !== null && 'id' in data) {
+    // narrowed
+  }
+}
+const value: IApiResponse = fetchSomething();
+```
+
+## Interface prefix: `I`
+
+- **Prefix interface names with `I`:** `IUser`, `IOrderItem`, `IApiResponse`.
+
+```typescript
+// ❌ BAD
+interface User {}
+interface OrderItem {}
+
+// ✅ GOOD
+interface IUser {}
+interface IOrderItem {}
+```
+
+## Type alias prefix: `T`
+
+- **Prefix type alias names with `T`:** `TUserId`, `TStatus`, `TNullable<T>`.
+
+```typescript
+// ❌ BAD
+type UserId = string;
+type Status = 'pending' | 'done';
+
+// ✅ GOOD
+type TUserId = string;
+type TStatus = 'pending' | 'done';
+type TNullable<T> = T | null;
+```
+
+## Summary
+
+| Kind     | Prefix | Example        |
+|----------|--------|----------------|
+| Interface| `I`    | `IUserProfile` |
+| Type     | `T`    | `TUserId`, `TResult<T>` |
+| Value    | —      | No prefix (e.g. `user`, `fetchUser`) |

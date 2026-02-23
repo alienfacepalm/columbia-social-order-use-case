@@ -1,11 +1,12 @@
 import type { ReactElement } from 'react'
-import type { InlineSpan, Slide as SlideModel, SlideContentNode } from '../models/slide'
+
+import type { TInlineSpan, ISlide, TSlideContentNode } from '../models/slide'
 import { assetUrl } from '../config/app'
 import { getSlideImage, getSlideImagePosition, IMAGE_SIZE_PX } from '../config/slide-images'
 import { MermaidSlide } from './mermaid-slide'
 import { parseInline } from '../utils/parse-presentation'
 
-function renderInline(inlines: readonly InlineSpan[]): ReactElement[] {
+function renderInline(inlines: readonly TInlineSpan[]): ReactElement[] {
   return inlines.map((span, j) => {
     if (span.type === 'bold') {
       return (
@@ -35,21 +36,21 @@ function renderInline(inlines: readonly InlineSpan[]): ReactElement[] {
   })
 }
 
-export interface SlideProps {
-  readonly slide: SlideModel
+export interface ISlideProps {
+  readonly slide: ISlide
   readonly slideIndex: number
 }
 
-function hasDiagram(slide: SlideModel): boolean {
+function hasDiagram(slide: ISlide): boolean {
   return slide.content.some((node) => node.type === 'mermaid')
 }
 
 /** Use full-size diagram only when slide has no list (diagram-only or diagram + short text). */
-function getFullSizeDiagram(slide: SlideModel): boolean {
+function getFullSizeDiagram(slide: ISlide): boolean {
   return hasDiagram(slide) && !slide.content.some((node) => node.type === 'ul')
 }
 
-export function Slide({ slide, slideIndex }: SlideProps): ReactElement {
+export function Slide({ slide, slideIndex }: ISlideProps): ReactElement {
   const isDiagramSlide = hasDiagram(slide)
   const imageConfig = getSlideImage(slideIndex, isDiagramSlide)
   const imagePosition = getSlideImagePosition(slideIndex)
@@ -157,8 +158,8 @@ export function Slide({ slide, slideIndex }: SlideProps): ReactElement {
   )
 }
 
-interface SlideNodeProps {
-  readonly node: SlideContentNode
+interface ISlideNodeProps {
+  readonly node: TSlideContentNode
   readonly slideIndex: number
   readonly nodeIndex: number
   readonly isDiagramSlide: boolean
@@ -166,7 +167,7 @@ interface SlideNodeProps {
   readonly constrainDiagramHeight: boolean
 }
 
-function SlideNode({ node, slideIndex, nodeIndex, fullSizeDiagram, constrainDiagramHeight }: SlideNodeProps): ReactElement | null {
+function SlideNode({ node, slideIndex, nodeIndex, fullSizeDiagram, constrainDiagramHeight }: ISlideNodeProps): ReactElement | null {
   if (node.type === 'mermaid') {
     return (
       <MermaidSlide

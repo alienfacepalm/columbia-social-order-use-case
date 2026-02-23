@@ -1,12 +1,13 @@
 import { useRef, useCallback } from 'react'
+
 import { SWIPE_THRESHOLD_PX } from '../config/app'
 
-export interface UseSwipeNavigationOptions {
+export interface IUseSwipeNavigationOptions {
   readonly onSwipeLeft: () => void
   readonly onSwipeRight: () => void
 }
 
-export interface UseSwipeNavigationReturn {
+export interface IUseSwipeNavigationReturn {
   readonly onTouchStart: (e: React.TouchEvent) => void
   readonly onTouchEnd: (e: React.TouchEvent) => void
 }
@@ -17,7 +18,7 @@ export interface UseSwipeNavigationReturn {
 export function useSwipeNavigation({
   onSwipeLeft,
   onSwipeRight,
-}: UseSwipeNavigationOptions): UseSwipeNavigationReturn {
+}: IUseSwipeNavigationOptions): IUseSwipeNavigationReturn {
   const touchStartX = useRef<number | null>(null)
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {

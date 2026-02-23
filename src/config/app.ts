@@ -4,7 +4,7 @@ export const MOBILE_TITLE_MAX_LENGTH = 24
 export const SWIPE_THRESHOLD_PX = 50
 
 const BASE = typeof import.meta !== 'undefined' && import.meta.env?.BASE_URL
-  ? (import.meta.env.BASE_URL as string)
+  ? import.meta.env.BASE_URL
   : '/'
 
 /**

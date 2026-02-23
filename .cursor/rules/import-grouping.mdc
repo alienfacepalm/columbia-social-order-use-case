@@ -1,0 +1,44 @@
+---
+description: Separate external and local imports with a blank line
+globs: **/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Import grouping
+
+Group imports in two blocks with a **blank line** between them:
+
+1. **External** — packages from `node_modules` (no path prefix).
+2. **Local** — project files using `./` or `../`.
+
+## Rules
+
+- Put all external imports first.
+- Add exactly one blank line after the last external import.
+- Put all local imports after the blank line.
+- Within each group, keep one import per line; sort alphabetically if desired.
+
+## Examples
+
+```typescript
+// ✅ GOOD
+import { useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
+
+import { useSwipeNavigation } from '../hooks/use-swipe-navigation';
+import { SlideDeck } from './slide-deck';
+```
+
+```typescript
+// ❌ BAD — no blank line between external and local
+import { useCallback } from 'react';
+import { SlideDeck } from './slide-deck';
+import { useSearchParams } from 'react-router-dom';
+```
+
+```typescript
+// ❌ BAD — local mixed with external
+import { useCallback } from 'react';
+import { useSwipeNavigation } from '../hooks/use-swipe-navigation';
+import { useSearchParams } from 'react-router-dom';
+```

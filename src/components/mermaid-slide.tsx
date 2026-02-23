@@ -22,7 +22,7 @@ mermaid.initialize({
   },
 })
 
-export interface MermaidSlideProps {
+export interface IMermaidSlideProps {
   readonly code: string
   readonly id: string
   /** When true, diagram fills available space (diagram-only slide). */
@@ -93,17 +93,17 @@ function ZoomInIcon({ className }: { className?: string }): ReactElement {
   )
 }
 
-interface DragState {
+interface IDragState {
   startX: number
   startY: number
   startScrollLeft: number
   startScrollTop: number
 }
 
-export function MermaidSlide({ code, id, fullSize = false, constrainHeight = false }: MermaidSlideProps): ReactElement {
+export function MermaidSlide({ code, id, fullSize = false, constrainHeight = false }: IMermaidSlideProps): ReactElement {
   const ref = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const dragRef = useRef<DragState | null>(null)
+  const dragRef = useRef<IDragState | null>(null)
   const uniqueId = useId()
   const [zoom, setZoom] = useState<number>(100)
   const [isFullscreen, setIsFullscreen] = useState(false)

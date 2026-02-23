@@ -1,4 +1,5 @@
 import type { ReactElement } from 'react'
+
 import { assetUrl } from '../config/app'
 
 export function PresentationHeader(): ReactElement {
