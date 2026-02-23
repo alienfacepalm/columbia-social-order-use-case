@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react'
 import type { InlineSpan, Slide as SlideModel, SlideContentNode } from '../models/slide'
+import { assetUrl } from '../config/app'
 import { getSlideImage, getSlideImagePosition, IMAGE_SIZE_PX } from '../config/slide-images'
 import { MermaidSlide } from './mermaid-slide'
 import { parseInline } from '../utils/parse-presentation'
@@ -44,7 +45,7 @@ function hasDiagram(slide: SlideModel): boolean {
 }
 
 /** Use full-size diagram only when slide has no list (diagram-only or diagram + short text). */
-function useFullSizeDiagram(slide: SlideModel): boolean {
+function getFullSizeDiagram(slide: SlideModel): boolean {
   return hasDiagram(slide) && !slide.content.some((node) => node.type === 'ul')
 }
 
@@ -52,7 +53,7 @@ export function Slide({ slide, slideIndex }: SlideProps): ReactElement {
   const isDiagramSlide = hasDiagram(slide)
   const imageConfig = getSlideImage(slideIndex, isDiagramSlide)
   const imagePosition = getSlideImagePosition(slideIndex)
-  const fullSizeDiagram = useFullSizeDiagram(slide)
+  const fullSizeDiagram = getFullSizeDiagram(slide)
   const isTitleSlide = slideIndex === 0
 
   if (isTitleSlide) {
@@ -89,7 +90,7 @@ export function Slide({ slide, slideIndex }: SlideProps): ReactElement {
           })}
         </div>
         <img
-          src={`${import.meta.env.BASE_URL}title.png`}
+          src={assetUrl('title.png')}
           alt="Presentation title"
           className="relative z-0 block flex-shrink-0 object-contain w-full max-w-[280px] sm:max-w-[320px] md:max-w-[380px] max-h-[40vh] sm:max-h-[65vh]"
         />
@@ -141,7 +142,7 @@ export function Slide({ slide, slideIndex }: SlideProps): ReactElement {
         {imageConfig && (
           <div className="slide-illustration-wrap flex-shrink-0 w-full max-w-[280px] md:w-[280px] min-h-[160px] sm:min-h-[200px] flex items-center justify-center">
             <img
-              src={`${import.meta.env.BASE_URL}${imageConfig.src.replace(/^\//, '')}`}
+              src={assetUrl(imageConfig.src)}
               alt={imageConfig.alt}
               className={`slide-illustration object-contain object-center w-auto h-auto max-h-[160px] sm:max-h-[200px] ${
                 imageConfig.size === 's' ? 'max-w-[130px]' : imageConfig.size === 'm' ? 'max-w-[200px]' : 'max-w-[260px]'
