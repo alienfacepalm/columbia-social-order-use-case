@@ -131,6 +131,35 @@ flowchart LR
 ## Slide 6 — High‑Level Architecture (RADIO: A — Architecture)
 
 ```mermaid
+sequenceDiagram
+    participant TT as TikTok Shop
+    participant R as Rithum (RCA)
+    participant APIM as APIM
+    participant AF as Social-Order Adapter
+    participant CART as SFCC Cartridge API
+    participant SFCC as SFCC
+    participant SFOMS as SFOMS
+    participant EOS as EOS
+    participant SAP as SAP
+
+    Note over TT,SAP: Inbound: order creation
+    TT->>R: 1h remorse → finalized
+    R->>APIM: Webhook POST (orders / status)
+    APIM->>AF: APIM-secured webhook
+    AF->>CART: Order create request
+    CART->>SFCC: Order payload
+    SFCC->>SFOMS: Order payload
+    SFOMS->>EOS: Order lifecycle
+    EOS->>SAP: Fulfillment
+
+    Note over SAP,TT: Upstream: status sync
+    SAP->>EOS: Fulfillment state
+    EOS->>AF: Service Bus (lifecycle events)
+    AF->>R: Status update request
+    R->>TT: Sync to shop
+```
+
+```mermaid
 flowchart LR
     subgraph inbound["Inbound: TikTok → Columbia"]
         TT["TikTok Shop"] -->|"1h remorse → finalized"| R["Rithum (RCA / Channel Advisor API)"]
