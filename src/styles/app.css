@@ -103,3 +103,10 @@
 .edgeLabel .labelBkg {
   fill: #2d4a6f !important;
 }
+
+/* Fullscreen diagram: SVG fills wrapper so it's visible and scales (e.g. when diagramSize was null) */
+.fullscreen-diagram-wrap svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}

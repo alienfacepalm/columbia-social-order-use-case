@@ -62,6 +62,8 @@ export function MermaidSlide({ code, id, fullSize = false, constrainHeight = fal
   } | null>(null)
   const [diagramSize, setDiagramSize] = useState<{ width: number; height: number } | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [fullscreenScale, setFullscreenScale] = useState(1)
+  const fullscreenWrapRef = useRef<HTMLDivElement>(null)
 
   useLayoutEffect(() => {
     if (!code?.trim()) return
@@ -217,6 +219,58 @@ export function MermaidSlide({ code, id, fullSize = false, constrainHeight = fal
     }
   }, [isFullscreen])
 
+  // Scale diagram in fullscreen: use viewport so we don't depend on ref timing; never shrink below 1x
+  const updateFullscreenScale = useCallback(() => {
+    if (!diagramSize || diagramSize.width <= 0 || diagramSize.height <= 0) return
+    const padding = 32
+    const headerH = 56
+    const cw = Math.max(100, window.innerWidth - padding * 2)
+    const ch = Math.max(100, window.innerHeight - headerH - padding * 2)
+    const fitScale = Math.min(cw / diagramSize.width, ch / diagramSize.height)
+    const scale = Math.max(1, Math.min(fitScale, 5))
+    setFullscreenScale(scale)
+  }, [diagramSize])
+
+  useEffect(() => {
+    if (!isFullscreen || !diagramSize) {
+      setFullscreenScale(1)
+      return
+    }
+    updateFullscreenScale()
+    window.addEventListener('resize', updateFullscreenScale)
+    return () => window.removeEventListener('resize', updateFullscreenScale)
+  }, [isFullscreen, diagramSize, updateFullscreenScale])
+
+  // When fullscreen opens, read SVG size from the overlay if we don't have diagramSize yet (e.g. sequence diagrams)
+  useLayoutEffect(() => {
+    if (!isFullscreen || diagramSize || !result?.svg) return
+    const timer = requestAnimationFrame(() => {
+      const wrap = fullscreenWrapRef.current
+      const svg = wrap?.querySelector('svg')
+      if (!svg) return
+      const w = svg.getAttribute('width')
+      const h = svg.getAttribute('height')
+      const viewBox = svg.getAttribute('viewBox')
+      let width = 0
+      let height = 0
+      if (w != null && h != null) {
+        width = parseFloat(w) || 0
+        height = parseFloat(h) || 0
+      }
+      if ((width === 0 || height === 0) && viewBox) {
+        const parts = viewBox.trim().split(/\s+/)
+        if (parts.length >= 4) {
+          width = width || parseFloat(parts[2]) || 0
+          height = height || parseFloat(parts[3]) || 0
+        }
+      }
+      if (width > 0 && height > 0) {
+        setDiagramSize({ width, height })
+      }
+    })
+    return () => cancelAnimationFrame(timer)
+  }, [isFullscreen, diagramSize, result?.svg])
+
   if (error) {
     return (
       <div className="text-[#f85149] text-sm space-y-1">
@@ -334,11 +388,12 @@ export function MermaidSlide({ code, id, fullSize = false, constrainHeight = fal
               </button>
             </div>
             <div
-              className="flex-1 min-h-0 min-w-0 overflow-x-auto overflow-y-auto p-4"
+              className="flex flex-1 min-h-0 min-w-0 items-center justify-center overflow-x-auto overflow-y-auto p-4"
               onClick={(e) => e.stopPropagation()}
             >
               <div
-                className="inline-flex shrink-0 [&_svg]:block"
+                ref={fullscreenWrapRef}
+                className="fullscreen-diagram-wrap inline-flex shrink-0 [&_svg]:block [&_svg]:max-w-full [&_svg]:max-h-full [&_svg]:w-auto [&_svg]:h-auto"
                 style={
                   diagramSize
                     ? {
@@ -346,8 +401,15 @@ export function MermaidSlide({ code, id, fullSize = false, constrainHeight = fal
                         height: diagramSize.height,
                         minWidth: diagramSize.width,
                         minHeight: diagramSize.height,
+                        transform: `scale(${fullscreenScale})`,
+                        transformOrigin: 'center center',
                       }
-                    : undefined
+                    : {
+                        width: '90vw',
+                        height: '80vh',
+                        minWidth: 400,
+                        minHeight: 300,
+                      }
                 }
                 dangerouslySetInnerHTML={{ __html: result.svg }}
               />

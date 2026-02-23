@@ -159,43 +159,6 @@ sequenceDiagram
     R->>TT: Sync to shop
 ```
 
-```mermaid
-flowchart LR
-    subgraph inbound["Inbound: TikTok → Columbia"]
-        TT["TikTok Shop"] -->|"1h remorse → finalized"| R["Rithum (RCA / Channel Advisor API)"]
-        R -->|"Webhook POST (orders / status)"| APIM["Azure API Management"]
-        APIM -->|"APIM‑secured webhook → adapter"| AF["Social-Order Adapter"]
-        AF -->|"Order create request"| CART["SFCC Cartridge API"]
-        CART -->|"Order payload"| SFCC["SFCC"]
-        SFCC -->|"Order payload"| SFOMS["SFOMS"]
-        SFOMS -->|"Order lifecycle"| EOS["EOS (Columbia’s Enterprise Order Service API)"]
-        EOS -->|"Fulfillment"| SAP["SAP"]
-    end
-
-    subgraph upstream["Upstream: Columbia → TikTok"]
-        SAP -->|"Fulfillment state"| EOS2["EOS"]
-        EOS2 -->|"Lifecycle events"| SB2["Service Bus Upstream"]
-        SB2 -->|"Status message trigger"| AF2["Social-Order Adapter"]
-        AF2 -->|"Status update request"| RAPI["Rithum API"]
-        RAPI -->|"Sync to shop"| TTAPI["TikTok API"]
-        TTAPI --> TTV["User sees updates in TikTok"]
-    end
-
-    subgraph observability["Observability"]
-        AM["Azure Monitor Logs"]
-        Loki["Loki"]
-        KQL["KQL"]
-        Grafana["Grafana"]
-        AF -->|"Structured logs"| AM
-        AF -->|"Structured logs"| KQL
-        APIM -->|"Request logs"| KQL
-        SB2 -->|"Event logs"| AM
-        AM -->|"Unified ingest"| Loki
-        Loki -->|"Query / dashboards"| Grafana
-        KQL -->|"Query / dashboards"| Grafana
-    end
-```
-
 <!-- STAR: A — System architecture and design choices -->
 <!-- Pacing: 3 minutes -->
 
