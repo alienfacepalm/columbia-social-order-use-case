@@ -9,6 +9,7 @@ The slide deck is a React SPA that reads `presentation.md` and renders slides wi
 - **Run:** `pnpm dev` then open the URL (e.g. http://localhost:5173)
 - **Build:** `pnpm build` → output in `dist/`
 - **Preview build:** `pnpm preview`
+- **Test:** `pnpm test` (unit tests; CI runs this before deploy)
 
 ### Controls
 
@@ -27,6 +28,6 @@ Put logos, favicons, and other static files in **`public/`**. They are served at
 
 ### Publishing to GitHub Pages
 
-The site is built and deployed as a **GitHub Pages static site** via the workflow in **`.github/workflows/deploy-pages.yml`**. On push to `main` or `master`, it installs dependencies, runs `pnpm build`, and deploys the `dist/` output to GitHub Pages.
+The site is built and deployed as a **GitHub Pages static site** via the workflow in **`.github/workflows/deploy-pages.yml`**. On push to `main` or `master`, it installs dependencies, runs unit tests (`pnpm test`), then builds (`pnpm build`); deploy is skipped if tests fail. The `dist/` output is deployed to GitHub Pages.
 
 **One-time setup:** In the repo on GitHub go to **Settings → Pages**, set **Source** to **GitHub Actions**, then push to `main`. The site will be at **`https://<owner>.github.io/<repo>/`** (e.g. `https://alienfacepalm.github.io/echodyne-presentation/`).

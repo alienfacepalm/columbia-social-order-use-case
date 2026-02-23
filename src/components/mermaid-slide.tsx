@@ -3,6 +3,8 @@ import { createPortal } from 'react-dom'
 import type { ReactElement } from 'react'
 import mermaid from 'mermaid'
 
+import { FullscreenIcon, ZoomInIcon, ZoomOutIcon } from './mermaid-slide-icons'
+
 mermaid.initialize({
   startOnLoad: false,
   theme: 'dark',
@@ -37,67 +39,11 @@ const ZOOM_STEP = 25
 
 const renderIdRef = { current: 0 }
 
-function FullscreenIcon({ className }: { className?: string }): ReactElement {
-  return (
-    <svg
-      className={className}
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
-    </svg>
-  )
-}
-
-function ZoomOutIcon({ className }: { className?: string }): ReactElement {
-  return (
-    <svg
-      className={className}
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <circle cx={11} cy={11} r={8} />
-      <path d="m21 21-4.35-4.35M8 11h6" />
-    </svg>
-  )
-}
-
-function ZoomInIcon({ className }: { className?: string }): ReactElement {
-  return (
-    <svg
-      className={className}
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <circle cx={11} cy={11} r={8} />
-      <path d="m21 21-4.35-4.35M11 8v6M8 11h6" />
-    </svg>
-  )
-}
-
 interface IDragState {
-  startX: number
-  startY: number
-  startScrollLeft: number
-  startScrollTop: number
+  readonly startX: number
+  readonly startY: number
+  readonly startScrollLeft: number
+  readonly startScrollTop: number
 }
 
 export function MermaidSlide({ code, id, fullSize = false, constrainHeight = false }: IMermaidSlideProps): ReactElement {

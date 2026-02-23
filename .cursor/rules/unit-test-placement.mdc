@@ -1,0 +1,27 @@
+---
+description: Unit tests live next to the source file in the same directory
+globs: "**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx,**/*.ts,**/*.tsx"
+alwaysApply: false
+---
+
+# Unit test placement
+
+Put unit tests for a file **next to that file in the same directory**. Do not use a single top-level `__tests__/` or `tests/` folder that mirrors the tree.
+
+## Convention
+
+- One directory per logical unit (component, module, util).
+- The spec/test file lives in that unit’s directory beside the source file.
+
+## Examples
+
+- `src/utils/truncate-title.ts` → `src/utils/truncate-title.test.ts` (or `.spec.ts`)
+- `src/components/button/button.tsx` → `src/components/button/button.test.tsx`
+- `src/hooks/use-swipe-navigation.ts` → `src/hooks/use-swipe-navigation.test.ts`
+
+## Avoid
+
+- `src/utils/truncate-title.ts` with test in `tests/utils/truncate-title.test.ts`
+- `__tests__/` at repo or `src` root containing all specs
+
+Use `.test.ts` / `.test.tsx` or `.spec.ts` / `.spec.tsx` consistently per project (this repo uses `.test.*`).
