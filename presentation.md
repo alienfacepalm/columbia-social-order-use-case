@@ -306,7 +306,7 @@ flowchart LR
 
 ## Slide 12 — How We Approached Key Challenges (RADIO: O) (Action)
 
-**Scaling** — Azure Functions auto-scale with webhook and Service Bus load; Service Bus buffers bursty TikTok traffic so we don’t over-provision or drop messages.
+**Scaling** — Azure Functions auto-scale with webhook and Service Bus load; Service Bus buffers upstream (EOS → Rithum) status traffic so we don’t over-provision or drop messages.
 
 **Data synchronization** — Bidirectional flow: Rithum → adapter → SFCC/SFOMS → EOS → SAP (orders) and EOS/SAP (lifecycle events) → Service Bus → adapter → Rithum (status). Canonical mapping and idempotent order creation keep systems in sync; SFCC and SFOMS (same suite) pass orders into EOS; EOS is the order-lifecycle authority into SAP; provenance chain supports reconciliation.
 
