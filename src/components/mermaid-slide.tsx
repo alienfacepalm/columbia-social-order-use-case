@@ -332,11 +332,11 @@ export function MermaidSlide({ code, id, fullSize = false, constrainHeight = fal
               </button>
             </div>
             <div
-              className="flex-1 min-h-0 overflow-auto flex items-center justify-center p-4"
+              className="flex-1 min-h-0 min-w-0 overflow-x-auto overflow-y-auto p-4"
               onClick={(e) => e.stopPropagation()}
             >
               <div
-                className="inline-flex [&_svg]:block"
+                className="inline-flex shrink-0 [&_svg]:block"
                 style={
                   diagramSize
                     ? {

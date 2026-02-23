@@ -13,7 +13,13 @@
   html,
   body,
   #root {
-    @apply m-0 h-full overflow-hidden;
+    @apply m-0 h-full w-full max-w-full overflow-hidden box-border;
+  }
+  html {
+    overflow-x: hidden;
+  }
+  body {
+    overflow-x: hidden;
   }
   body {
     font-family: var(--font-body);

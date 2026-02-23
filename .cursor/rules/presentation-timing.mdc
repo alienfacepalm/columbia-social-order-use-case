@@ -1,0 +1,21 @@
+---
+description: Presentation must stay under 40 minutes total runtime
+globs: presentation.md
+alwaysApply: false
+---
+
+# Presentation timing
+
+The **entire presentation** must run in **under 40 minutes**.
+
+## Constraints
+
+- Total speaking time for all slides: **&lt; 40 minutes**.
+- When adding or expanding slides, preserve this limit: trim elsewhere or keep new content short.
+- Respect existing `<!-- Pacing: X minutes -->` comments per slide; they should sum to under 40.
+
+## When editing the presentation
+
+- Prefer concise slides; avoid long bullet lists or redundant points.
+- If total estimated time exceeds 40 minutes, suggest cuts or merges (e.g. combine slides, shorten examples).
+- When asked to add content, remind that the 40-minute cap applies and offer to trim another section if needed.

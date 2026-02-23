@@ -8,9 +8,20 @@ export function parsePresentation(raw: string): ISlide[] {
   const slides: ISlide[] = []
   const blocks = raw.split(/\n---\n/).map((b) => b.trim()).filter(Boolean)
 
+  const pacingRegex = /<!--\s*Pacing:\s*(\d+)(?:[–-](\d+))?\s*(?:minute|min)s?\s*-->/i
+
   for (let i = 0; i < blocks.length; i++) {
     const block = blocks[i]
     const lines = block.split('\n')
+
+    let durationSeconds = 75
+    const pacingMatch = block.match(pacingRegex)
+    if (pacingMatch) {
+      const low = parseInt(pacingMatch[1], 10)
+      const high = pacingMatch[2] ? parseInt(pacingMatch[2], 10) : low
+      const minutes = Math.max(low, high)
+      durationSeconds = Math.round(minutes * 1.25 * 60)
+    }
 
     let title = ''
     let bodyStart = 0
@@ -47,7 +58,7 @@ export function parsePresentation(raw: string): ISlide[] {
     })
 
     const content = parseBody(body, mermaidCharts)
-    slides.push({ title, content, index: i })
+    slides.push({ title, content, index: i, durationSeconds })
   }
 
   return slides

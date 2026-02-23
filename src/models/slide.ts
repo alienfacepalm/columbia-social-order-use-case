@@ -16,4 +16,6 @@ export interface ISlide {
   readonly title: string
   readonly content: readonly TSlideContentNode[]
   readonly index: number
+  /** Speaker timer: seconds to spend on this slide (from Pacing comments or default). */
+  readonly durationSeconds: number
 }
