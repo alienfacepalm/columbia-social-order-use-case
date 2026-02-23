@@ -165,7 +165,7 @@ sequenceDiagram
 
 ---
 
-## Slide 7 — Backend, Scaling & Deployment (RADIO: A — Architecture)
+## Slide 7 — Backend, Scaling & Deployment (RADIO: A + O)
 
 **Auto-Scaling**
 
@@ -330,7 +330,7 @@ flowchart LR
 
 ---
 
-## Slide 14 — QA and Testing
+## Slide 14 — QA and Testing (RADIO: O)
 
 We applied a **layered testing strategy** so the adapter and cartridge behave predictably under real and synthetic payloads.
 
@@ -438,7 +438,7 @@ flowchart LR
 
 ## Slide 18 — Impact & Reflections (Result)
 
-- **Technical impact** — Reliable, scalable adapter pipeline; full order provenance TikTok → SAP → TikTok; faster debugging via Loki; reduced operational overhead.
+- **Technical impact** — Reliable, scalable adapter pipeline; full order provenance TikTok → SAP → TikTok; faster debugging via Grafana (querying Loki with LogQL); reduced operational overhead.
 - **Organizational impact** — New social channels (e.g. Instagram) can be added with minimal work; clearer ownership between Columbia, Rithum, SFCC/SFOMS, and SAP.
 - **Reflections** — **Our canonical data model** and one adapter paid off for maintainability; Rithum stayed an external contract we mapped to, so schema volatility stayed isolated. Investing in observability early made incidents and contract issues easier to diagnose.
 
@@ -449,8 +449,9 @@ flowchart LR
 
 ## Slide 19 — Closing
 
-I build systems that perform under real‑world constraints.  
-I'd bring the same rigor, clarity, and reliability to Echodyne's radar software platform.
+What you’ve seen today is how I approach **high‑reliability, real‑time systems**: clear requirements and architecture, a **canonical data model** that keeps integration volatility at the boundary, and **observability** that turns incidents into fast, precise fixes. I led that design and delivery across Columbia, Rithum, SFCC, and SAP—without cutting corners or leaking external schemas into the domain.
+
+I would bring that same discipline—**requirements‑driven design**, **maintainable boundaries**, and **operational clarity**—to the kind of mission‑critical systems Echodyne builds.
 
 <!-- STAR: R -->
 <!-- Pacing: 1 minute -->

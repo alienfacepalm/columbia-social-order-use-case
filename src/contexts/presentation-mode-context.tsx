@@ -1,23 +1,13 @@
 import type { ReactNode } from 'react'
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useMemo } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 
 export type PresentationMode = 'simple' | 'advanced'
 
-const URL_PARAM = 'mode'
 const STORAGE_KEY = 'echodyne-presentation-mode'
 
-function getModeFromUrl(): PresentationMode | null {
-  if (typeof window === 'undefined') return null
-  const params = new URLSearchParams(window.location.search)
-  const value = params.get(URL_PARAM)
-  if (value === 'simple' || value === 'advanced') return value
-  return null
-}
-
-function loadInitialMode(): PresentationMode {
+function getStoredMode(): PresentationMode {
   if (typeof window === 'undefined') return 'advanced'
-  const fromUrl = getModeFromUrl()
-  if (fromUrl !== null) return fromUrl
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY)
     if (stored === 'simple' || stored === 'advanced') return stored
@@ -25,13 +15,6 @@ function loadInitialMode(): PresentationMode {
     // ignore
   }
   return 'advanced'
-}
-
-function updateUrlMode(mode: PresentationMode): void {
-  if (typeof window === 'undefined') return
-  const url = new URL(window.location.href)
-  url.searchParams.set(URL_PARAM, mode)
-  window.history.replaceState(null, '', url.toString())
 }
 
 interface IPresentationModeContextValue {
@@ -56,26 +39,24 @@ interface IPresentationModeProviderProps {
 }
 
 export function PresentationModeProvider({ children }: IPresentationModeProviderProps): ReactNode {
-  const [mode, setModeState] = useState<PresentationMode>(loadInitialMode)
+  const { mode: paramMode, slideNum } = useParams<{ mode: string; slideNum?: string }>()
+  const navigate = useNavigate()
 
-  const setMode = useCallback((next: PresentationMode) => {
-    setModeState(next)
-    updateUrlMode(next)
-    try {
-      window.localStorage.setItem(STORAGE_KEY, next)
-    } catch {
-      // ignore
-    }
-  }, [])
+  const mode: PresentationMode =
+    paramMode === 'simple' || paramMode === 'advanced' ? paramMode : getStoredMode()
 
-  useEffect(() => {
-    const onPopState = (): void => {
-      const fromUrl = getModeFromUrl()
-      setModeState(fromUrl ?? 'advanced')
-    }
-    window.addEventListener('popstate', onPopState)
-    return () => window.removeEventListener('popstate', onPopState)
-  }, [])
+  const setMode = useCallback(
+    (next: PresentationMode) => {
+      const slide = slideNum ?? '1'
+      navigate(`/${next}/${slide}`, { replace: true })
+      try {
+        window.localStorage.setItem(STORAGE_KEY, next)
+      } catch {
+        // ignore
+      }
+    },
+    [navigate, slideNum],
+  )
 
   const toggle = useCallback(() => {
     setMode(mode === 'simple' ? 'advanced' : 'simple')

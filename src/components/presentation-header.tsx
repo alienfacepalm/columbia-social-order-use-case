@@ -23,14 +23,27 @@ export function PresentationHeader(): ReactElement {
       <div className="flex flex-col items-center gap-1.5 sm:items-end sm:gap-1 text-center sm:text-right">
         <button
           type="button"
+          role="switch"
           onClick={toggle}
-          className="flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-2.5 py-1 sm:px-3 sm:py-1.5 text-[0.65rem] sm:text-xs font-medium text-white/95 backdrop-blur-sm hover:bg-white/20 hover:border-white/35 transition-colors"
+          className="relative flex h-8 w-[7.5rem] sm:h-9 sm:w-[8.5rem] rounded-full border border-white/25 bg-white/10 p-1 sm:p-1.5 backdrop-blur-sm hover:bg-white/15 hover:border-white/35 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
           title={isSimple ? 'Switch to advanced (detailed) text' : 'Switch to simple (easier) text'}
-          aria-pressed={isSimple}
+          aria-checked={!isSimple}
+          aria-label="Presentation mode: Advanced or Simple"
         >
-          <span className={!isSimple ? 'font-semibold text-white' : 'text-white/80'}>Advanced</span>
-          <span className="text-white/50">|</span>
-          <span className={isSimple ? 'font-semibold text-white' : 'text-white/80'}>Simple</span>
+          <span
+            className="absolute top-1 bottom-1 sm:top-1.5 sm:bottom-1.5 w-[calc(50%-2px)] rounded-full bg-white/90 shadow-md transition-all duration-200 ease-out"
+            style={{ left: isSimple ? 'calc(50% + 2px)' : '4px' }}
+          />
+          <span
+            className={`relative z-10 flex flex-1 items-center justify-center text-[0.65rem] sm:text-xs font-medium transition-colors ${!isSimple ? 'text-[#1d3356] font-semibold' : 'text-white/70'}`}
+          >
+            Advanced
+          </span>
+          <span
+            className={`relative z-10 flex flex-1 items-center justify-center text-[0.65rem] sm:text-xs font-medium transition-colors ${isSimple ? 'text-[#1d3356] font-semibold' : 'text-white/70'}`}
+          >
+            Simple
+          </span>
         </button>
         <span className="text-[0.65rem] sm:text-xs font-normal leading-tight text-white/90">
           Prepared for Echodyne Interview by Brandon Pliska

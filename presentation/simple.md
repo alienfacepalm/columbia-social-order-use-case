@@ -132,7 +132,7 @@ sequenceDiagram
 
 ---
 
-## Slide 7 — Backend, Scaling & Deployment (RADIO: A — Architecture)
+## Slide 7 — Backend, Scaling & Deployment (RADIO: A + O)
 
 **Auto-Scaling**
 
@@ -267,7 +267,7 @@ flowchart LR
 
 ---
 
-## Slide 14 — QA and Testing
+## Slide 14 — QA and Testing (RADIO: O)
 
 We tested in layers so the adapter behaves predictably with real and test data.
 
@@ -359,7 +359,7 @@ flowchart LR
 
 ## Slide 18 — Impact & Reflections (Result)
 
-- **Technical** — Reliable, scalable pipeline; full order trail TikTok → SAP → TikTok; faster debugging with Loki; less operational overhead.
+- **Technical** — Reliable, scalable pipeline; full order trail TikTok → SAP → TikTok; faster debugging with Grafana (querying Loki with LogQL); less operational overhead.
 - **Organizational** — New channels (e.g. Instagram) can be added with less work; clearer ownership between Columbia, partner, and SAP.
 - **Reflections** — One data model and one adapter paid off. Keeping the partner as an external contract we map to kept schema churn isolated. Investing in observability early made incidents and contract issues easier to fix.
 

@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react'
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 
 import { Slide } from './slide'
 import { PresentationHeader } from './presentation-header'
@@ -19,6 +20,15 @@ const slides = mergePresentationWithSimple(
 )
 
 export function App(): ReactElement {
+  const { mode, slideNum } = useParams<{ mode: string; slideNum?: string }>()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (mode !== 'simple' && mode !== 'advanced') {
+      navigate(`/advanced/${slideNum ?? '1'}`, { replace: true })
+    }
+  }, [mode, slideNum, navigate])
+
   const { index, go, goTo } = useSlideNav({ total: slides.length })
   const isMobile = useMediaQuery('(max-width: 640px)')
 

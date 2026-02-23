@@ -1,18 +1,5 @@
-import { useState, useEffect, useCallback } from 'react'
-
-const HASH_PREFIX = 'slide-'
-
-function parseSlideFromHash(total: number): number {
-  const hash = window.location.hash.slice(1)
-  if (!hash.startsWith(HASH_PREFIX)) return 0
-  const n = parseInt(hash.slice(HASH_PREFIX.length), 10)
-  if (!Number.isFinite(n) || n < 1) return 0
-  return Math.min(n - 1, total - 1)
-}
-
-function slideToHash(index: number): string {
-  return `#${HASH_PREFIX}${index + 1}`
-}
+import { useCallback, useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 
 export interface IUseSlideNavOptions {
   readonly total: number
@@ -26,41 +13,46 @@ export interface IUseSlideNavReturn {
   readonly goToEnd: () => void
 }
 
+function parseSlideIndex(slideNum: string | undefined, total: number): number {
+  if (slideNum == null || slideNum === '') return 0
+  const n = parseInt(slideNum, 10)
+  if (!Number.isFinite(n) || n < 1) return 0
+  return Math.min(n - 1, total - 1)
+}
+
 export function useSlideNav({ total }: IUseSlideNavOptions): IUseSlideNavReturn {
-  const [current, setCurrent] = useState(() => parseSlideFromHash(total))
-  const index = Math.max(0, Math.min(current, total - 1))
+  const { mode, slideNum } = useParams<{ mode: string; slideNum?: string }>()
+  const navigate = useNavigate()
 
-  // Sync URL hash when slide changes
-  useEffect(() => {
-    const expected = slideToHash(index)
-    if (window.location.hash !== expected) {
-      window.history.replaceState(null, '', expected)
-    }
-  }, [index])
+  const index = Math.max(0, Math.min(parseSlideIndex(slideNum, total), total - 1))
+  const routeMode = mode === 'simple' || mode === 'advanced' ? mode : 'advanced'
 
-  // React to hash changes (back/forward, manual URL edit)
-  useEffect(() => {
-    const onHashChange = (): void => {
-      setCurrent(parseSlideFromHash(total))
-    }
-    window.addEventListener('hashchange', onHashChange)
-    return () => window.removeEventListener('hashchange', onHashChange)
-  }, [total])
+  const go = useCallback(
+    (delta: number) => {
+      const next = Math.max(1, Math.min(index + 1 + delta, total))
+      navigate(`/${routeMode}/${next}`, { replace: true })
+    },
+    [index, total, routeMode, navigate],
+  )
 
-  const go = useCallback((delta: number) => {
-    setCurrent((c) => Math.max(0, Math.min(c + delta, total - 1)))
-  }, [total])
+  const goTo = useCallback(
+    (slideIndex: number) => {
+      const next = Math.max(1, Math.min(slideIndex + 1, total))
+      navigate(`/${routeMode}/${next}`, { replace: true })
+    },
+    [total, routeMode, navigate],
+  )
 
-  const goTo = useCallback((slideIndex: number) => {
-    setCurrent(Math.max(0, Math.min(slideIndex, total - 1)))
-  }, [total])
+  const goToStart = useCallback(() => {
+    navigate(`/${routeMode}/1`, { replace: true })
+  }, [routeMode, navigate])
 
-  const goToStart = useCallback(() => setCurrent(0), [])
-  const goToEnd = useCallback(() => setCurrent(total - 1), [total])
+  const goToEnd = useCallback(() => {
+    navigate(`/${routeMode}/${total}`, { replace: true })
+  }, [routeMode, total, navigate])
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent): void => {
-      // Ignore when typing in an input/textarea
       const target = e.target as HTMLElement
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return
       if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
