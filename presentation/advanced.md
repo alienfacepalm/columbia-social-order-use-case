@@ -1,11 +1,3 @@
-<!--
-HYBRID FORMAT NOTES
-- Slides are clean for Cursor slide generation
-- System design follows RADIO: Requirements → Architecture → Data model → Interface (API) → Optimizations
-- STAR story arc: Situation → Task → Action → Result (for narrative flow)
-- Pacing target: 30–40 minutes presentation + Q&A
--->
-
 # Social-Order Adapter
 
 ## High‑Reliability Real‑Time System Design
@@ -124,7 +116,7 @@ flowchart LR
 ```
 
 <!-- STAR: T/A — Key technology decisions and rationales -->
-<!-- Pacing: 3 minutes -->
+<!-- Pacing: 2 minutes -->
 <!-- Interview phrasing: "We defined our own canonical data model for orders and inventory. Rithum's API schema was treated as an external contract, and we built a mapping layer so their schema never leaked into our domain." -->
 
 ---
@@ -161,7 +153,7 @@ sequenceDiagram
 ```
 
 <!-- STAR: A — System architecture and design choices -->
-<!-- Pacing: 3 minutes -->
+<!-- Pacing: 2 minutes -->
 
 ---
 
@@ -189,7 +181,7 @@ flowchart LR
 ```
 
 <!-- STAR: A — Scaling strategy; deployment model -->
-<!-- Pacing: 2–3 minutes -->
+<!-- Pacing: 2 minutes -->
 
 ---
 
@@ -215,7 +207,7 @@ flowchart LR
 ```
 
 <!-- RADIO: D — Data model / core entities -->
-<!-- Pacing: 3 minutes -->
+<!-- Pacing: 2 minutes -->
 
 ---
 
@@ -243,7 +235,7 @@ flowchart TB
 ```
 
 <!-- RADIO: I — Interface (API) between components -->
-<!-- Pacing: 3 minutes -->
+<!-- Pacing: 2 minutes -->
 
 ---
 
@@ -266,7 +258,7 @@ flowchart LR
 ```
 
 <!-- RADIO: I — Interface (API) between components -->
-<!-- Pacing: 3 minutes -->
+<!-- Pacing: 2 minutes -->
 
 ---
 
@@ -291,7 +283,7 @@ flowchart LR
 ```
 
 <!-- RADIO: O — Optimizations and deep dive -->
-<!-- Pacing: 3 minutes -->
+<!-- Pacing: 2 minutes -->
 
 ---
 
@@ -313,7 +305,7 @@ flowchart LR
 ```
 
 <!-- STAR: A — Scaling, data sync, security, fault tolerance per prompt -->
-<!-- Pacing: 3 minutes -->
+<!-- Pacing: 2 minutes -->
 
 ---
 
@@ -373,7 +365,7 @@ flowchart LR
 ```
 
 <!-- RADIO: O — Quality and reliability -->
-<!-- Pacing: 2–3 minutes -->
+<!-- Pacing: 2 minutes -->
 
 ---
 
@@ -432,7 +424,7 @@ flowchart LR
 ```
 
 <!-- STAR: A — Risks, trade-offs, scaling per prompt -->
-<!-- Pacing: 4 minutes -->
+<!-- Pacing: 3 minutes -->
 
 ---
 
