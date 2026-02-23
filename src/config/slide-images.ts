@@ -22,7 +22,7 @@ const SLIDE_IMAGES: readonly ISlideImageConfig[] = [
 const SLIDE_INDICES_WITH_IMAGE: readonly number[] = [1, 3, 12, 13, 15, 16]
 
 /** Width in px for each size; height scales with object-contain inside fixed container. */
-export const IMAGE_SIZE_PX: Record<TSlideImageSize, number> = {
+export const IMAGE_SIZE_PX: Readonly<Record<TSlideImageSize, number>> = {
   s: 130,
   m: 200,
   l: 260,
@@ -36,7 +36,7 @@ export function getSlideImage(slideIndex: number, hasDiagram?: boolean): ISlideI
   return SLIDE_IMAGES[idx] ?? null
 }
 
-/** Even = right, odd = left */
+/** Even = right, odd = left. */
 export function getSlideImagePosition(slideIndex: number): 'left' | 'right' {
   return slideIndex % 2 === 0 ? 'right' : 'left'
 }
