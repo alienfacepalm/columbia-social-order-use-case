@@ -103,7 +103,26 @@ function parseBody(body: string, mermaidCharts: readonly string[]): SlideContent
   return nodes
 }
 
-/** Inline: **bold** and plain text */
+/** Parse a segment that may contain [text](url) links (no **) */
+function parseLinkSegment(segment: string): InlineSpan[] {
+  const out: InlineSpan[] = []
+  const linkRegex = /\[([^\]]*)\]\(([^)]*)\)/g
+  let lastIndex = 0
+  let m: RegExpExecArray | null
+  while ((m = linkRegex.exec(segment)) !== null) {
+    if (m.index > lastIndex) {
+      out.push({ type: 'text', value: segment.slice(lastIndex, m.index) })
+    }
+    out.push({ type: 'link', value: m[1], href: m[2] })
+    lastIndex = m.index + m[0].length
+  }
+  if (lastIndex < segment.length) {
+    out.push({ type: 'text', value: segment.slice(lastIndex) })
+  }
+  return out
+}
+
+/** Inline: **bold**, [link](url), and plain text */
 export function parseInline(text: string): InlineSpan[] {
   const out: InlineSpan[] = []
   const boldRegex = /\*\*([^*]+)\*\*/g
@@ -111,13 +130,11 @@ export function parseInline(text: string): InlineSpan[] {
   let m: RegExpExecArray | null
   while ((m = boldRegex.exec(text)) !== null) {
     if (m.index > lastIndex) {
-      out.push({ type: 'text', value: text.slice(lastIndex, m.index) })
+      out.push(...parseLinkSegment(text.slice(lastIndex, m.index)))
     }
     out.push({ type: 'bold', value: m[1] })
     lastIndex = m.index + m[0].length
   }
-  if (lastIndex < text.length) {
-    out.push({ type: 'text', value: text.slice(lastIndex) })
-  }
+  out.push(...parseLinkSegment(text.slice(lastIndex)))
   return out.length > 0 ? out : [{ type: 'text', value: text }]
 }

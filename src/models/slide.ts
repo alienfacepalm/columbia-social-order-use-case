@@ -1,7 +1,8 @@
-/** Inline span: plain text or bold */
+/** Inline span: plain text, bold, or link */
 export type InlineSpan =
   | { readonly type: 'text'; value: string }
   | { readonly type: 'bold'; value: string }
+  | { readonly type: 'link'; value: string; href: string }
 
 /** Content node for a single slide */
 export type SlideContentNode =

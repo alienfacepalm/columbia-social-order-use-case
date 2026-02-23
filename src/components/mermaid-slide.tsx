@@ -1,4 +1,4 @@
-import { useId, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useId, useLayoutEffect, useRef, useState } from 'react'
 import type { ReactElement } from 'react'
 import mermaid from 'mermaid'
 
@@ -6,6 +6,7 @@ mermaid.initialize({
   startOnLoad: false,
   theme: 'dark',
   securityLevel: 'loose',
+  deterministicIds: true,
   themeVariables: {
     primaryColor: '#2d3748',
     primaryTextColor: '#e2e8f0',
@@ -27,24 +28,39 @@ export interface MermaidSlideProps {
   readonly fullSize?: boolean
 }
 
-const DIAGRAM_ZOOM_OPTIONS = [100, 125, 150, 200] as const
+const ZOOM_MIN = 50
+const ZOOM_MAX = 250
+const ZOOM_STEP = 25
+
+const renderIdRef = { current: 0 }
+
+interface DragState {
+  startX: number
+  startY: number
+  startScrollLeft: number
+  startScrollTop: number
+}
 
 export function MermaidSlide({ code, id, fullSize = false }: MermaidSlideProps): ReactElement {
   const ref = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const dragRef = useRef<DragState | null>(null)
   const uniqueId = useId()
-  const mermaidId = `mermaid-${uniqueId.replace(/:/g, '-')}`
-  const [zoom, setZoom] = useState<number>(125)
+  const [zoom, setZoom] = useState<number>(100)
+  const [isDragging, setIsDragging] = useState(false)
   const [result, setResult] = useState<{
     svg: string
     bindFunctions: ((element: Element) => void) | undefined
   } | null>(null)
-  const [error, setError] = useState<boolean>(false)
+  const [diagramSize, setDiagramSize] = useState<{ width: number; height: number } | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   useLayoutEffect(() => {
     if (!code?.trim()) return
-    setError(false)
+    setError(null)
     setResult(null)
     let cancelled = false
+    const mermaidId = `mermaid-${uniqueId.replace(/:/g, '-')}-${++renderIdRef.current}`
 
     mermaid
       .render(mermaidId, code.trim())
@@ -52,71 +68,224 @@ export function MermaidSlide({ code, id, fullSize = false }: MermaidSlideProps):
         if (cancelled) return
         setResult({ svg, bindFunctions })
       })
-      .catch((err) => {
+      .catch((err: unknown) => {
         if (!cancelled) {
+          const message = err instanceof Error ? err.message : String(err)
           console.error('Mermaid render failed:', err)
-          setError(true)
+          setError(message)
         }
       })
 
     return () => {
       cancelled = true
     }
-  }, [code, mermaidId])
+  }, [code, uniqueId])
 
   useLayoutEffect(() => {
-    if (result?.bindFunctions && ref.current) {
-      result.bindFunctions(ref.current)
+    if (!result?.bindFunctions || !ref.current) return
+    result.bindFunctions(ref.current)
+    const svg = ref.current.querySelector('svg')
+    if (svg) {
+      const w = svg.getAttribute('width')
+      const h = svg.getAttribute('height')
+      const viewBox = svg.getAttribute('viewBox')
+      let width = 0
+      let height = 0
+      if (w != null && h != null) {
+        width = parseFloat(w) || 0
+        height = parseFloat(h) || 0
+      }
+      if ((width === 0 || height === 0) && viewBox) {
+        const parts = viewBox.trim().split(/\s+/)
+        if (parts.length >= 4) {
+          width = width || parseFloat(parts[2]) || 0
+          height = height || parseFloat(parts[3]) || 0
+        }
+      }
+      if (width > 0 && height > 0) {
+        setDiagramSize({ width, height })
+      }
     }
   }, [result])
 
+  useLayoutEffect(() => {
+    const el = containerRef.current
+    if (el && result?.svg != null) {
+      const maxLeft = Math.max(0, el.scrollWidth - el.clientWidth)
+      const maxTop = Math.max(0, el.scrollHeight - el.clientHeight)
+      el.scrollLeft = maxLeft / 2
+      el.scrollTop = maxTop / 2
+    }
+  }, [result?.svg, zoom])
+
+  const handlePanMove = useCallback((clientX: number, clientY: number) => {
+    const state = dragRef.current
+    const el = containerRef.current
+    if (!state || !el) return
+    const dx = state.startX - clientX
+    const dy = state.startY - clientY
+    el.scrollLeft = state.startScrollLeft + dx
+    el.scrollTop = state.startScrollTop + dy
+  }, [])
+
+  const handlePanEnd = useCallback(() => {
+    if (dragRef.current) {
+      dragRef.current = null
+      setIsDragging(false)
+    }
+  }, [])
+
+  const onContainerMouseDown = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (!containerRef.current || e.button !== 0) return
+      dragRef.current = {
+        startX: e.clientX,
+        startY: e.clientY,
+        startScrollLeft: containerRef.current.scrollLeft,
+        startScrollTop: containerRef.current.scrollTop,
+      }
+      setIsDragging(true)
+    },
+    []
+  )
+
+  const onContainerMouseMove = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (dragRef.current) handlePanMove(e.clientX, e.clientY)
+    },
+    [handlePanMove]
+  )
+
+  const onContainerTouchStart = useCallback(
+    (e: React.TouchEvent<HTMLDivElement>) => {
+      if (!containerRef.current || e.changedTouches.length !== 1) return
+      const t = e.changedTouches[0]
+      dragRef.current = {
+        startX: t.clientX,
+        startY: t.clientY,
+        startScrollLeft: containerRef.current.scrollLeft,
+        startScrollTop: containerRef.current.scrollTop,
+      }
+      setIsDragging(true)
+    },
+    []
+  )
+
+  useLayoutEffect(() => {
+    if (!isDragging) return
+    const onMouseMove = (e: MouseEvent) => handlePanMove(e.clientX, e.clientY)
+    const onMouseUp = () => handlePanEnd()
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.changedTouches.length === 1) {
+        e.preventDefault()
+        handlePanMove(e.changedTouches[0].clientX, e.changedTouches[0].clientY)
+      }
+    }
+    const onTouchEnd = () => handlePanEnd()
+    document.addEventListener('mousemove', onMouseMove)
+    document.addEventListener('mouseup', onMouseUp)
+    document.addEventListener('touchmove', onTouchMove, { passive: false })
+    document.addEventListener('touchend', onTouchEnd)
+    document.addEventListener('touchcancel', onTouchEnd)
+    return () => {
+      document.removeEventListener('mousemove', onMouseMove)
+      document.removeEventListener('mouseup', onMouseUp)
+      document.removeEventListener('touchmove', onTouchMove)
+      document.removeEventListener('touchend', onTouchEnd)
+      document.removeEventListener('touchcancel', onTouchEnd)
+    }
+  }, [isDragging, handlePanMove, handlePanEnd])
+
   if (error) {
     return (
-      <div className="text-[#f85149] text-sm">
-        Diagram failed to render.
+      <div className="text-[#f85149] text-sm space-y-1">
+        <p className="font-medium">Diagram failed to render.</p>
+        <p className="text-xs text-white/80 font-mono break-all">{error}</p>
       </div>
     )
   }
 
+  const diagramContent =
+    result?.svg != null ? (
+      <div
+        ref={ref}
+        className={
+          fullSize
+            ? 'inline-flex flex-shrink-0 items-center justify-center [&_svg]:block [&_svg]:min-h-[280px]'
+            : 'flex items-center justify-center [&_svg]:max-w-full [&_svg]:max-h-full [&_svg]:h-auto [&_svg]:w-auto [&_svg]:min-h-[280px]'
+        }
+        style={
+          fullSize
+            ? {
+                zoom: zoom / 100,
+                ...(diagramSize && {
+                  width: diagramSize.width,
+                  height: diagramSize.height,
+                  minWidth: diagramSize.width,
+                  minHeight: diagramSize.height,
+                }),
+              }
+            : undefined
+        }
+        data-mermaid-id={id}
+        dangerouslySetInnerHTML={{ __html: result.svg }}
+      />
+    ) : code.trim() ? (
+      <div className="flex min-h-[200px] items-center justify-center text-white/60 text-sm">
+        Loading diagram…
+      </div>
+    ) : (
+      <div className="flex min-h-[200px] items-center justify-center text-white/50 text-sm">
+        No diagram source.
+      </div>
+    )
+
   if (fullSize) {
     return (
       <div className="flex flex-1 min-h-0 min-w-0 flex-col">
-        <div className="flex flex-shrink-0 justify-end gap-1 pb-2">
-          <span className="text-xs text-white/70 mr-1">Zoom:</span>
-          {DIAGRAM_ZOOM_OPTIONS.map((pct) => (
-            <button
-              key={pct}
-              type="button"
-              onClick={() => setZoom(pct)}
-              className={`min-w-[2.25rem] rounded px-1.5 py-0.5 text-xs border ${
-                zoom === pct
-                  ? 'bg-white/20 border-white/50 text-white'
-                  : 'bg-transparent border-white/30 text-white/80 hover:bg-white/10'
-              }`}
-            >
-              {pct}%
-            </button>
-          ))}
+        <div className="flex flex-shrink-0 items-center justify-end gap-1 pb-2">
+          <span className="text-xs text-white/70">Zoom</span>
+          <button
+            type="button"
+            onClick={() => setZoom((z) => Math.max(ZOOM_MIN, z - ZOOM_STEP))}
+            disabled={zoom <= ZOOM_MIN}
+            className="min-w-[2rem] rounded px-1.5 py-0.5 text-sm font-medium border bg-transparent border-white/30 text-white/80 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+            aria-label="Zoom out"
+          >
+            −
+          </button>
+          <span className="min-w-[2.5rem] text-center text-xs text-white/90 tabular-nums">
+            {zoom}%
+          </span>
+          <button
+            type="button"
+            onClick={() => setZoom((z) => Math.min(ZOOM_MAX, z + ZOOM_STEP))}
+            disabled={zoom >= ZOOM_MAX}
+            className="min-w-[2rem] rounded px-1.5 py-0.5 text-sm font-medium border bg-transparent border-white/30 text-white/80 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+            aria-label="Zoom in"
+          >
+            +
+          </button>
         </div>
-        <div className="flex-1 min-h-0 overflow-auto flex items-center justify-center">
-          <div
-            ref={ref}
-            className="flex items-center justify-center [&_svg]:max-w-full [&_svg]:max-h-full [&_svg]:h-auto [&_svg]:w-auto"
-            style={{ zoom: zoom / 100 }}
-            data-mermaid-id={id}
-            dangerouslySetInnerHTML={result?.svg ? { __html: result.svg } : undefined}
-          />
+        <div
+          ref={containerRef}
+          className="flex-1 min-h-[320px] overflow-auto select-none cursor-grab active:cursor-grabbing"
+          style={{ userSelect: isDragging ? 'none' : undefined }}
+          onMouseDown={onContainerMouseDown}
+          onMouseMove={onContainerMouseMove}
+          onMouseUp={handlePanEnd}
+          onMouseLeave={handlePanEnd}
+          onTouchStart={onContainerTouchStart}
+        >
+          {diagramContent}
         </div>
       </div>
     )
   }
 
   return (
-    <div
-      ref={ref}
-      className="my-4 flex min-h-[200px] items-center justify-center [&_svg]:max-w-full [&_svg]:h-auto"
-      data-mermaid-id={id}
-      dangerouslySetInnerHTML={result?.svg ? { __html: result.svg } : undefined}
-    />
+    <div className="my-4 flex min-h-[280px] items-center justify-center">
+      {diagramContent}
+    </div>
   )
 }

@@ -21,6 +21,7 @@ export interface UseSlideNavOptions {
 export interface UseSlideNavReturn {
   readonly index: number
   readonly go: (delta: number) => void
+  readonly goTo: (slideIndex: number) => void
   readonly goToStart: () => void
   readonly goToEnd: () => void
 }
@@ -50,6 +51,10 @@ export function useSlideNav({ total }: UseSlideNavOptions): UseSlideNavReturn {
     setCurrent((c) => Math.max(0, Math.min(c + delta, total - 1)))
   }, [total])
 
+  const goTo = useCallback((slideIndex: number) => {
+    setCurrent(Math.max(0, Math.min(slideIndex, total - 1)))
+  }, [total])
+
   const goToStart = useCallback(() => setCurrent(0), [])
   const goToEnd = useCallback(() => setCurrent(total - 1), [total])
 
@@ -76,5 +81,5 @@ export function useSlideNav({ total }: UseSlideNavOptions): UseSlideNavReturn {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [go, goToStart, goToEnd])
 
-  return { index, go, goToStart, goToEnd }
+  return { index, go, goTo, goToStart, goToEnd }
 }

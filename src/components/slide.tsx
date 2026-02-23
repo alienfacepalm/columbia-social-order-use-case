@@ -5,13 +5,33 @@ import { MermaidSlide } from './mermaid-slide'
 import { parseInline } from '../utils/parse-presentation'
 
 function renderInline(inlines: readonly InlineSpan[]): ReactElement[] {
-  return inlines.map((span, j) =>
-    span.type === 'bold' ? (
-      <strong key={j}>{span.value}</strong>
-    ) : (
-      <span key={j}>{span.value}</span>
-    )
-  )
+  return inlines.map((span, j) => {
+    if (span.type === 'bold') {
+      return (
+        <strong key={j}>
+          {renderInline(parseInline(span.value))}
+        </strong>
+      )
+    }
+    if (span.type === 'link') {
+      const isExternal =
+        span.href.startsWith('http://') || span.href.startsWith('https://')
+      return isExternal ? (
+        <a
+          key={j}
+          href={span.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[#66a5e8] underline hover:text-[#99c4f0]"
+        >
+          {span.value}
+        </a>
+      ) : (
+        <span key={j}>{span.value}</span>
+      )
+    }
+    return <span key={j}>{span.value}</span>
+  })
 }
 
 export interface SlideProps {
@@ -27,6 +47,27 @@ export function Slide({ slide, slideIndex }: SlideProps): ReactElement {
   const imageConfig = getSlideImage(slideIndex)
   const imagePosition = getSlideImagePosition(slideIndex)
   const isDiagramSlide = hasDiagram(slide)
+  const isTitleSlide = slideIndex === 0
+
+  if (isTitleSlide) {
+    const [main, sub, byline] = slide.content
+    const mainText = main?.type === 'p' ? renderInline(main.content) : null
+    const subText = sub?.type === 'p' ? renderInline(sub.content) : null
+    const bylineText = byline?.type === 'p' ? renderInline(byline.content) : null
+    return (
+      <section className="flex flex-1 w-full min-h-0 overflow-auto mt-8 px-8 py-12 bg-black/25 border border-white/20 rounded-xl flex-col items-center justify-center text-center max-w-4xl">
+        <h1 className="text-[clamp(2rem,5vw,3.25rem)] font-bold leading-tight text-white mb-4 m-0 tracking-tight">
+          {mainText}
+        </h1>
+        <p className="text-xl text-white/95 mb-6 m-0">
+          {subText}
+        </p>
+        <p className="text-base text-white/80 m-0 font-medium">
+          {bylineText}
+        </p>
+      </section>
+    )
+  }
 
   return (
     <section
@@ -62,11 +103,11 @@ export function Slide({ slide, slideIndex }: SlideProps): ReactElement {
           ))}
         </div>
         {!isDiagramSlide && imageConfig && (
-          <div className="slide-illustration-wrap flex-shrink-0 w-[280px] h-[200px] flex items-center justify-center">
+          <div className="slide-illustration-wrap flex-shrink-0 w-[280px] h-[200px] flex items-center justify-center p-3">
             <img
               src={imageConfig.src}
               alt={imageConfig.alt}
-              className={`slide-illustration object-contain object-center w-auto h-auto max-h-[200px] ${
+              className={`slide-illustration object-contain object-center w-auto h-auto max-h-[176px] ${
                 imageConfig.size === 's' ? 'max-w-[130px]' : imageConfig.size === 'm' ? 'max-w-[200px]' : 'max-w-[260px]'
               }`}
               width={IMAGE_SIZE_PX[imageConfig.size]}

@@ -6,19 +6,21 @@ HYBRID FORMAT NOTES
 - Pacing target: ~40 minutes
 -->
 
-# High‑Reliability Real‑Time System Design
+# Social-Order
+
+## High‑Reliability Real‑Time System Design
 
 ### Columbia Social‑Order Commerce Pipeline
 
-Buck — Senior Full Stack Engineer Candidate
+### Brandon Pliska — Senior Full Stack Engineer Candidate
 
 ---
 
-## Slide 1 — Title
+## Slide 1 — Welcome
 
 **High‑Reliability Real‑Time System Design**  
 Columbia Social‑Order Commerce Pipeline  
-Buck — Senior Full Stack Engineer Candidate
+Brandon Pliska — Senior Full Stack Engineer Candidate
 
 <!-- STAR: S — Introduce the situation -->
 <!-- RADIO: R — Problem framing -->
@@ -104,24 +106,21 @@ We evaluated two options:
 flowchart LR
     TT["TikTok Shop Webhooks"] --> R["Rithum Middleware"]
     R --> APIM["Azure API Management"]
-    APIM --> AF["Azure Function App (Stateless)"]
-    AF --> SB1["Azure Service Bus (Downstream)"]
-    SB1 --> CM["Canonical Mapping Layer"]
-    CM --> CART["Custom SFCC Cartridge"]
-    CART --> SFCC["Salesforce Commerce Cloud"]
-    SFCC --> SFOMS["Salesforce Order Management System"]
-    SFOMS --> SAP["SAP Fulfillment"]
+    APIM --> AF["Azure Function App"]
+    AF --> SB1["Azure Service Bus"]
+    SB1 --> CM["Canonical Mapping"]
+    CM --> CART["SFCC Cartridge"]
+    CART --> SFCC["Commerce Cloud"]
+    SFCC --> SFOMS["SFOMS"]
+    SFOMS --> SAP["SAP"]
 
-    SAP --> SB2["Azure Service Bus (Upstream)"]
-    SB2 --> AF2["Social-Order Function App"]
-    AF2 --> RAPI["Rithum API (Status Update)"]
+    SAP --> SB2["Service Bus Upstream"]
+    SB2 --> AF2["Function App"]
+    AF2 --> RAPI["Rithum API"]
 
-    subgraph Observability
-        L["Loki (Unified Logs)"]
-        K["KQL (Azure Logs)"]
-        G["Grafana Dashboards"]
-        T["Traces"]
-    end
+    L["Loki"]
+    K["KQL"]
+    G["Grafana"]
 
     AF --> L
     AF --> K
