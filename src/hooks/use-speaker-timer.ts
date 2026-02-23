@@ -20,6 +20,7 @@ export function useSpeakerTimer({
 }: IUseSpeakerTimerOptions): IUseSpeakerTimerReturn {
   const [secondsRemaining, setSecondsRemaining] = useState(durationSeconds)
 
+  // Reset to full duration whenever slide or duration changes
   useEffect(() => {
     setSecondsRemaining(durationSeconds)
   }, [durationSeconds, slideIndex])

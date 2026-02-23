@@ -45,6 +45,7 @@ export function App(): ReactElement {
 
       {slides[index] ? (
         <SpeakerTimer
+          key={index}
           durationSeconds={slides[index].durationSeconds}
           slideIndex={index}
         />
