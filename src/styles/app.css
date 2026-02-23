@@ -1,30 +1,73 @@
 @import 'tailwindcss';
 
+@theme {
+  --font-display: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+}
+
 @layer base {
   html,
   body,
   #root {
     @apply m-0 h-full overflow-hidden;
   }
+  body {
+    font-family: var(--font-body);
+  }
 }
 
-/* Styling for slides that have images (content + illustration layout) */
+/* Title slide: gradient text with soft glow */
+.slide-title-main {
+  font-family: var(--font-display);
+  background: linear-gradient(135deg, #ffffff 0%, #e0edff 50%, #a8d0ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3)) drop-shadow(0 0 24px rgba(168, 208, 255, 0.2));
+}
+.slide-title-main strong,
+.slide-title-main span,
+.slide-title-main a {
+  -webkit-text-fill-color: transparent;
+  background-clip: inherit;
+  background: inherit;
+}
+
+.slide-title-sub {
+  font-family: var(--font-display);
+}
+
+.slide-title-byline {
+  font-family: var(--font-body);
+  letter-spacing: 0.04em;
+}
+
+/* Slide section title pill (e.g. "Welcome") */
+.slide-section-title {
+  font-family: var(--font-display);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* Body content typography */
+.slide-content-subtitle {
+  font-family: var(--font-display);
+}
+
+.slide-content-p,
+.slide-content-list {
+  font-family: var(--font-body);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+/* Slide images: no frame, transparent background so PNG alpha shows through */
 .slide-illustration-wrap {
   min-height: 200px;
-  @apply rounded-xl overflow-hidden;
-  background: linear-gradient(145deg, rgba(43, 65, 106, 0.5) 0%, rgba(29, 51, 86, 0.6) 100%);
-  border: 1px solid rgba(102, 165, 232, 0.35);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 4px 16px rgba(0, 0, 0, 0.2),
-    0 0 0 1px rgba(0, 0, 0, 0.1);
+  @apply flex items-center justify-center;
+  background: transparent;
 }
 
 .slide-illustration {
-  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
-  transition: filter 0.2s ease;
-}
-
-.slide-illustration-wrap:hover .slide-illustration {
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.25));
+  display: block;
 }

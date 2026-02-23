@@ -56,13 +56,13 @@ export function Slide({ slide, slideIndex }: SlideProps): ReactElement {
     const bylineText = byline?.type === 'p' ? renderInline(byline.content) : null
     return (
       <section className="flex flex-1 w-full min-h-0 overflow-auto mt-8 px-8 py-12 bg-black/25 border border-white/20 rounded-xl flex-col items-center justify-center text-center max-w-4xl">
-        <h1 className="text-[clamp(2rem,5vw,3.25rem)] font-bold leading-tight text-white mb-4 m-0 tracking-tight">
+        <h1 className="slide-title-main text-[clamp(2rem,5vw,3.25rem)] font-bold leading-tight mb-4 m-0 tracking-tight">
           {mainText}
         </h1>
-        <p className="text-xl text-white/95 mb-6 m-0">
+        <p className="slide-title-sub text-xl font-medium tracking-wide text-white/95 mb-6 m-0 border-b border-white/30 pb-1 inline-block">
           {subText}
         </p>
-        <p className="text-base text-white/80 m-0 font-medium">
+        <p className="slide-title-byline text-base text-white/85 m-0 font-medium tracking-[0.04em]">
           {bylineText}
         </p>
       </section>
@@ -75,7 +75,7 @@ export function Slide({ slide, slideIndex }: SlideProps): ReactElement {
     >
       {slide.title && (
         <div className="flex justify-end mb-2 flex-shrink-0">
-          <h2 className="text-sm font-semibold leading-tight text-white/90 m-0">
+          <h2 className="slide-section-title text-xs font-semibold leading-tight text-white/95 m-0 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm">
             {renderInline(parseInline(slide.title))}
           </h2>
         </div>
@@ -103,11 +103,11 @@ export function Slide({ slide, slideIndex }: SlideProps): ReactElement {
           ))}
         </div>
         {!isDiagramSlide && imageConfig && (
-          <div className="slide-illustration-wrap flex-shrink-0 w-[280px] h-[200px] flex items-center justify-center p-3">
+          <div className="slide-illustration-wrap flex-shrink-0 w-[280px] min-h-[200px] flex items-center justify-center">
             <img
               src={imageConfig.src}
               alt={imageConfig.alt}
-              className={`slide-illustration object-contain object-center w-auto h-auto max-h-[176px] ${
+              className={`slide-illustration object-contain object-center w-auto h-auto max-h-[200px] ${
                 imageConfig.size === 's' ? 'max-w-[130px]' : imageConfig.size === 'm' ? 'max-w-[200px]' : 'max-w-[260px]'
               }`}
               width={IMAGE_SIZE_PX[imageConfig.size]}
@@ -139,19 +139,21 @@ function SlideNode({ node, slideIndex, nodeIndex, isDiagramSlide }: SlideNodePro
   }
   if (node.type === 'subtitle') {
     return (
-      <p className="text-lg opacity-90 mb-4 m-0">{node.content}</p>
+      <p className="slide-content-subtitle text-lg font-semibold tracking-wide text-white/95 mb-4 m-0">
+        {node.content}
+      </p>
     )
   }
   if (node.type === 'p') {
     return (
-      <p className="mb-3 text-[1.05rem] leading-[1.55] m-0">
+      <p className="slide-content-p mb-3 text-[1.05rem] leading-[1.6] m-0 text-white/92">
         {renderInline(node.content)}
       </p>
     )
   }
   if (node.type === 'ul') {
     return (
-      <ul className="my-2 mb-4 pl-6 list-disc m-0 [&_li]:my-[0.35rem] [&_li]:leading-normal">
+      <ul className="slide-content-list my-2 mb-4 pl-6 list-disc m-0 space-y-1 [&_li]:leading-relaxed [&_li]:text-white/92">
         {node.items.map((inlines, j) => (
           <li key={j}>{renderInline(inlines)}</li>
         ))}

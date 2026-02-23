@@ -11,7 +11,7 @@ export function App(): ReactElement {
 
   return (
     <div
-      className="flex h-full flex-col bg-[linear-gradient(135deg,#1d3356_0%,#1d3356_45%,#3385e2_100%)] font-sans text-white"
+      className="flex h-full flex-col bg-[linear-gradient(135deg,#1d3356_0%,#1d3356_45%,#3385e2_100%)] text-white"
     >
       <div
         className="flex min-h-0 flex-1 w-full transition-transform duration-300 ease-out"
