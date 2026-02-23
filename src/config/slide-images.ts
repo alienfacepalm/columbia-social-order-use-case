@@ -8,24 +8,18 @@ export interface SlideImageConfig {
   readonly size: SlideImageSize
 }
 
+/** Only non-diagram slides get an image. Order matches slide indices: 1, 3, 12, 13, 15, 16. */
 const SLIDE_IMAGES: readonly SlideImageConfig[] = [
-  { src: '/slide-images/slide-1.png', alt: 'Title slide', size: 'm' },
-  { src: '/slide-images/slide-2.png', alt: 'Problem framing: TikTok and commerce', size: 'l' },
+  { src: '/slide-images/slide-1.png', alt: 'Welcome', size: 'm' },
   { src: '/slide-images/slide-3.png', alt: 'Requirements and pipeline', size: 's' },
-  { src: '/slide-images/slide-4.png', alt: 'Rithum vs direct integration', size: 'm' },
-  { src: '/slide-images/slide-5.png', alt: 'Architecture flow', size: 'l' },
-  { src: '/slide-images/slide-6.png', alt: 'Azure Function App: Auto-Scaling & Social-Order Adapter', size: 'm' },
-  { src: '/slide-images/slide-7.png', alt: 'Downstream order creation', size: 'm' },
-  { src: '/slide-images/slide-8.png', alt: 'Upstream status sync', size: 's' },
-  { src: '/slide-images/slide-9.png', alt: 'Data provenance and canonical mapping', size: 'm' },
-  { src: '/slide-images/slide-10.png', alt: 'Observability: Grafana, Loki, KQL', size: 'l' },
-  { src: '/slide-images/slide-11.png', alt: 'Fault tolerance and reliability', size: 's' },
   { src: '/slide-images/slide-12.png', alt: 'Deployment model (Commerce)', size: 'm' },
   { src: '/slide-images/slide-13.png', alt: 'Cross-functional integration', size: 'l' },
-  { src: '/slide-images/slide-14.png', alt: 'Key trade-offs', size: 's' },
   { src: '/slide-images/slide-15.png', alt: 'Impact', size: 'm' },
   { src: '/slide-images/slide-16.png', alt: 'Closing / Thank you', size: 'l' },
 ]
+
+/** Slide indices that display a sidebar image (non-diagram slides only). */
+const SLIDE_INDICES_WITH_IMAGE: readonly number[] = [1, 3, 12, 13, 15, 16]
 
 /** Width in px for each size; height scales with object-contain inside fixed container. */
 export const IMAGE_SIZE_PX: Record<SlideImageSize, number> = {
@@ -34,10 +28,12 @@ export const IMAGE_SIZE_PX: Record<SlideImageSize, number> = {
   l: 260,
 } as const
 
-/** Returns image config for slide index 1..16; index 0 (title) has no sidebar image. */
-export function getSlideImage(slideIndex: number): SlideImageConfig | null {
-  if (slideIndex < 1 || slideIndex >= 1 + SLIDE_IMAGES.length) return null
-  return SLIDE_IMAGES[slideIndex - 1] ?? null
+/** Returns image config for non-diagram slides; index 0 (title) and any slide with a diagram get no image. */
+export function getSlideImage(slideIndex: number, hasDiagram?: boolean): SlideImageConfig | null {
+  if (slideIndex < 1 || hasDiagram) return null
+  const idx = SLIDE_INDICES_WITH_IMAGE.indexOf(slideIndex)
+  if (idx === -1) return null
+  return SLIDE_IMAGES[idx] ?? null
 }
 
 /** Even = right, odd = left */

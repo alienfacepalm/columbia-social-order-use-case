@@ -10,9 +10,9 @@ HYBRID FORMAT NOTES
 
 ## High‑Reliability Real‑Time System Design
 
-### Columbia: Social‑Order Adapter — Commerce Pipeline
+### Columbia: Social‑Order Adapter
 
-### Brandon Pliska — Senior Full Stack Engineer Candidate
+#### Brandon Pliska — Senior Full Stack Engineer Candidate
 
 ---
 

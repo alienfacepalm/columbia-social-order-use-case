@@ -74,15 +74,26 @@ function parseBody(body: string, mermaidCharts: readonly string[]): SlideContent
         i++
         continue
       }
-      if (line.startsWith('### ')) {
-        nodes.push({ type: 'subtitle', content: line.replace(/^#+\s*/, '').trim() })
+      if (line.startsWith('#### ')) {
+        nodes.push({ type: 'heading', level: 4, content: line.replace(/^####\s*/, '').trim() })
         i++
         continue
       }
-      if (line.startsWith('- ')) {
+      if (line.startsWith('### ')) {
+        nodes.push({ type: 'heading', level: 3, content: line.replace(/^###\s*/, '').trim() })
+        i++
+        continue
+      }
+      if (line.startsWith('## ')) {
+        nodes.push({ type: 'heading', level: 2, content: line.replace(/^##\s*/, '').trim() })
+        i++
+        continue
+      }
+      const trimmedLine = line.trimStart()
+      if (trimmedLine.startsWith('- ')) {
         const items: InlineSpan[][] = []
-        while (i < lines.length && lines[i].startsWith('- ')) {
-          items.push(parseInline(lines[i].slice(2)))
+        while (i < lines.length && lines[i].trimStart().startsWith('- ')) {
+          items.push(parseInline(lines[i].trimStart().slice(2)))
           i++
         }
         nodes.push({ type: 'ul', items })

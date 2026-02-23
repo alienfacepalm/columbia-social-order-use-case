@@ -8,6 +8,7 @@ export type InlineSpan =
 export type SlideContentNode =
   | { readonly type: 'mermaid'; code: string }
   | { readonly type: 'subtitle'; content: string }
+  | { readonly type: 'heading'; level: 2 | 3 | 4; content: string }
   | { readonly type: 'p'; content: readonly InlineSpan[] }
   | { readonly type: 'ul'; items: readonly InlineSpan[][] }
 

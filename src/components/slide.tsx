@@ -49,26 +49,51 @@ function useFullSizeDiagram(slide: SlideModel): boolean {
 }
 
 export function Slide({ slide, slideIndex }: SlideProps): ReactElement {
-  const imageConfig = getSlideImage(slideIndex)
-  const imagePosition = getSlideImagePosition(slideIndex)
   const isDiagramSlide = hasDiagram(slide)
+  const imageConfig = getSlideImage(slideIndex, isDiagramSlide)
+  const imagePosition = getSlideImagePosition(slideIndex)
   const fullSizeDiagram = useFullSizeDiagram(slide)
   const isTitleSlide = slideIndex === 0
 
   if (isTitleSlide) {
+    const headingNodes = slide.content.filter((n): n is typeof n & { type: 'heading' } => n.type === 'heading')
     return (
-      <section className="relative flex flex-1 w-full min-h-0 overflow-auto mt-4 sm:mt-8 px-4 sm:px-8 py-6 sm:py-12 rounded-xl flex-col items-center justify-center max-w-4xl">
-        <p className="text-base sm:text-lg md:text-xl font-medium tracking-wide text-white/95 text-center m-0 mb-3 sm:mb-4">
-          Columbia Sportswear: Social-Order Adapter
-        </p>
+      <section className="relative flex flex-1 w-full min-h-0 overflow-hidden mt-4 sm:mt-8 px-4 sm:px-8 py-6 sm:py-12 rounded-xl flex-col items-center justify-center max-w-4xl gap-0">
+        <div className="relative z-10 flex flex-shrink-0 flex-col items-center text-center">
+          <h1 className="slide-title-h1 text-2xl sm:text-3xl md:text-4xl font-semibold tracking-wide text-white m-0 mb-2 sm:mb-3">
+            {slide.title}
+          </h1>
+          {headingNodes.map((node, i) => {
+            if (node.level === 2) {
+              return (
+                <h2 key={i} className="slide-title-h2 text-xl sm:text-2xl md:text-3xl font-medium tracking-wide text-white/95 m-0 mb-1 sm:mb-2">
+                  {node.content}
+                </h2>
+              )
+            }
+            if (node.level === 3) {
+              return (
+                <h3 key={i} className="slide-title-h3 text-base sm:text-lg md:text-xl font-medium tracking-wide text-white/90 m-0 mb-2 sm:mb-3">
+                  {node.content}
+                </h3>
+              )
+            }
+            return (
+              <h4
+                key={i}
+                className="slide-title-byline text-base sm:text-lg md:text-xl font-normal tracking-wide text-white m-0 mt-2 sm:mt-3 mb-4 sm:mb-6 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]"
+                style={{ textShadow: '0 1px 3px rgba(0,0,0,0.9), 0 0 1px rgba(0,0,0,1)' }}
+              >
+                {node.content}
+              </h4>
+            )
+          })}
+        </div>
         <img
           src="/title.png"
           alt="Presentation title"
-          className="block w-full max-w-2xl object-contain max-h-[50vh] sm:max-h-[65vh] scale-[0.81]"
+          className="relative z-0 block w-full max-w-2xl flex-shrink-0 object-contain max-h-[50vh] sm:max-h-[65vh] scale-[0.81]"
         />
-        <h1 className="slide-title-main absolute bottom-[36px] sm:bottom-[60px] left-0 right-0 text-xl sm:text-2xl md:text-3xl font-semibold tracking-wide text-center m-0 px-3 sm:px-4 drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">
-          High‑Reliability Real‑Time System Design
-        </h1>
       </section>
     )
   }
@@ -107,7 +132,7 @@ export function Slide({ slide, slideIndex }: SlideProps): ReactElement {
             />
           ))}
         </div>
-        {!isDiagramSlide && imageConfig && (
+        {imageConfig && (
           <div className="slide-illustration-wrap flex-shrink-0 w-full max-w-[280px] md:w-[280px] min-h-[160px] sm:min-h-[200px] flex items-center justify-center">
             <img
               src={imageConfig.src}
@@ -148,6 +173,28 @@ function SlideNode({ node, slideIndex, nodeIndex, fullSizeDiagram }: SlideNodePr
       <p className="slide-content-subtitle text-base sm:text-lg font-semibold tracking-wide text-white/95 mb-3 sm:mb-4 m-0">
         {node.content}
       </p>
+    )
+  }
+  if (node.type === 'heading') {
+    const content = node.content
+    if (node.level === 2) {
+      return (
+        <h2 className="slide-content-h2 text-lg sm:text-xl font-semibold tracking-wide text-white/95 mb-2 sm:mb-3 m-0">
+          {content}
+        </h2>
+      )
+    }
+    if (node.level === 3) {
+      return (
+        <h3 className="slide-content-h3 text-base sm:text-lg font-semibold tracking-wide text-white/95 mb-3 sm:mb-4 m-0">
+          {content}
+        </h3>
+      )
+    }
+    return (
+      <h4 className="slide-content-h4 text-sm sm:text-base font-medium tracking-wide text-white/90 mb-2 sm:mb-3 m-0">
+        {content}
+      </h4>
     )
   }
   if (node.type === 'p') {
