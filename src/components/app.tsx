@@ -54,7 +54,7 @@ export function App(): ReactElement {
                 <img
                   src="/logo.png"
                   alt="Columbia Sportswear"
-                  className="block h-12 w-auto sm:h-14 md:h-[6.67rem] m-0 ml-2 sm:ml-4 md:ml-[40px] align-middle brightness-0 invert"
+                  className="block h-12 w-auto sm:h-14 md:h-[6.67rem] m-0 ml-2 sm:ml-4 md:ml-[70px] align-middle brightness-0 invert"
                   width={320}
                   height={68}
                 />

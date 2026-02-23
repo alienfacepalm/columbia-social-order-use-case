@@ -1,34 +1,43 @@
 <!--
 HYBRID FORMAT NOTES
 - Slides are clean for Cursor slide generation
-- STAR + RADIO cues included in HTML comments
-- Speaker Notes placeholders included for Cursor to auto-fill
-- Pacing target: ~40 minutes
+- System design follows RADIO: Requirements → Architecture → Data model → Interface (API) → Optimizations
+- STAR story arc: Situation → Task → Action → Result (for narrative flow)
+- Pacing target: 30–40 minutes presentation + Q&A
 -->
 
 # Social-Order Adapter
 
 ## High‑Reliability Real‑Time System Design
 
-### Columbia: Social‑Order Adapter
+### Client: Columbia Sportswear
+
+### Project: Social‑Order Adapter
+
+###
 
 #### Brandon Pliska — Senior Full Stack Engineer Candidate
 
 ---
 
-## Slide 1 — Welcome
+## Slide 2 — Presentation Structure (RADIO)
 
-**High‑Reliability Real‑Time System Design**  
-Columbia: Social‑Order Adapter — Commerce Pipeline  
-Brandon Pliska — Senior Full Stack Engineer Candidate
+The **system design** follows the [RADIO framework](https://www.greatfrontend.com/front-end-system-design-playbook/framework):
 
-<!-- STAR: S — Introduce the situation -->
-<!-- RADIO: R — Problem framing -->
-<!-- Pacing: 2 minutes -->
+- **R**equirements — Problem scope, functional & non-functional requirements, core use cases.
+- **A**rchitecture — Key components (Rithum, APIM, Adapter, Service Bus, SFCC/SFOMS, EOS, SAP) and how they relate.
+- **D**ata model — Core entities, canonical schema, provenance chain, and where data lives.
+- **I**nterface (API) — Webhooks, Service Bus contracts, and APIs between components (parameters, responses).
+- **O**ptimizations — Scaling, observability, fault tolerance, security, and trade-offs.
+
+We’ll also cover team leadership, delivery, and outcomes (STAR: Situation → Task → Action → Result).
+
+<!-- RADIO: Framework overview -->
+<!-- Pacing: 1 minute -->
 
 ---
 
-## Slide 2 – Problem Framing
+## Slide 3 – Problem Domain & Objectives (RADIO: R — Requirements)
 
 Columbia’s directive was to support **multiple social networks** for in-app commerce; [TikTok](copilot-action://composer-send?text=What%20is%20TikTok%20Shop) Shop was the **first**. Customers would purchase inside each platform (e.g. TikTok) using their existing accounts, and those orders had to flow reliably into Columbia’s [SFCC backend](copilot-action://composer-send?text=Explain%20Salesforce%20Commerce%20Cloud%20order%20flows).
 
@@ -49,18 +58,17 @@ flowchart LR
     Goal --> SFCC["Columbia / SFCC"]
 ```
 
-<!-- STAR: S -->
-<!-- RADIO: R -->
+<!-- STAR: S — Problem domain and objectives -->
 <!-- Pacing: 2 minutes -->
 
 ---
 
-## Slide 3 — Requirements (Social‑Order Adapter)
+## Slide 4 — Requirements (RADIO: R — Functional & Non-Functional)
 
 **Functional Requirements**
 
 - Ingest TikTok Shop orders via **Rithum posting to Social-Order Adapter webhook endpoints**
-- Normalize into **canonical formats** for SFCC / SFOMS (EOS) / SAP
+- Normalize into **canonical formats** for SFCC/SFOMS, **EOS (Enterprise Order Service)**, and SAP — **SFCC** and **SFOMS** are two systems in the same suite that work together; they pass orders into **EOS**, which orchestrates lifecycle (New → Authorized → Confirmed → Shipped → Fulfilled) and sends to SAP
 - Maintain **order provenance** end‑to‑end
 - Support **bidirectional** status updates
 - Authenticate via **APIM**
@@ -73,13 +81,12 @@ flowchart LR
 - Scalability under TikTok traffic spikes
 - Auditability across all systems
 
-<!-- STAR: S -->
-<!-- RADIO: R -->
+<!-- STAR: T — Requirements and constraints -->
 <!-- Pacing: 2 minutes -->
 
 ---
 
-## Slide 4 — Why Rithum Won (Decision Architecture)
+## Slide 5 — Key Technology Decision: Why Rithum (RADIO: R → A)
 
 We evaluated two options:
 
@@ -114,13 +121,12 @@ flowchart LR
     end
 ```
 
-<!-- STAR: T/A -->
-<!-- RADIO: I -->
+<!-- STAR: T/A — Key technology decisions and rationales -->
 <!-- Pacing: 3 minutes -->
 
 ---
 
-## Slide 5 — Social‑Order Adapter Architecture Diagram
+## Slide 6 — High‑Level Architecture (RADIO: A — Architecture)
 
 ```mermaid
 flowchart LR
@@ -131,13 +137,16 @@ flowchart LR
         AF --> SB1["Azure Service Bus"]
         SB1 --> CM["Canonical Mapping"]
         CM --> CART["SFCC Cartridge"]
-        CART --> SFCC["Commerce Cloud"]
-        SFCC --> SFOMS["SFOMS (EOS)"]
-        SFOMS --> SAP["SAP"]
+        CART --> SFCC["SFCC"]
+        CART --> SFOMS["SFOMS"]
+        SFCC --> EOS["EOS (Enterprise Order Service)"]
+        SFOMS --> EOS
+        EOS --> SAP["SAP"]
     end
 
     subgraph upstream["Upstream: Columbia → TikTok"]
-        SAP --> SB2["Service Bus Upstream"]
+        SAP --> EOS2["EOS"]
+        EOS2 --> SB2["Service Bus Upstream"]
         SB2 --> AF2["Social-Order Adapter"]
         AF2 --> RAPI["Rithum API"]
         RAPI --> TTAPI["TikTok API"]
@@ -160,13 +169,12 @@ flowchart LR
     end
 ```
 
-<!-- STAR: A -->
-<!-- RADIO: A/I -->
+<!-- STAR: A — System architecture and design choices -->
 <!-- Pacing: 3 minutes -->
 
 ---
 
-## Slide 6 — Azure Function App: Auto-Scaling & Social-Order Adapter
+## Slide 7 — Backend, Scaling & Deployment (RADIO: A — Architecture)
 
 **Auto-Scaling**
 
@@ -177,7 +185,7 @@ flowchart LR
 The adapter controls **downstream** (Rithum → Columbia) and **upstream** (Columbia → Rithum) flows between Rithum and Columbia.
 
 - **APIM-secured webhook endpoints** — Rithum posts order and update payloads here; APIM handles auth and policy.
-- **Service Bus triggers** — Downstream (e.g. SAP/SFOMS) events are published to Service Bus; the same Function App consumes them and calls back to the **Rithum API** so Rithum stays in sync with Columbia’s fulfillment state.
+- **Service Bus triggers** — **EOS** (or SAP) lifecycle and fulfillment events are published to Service Bus; the same Function App consumes them and calls back to the **Rithum API** so Rithum stays in sync with Columbia’s fulfillment state.
 
 Result: one adapter that ingests from Rithum and pushes status back to Rithum, with automatic scale for both webhook and Service Bus traffic.
 
@@ -189,21 +197,47 @@ flowchart LR
     FA --> RAPI["Rithum API"]
 ```
 
-<!-- STAR: A -->
-<!-- RADIO: I -->
+<!-- STAR: A — Scaling strategy; deployment model -->
 <!-- Pacing: 2–3 minutes -->
 
 ---
 
-## Slide 7 — Downstream Order Creation
+## Slide 8 — Data Model: Provenance & Canonical Mapping (RADIO: D)
+
+- **Canonical schema** — Core entities (order, line items, status) normalized for SFCC, SFOMS, **EOS**, and SAP; isolates upstream (TikTok/Rithum) volatility.
+- **Provenance chain** — End-to-end ownership and audit: TikTok → Rithum → Azure → SFCC/SFOMS → **EOS (Enterprise Order Service)** → SAP.
+- **Structured logging** (dot‑chaining from `LogEventNames.OrderFlow`, e.g. `order.flow.*`):
+  - `order.flow.webhook.paymentcleared.received`
+  - `order.flow.sfcc.create.request`
+  - `order.flow.enterpriseorderservice.updateordermaster.request`
+  - `order.flow.servicebus.eosorderupdate.received`
+  - `order.flow.rithum.updatestatus.request`
+
+```mermaid
+flowchart LR
+    TT["TikTok"] --> R["Rithum"]
+    R --> AZ["Azure"]
+    AZ --> SFCC["SFCC"]
+    SFCC --> EOS["EOS"]
+    EOS --> SAP["SAP"]
+```
+
+<!-- RADIO: D — Data model / core entities -->
+<!-- Pacing: 3 minutes -->
+
+---
+
+## Slide 9 — Interface: Downstream Order Creation (RADIO: I)
 
 **Flow**
 
 - Rithum posts to **Social-Order Adapter** webhook endpoints
 - APIM authenticates + applies policies
 - Adapter validates + normalizes → **Azure Service Bus**
-- **Canonical mapping** → SFCC Cartridge creates orders
-- SFOMS orchestrates lifecycle → SAP fulfills
+- **Canonical mapping** → SFCC Cartridge creates orders in **SFCC**
+- **EOS (Enterprise Order Service)** receives the order from SFCC, orchestrates lifecycle (New → Authorized → Confirmed → Shipped → Fulfilled), and sends to **SAP** for fulfillment
+
+**Key interfaces:** Rithum webhook (POST, order payload) → Adapter; Adapter → Service Bus (message contract); Cartridge API (order create request/response); SFCC → EOS → SAP (order lifecycle).
 
 ```mermaid
 flowchart TB
@@ -213,66 +247,39 @@ flowchart TB
     SB --> CM["Canonical Mapping"]
     CM --> CART["SFCC Cartridge"]
     CART --> SFCC["SFCC"]
-    SFCC --> SFOMS["SFOMS (EOS)"]
-    SFOMS --> SAP["SAP"]
+    SFCC --> EOS["EOS"]
+    EOS --> SAP["SAP"]
 ```
 
-<!-- STAR: A -->
-<!-- RADIO: I -->
+<!-- RADIO: I — Interface (API) between components -->
 <!-- Pacing: 3 minutes -->
 
 ---
 
-## Slide 8 — Upstream Status Sync
+## Slide 10 — Interface: Upstream Status Sync (RADIO: I)
 
 **Flow**
 
-- SAP emits fulfillment events
-- SFOMS (EOS) updates lifecycle
-- Events published to **Service Bus (Upstream)**
-- **Social-Order Adapter** transforms + updates Rithum API
+- **EOS** holds order lifecycle state; when SAP fulfills (or cancellations/refunds occur), **EOS** is updated and lifecycle events are published to **Service Bus (Upstream)**
+- **Social-Order Adapter** consumes those events, transforms status to Rithum semantics, and updates **Rithum API** so TikTok reflects current state
+
+**Key interfaces:** EOS / SAP → Service Bus (upstream topic, status message); Service Bus → Adapter; Adapter → Rithum API (status update request/response).
 
 ```mermaid
 flowchart LR
-    SAP["SAP"] --> SFOMS["SFOMS (EOS)"]
-    SFOMS --> SB["Service Bus Upstream"]
+    SAP["SAP"] --> EOS["EOS"]
+    EOS --> SB["Service Bus Upstream"]
     SB --> FA["Social-Order Adapter"]
     FA --> RAPI["Rithum API"]
     RAPI --> TT["TikTok"]
 ```
 
-<!-- STAR: A -->
-<!-- RADIO: I -->
+<!-- RADIO: I — Interface (API) between components -->
 <!-- Pacing: 3 minutes -->
 
 ---
 
-## Slide 9 — Data: Provenance & Canonical Mapping
-
-- Canonical schema isolates upstream volatility
-- Provenance chain:
-  - TikTok → Rithum → Azure → SFCC → SFOMS (EOS) → SAP
-- Structured logging with dot‑chaining (e.g. `order.flow.*`):
-  - `order.flow.rithum.webhook.received`
-  - `order.flow.sfcc.create.request`
-  - `order.flow.sap.fulfillment.status`
-
-```mermaid
-flowchart LR
-    TT["TikTok"] --> R["Rithum"]
-    R --> AZ["Azure"]
-    AZ --> SFCC["SFCC"]
-    SFCC --> SFOMS["SFOMS (EOS)"]
-    SFOMS --> SAP["SAP"]
-```
-
-<!-- STAR: A -->
-<!-- RADIO: D -->
-<!-- Pacing: 3 minutes -->
-
----
-
-## Slide 10 — Observability: Grafana + Loki / KQL
+## Slide 11 — Observability: Grafana + Loki / KQL (RADIO: O)
 
 **Why Loki > KQL**
 
@@ -292,19 +299,20 @@ flowchart LR
     Loki --> Grafana["Grafana"]
 ```
 
-<!-- STAR: A -->
-<!-- RADIO: O -->
+<!-- RADIO: O — Optimizations and deep dive -->
 <!-- Pacing: 3 minutes -->
 
 ---
 
-## Slide 11 — Fault Tolerance & Reliability
+## Slide 12 — How We Approached Key Challenges (RADIO: O) (Action)
 
-- Retry + backoff
-- Dead‑letter queues
-- Idempotent order creation
-- Health checks + circuit breakers
-- Autoscaling
+**Scaling** — Azure Functions auto-scale with webhook and Service Bus load; Service Bus buffers bursty TikTok traffic so we don’t over-provision or drop messages.
+
+**Data synchronization** — Bidirectional flow: Rithum → adapter → SFCC → EOS → SAP (orders) and EOS/SAP (lifecycle events) → Service Bus → adapter → Rithum (status). Canonical mapping and idempotent order creation keep systems in sync; EOS is the order-lifecycle authority between SFCC and SAP; provenance chain supports reconciliation.
+
+**Security** — APIM as single secure boundary; auth and policy at the edge; no raw TikTok credentials in our stack; least-privilege for adapter → Rithum and SFCC.
+
+**Fault tolerance** — Retry + exponential backoff; dead-letter queues for failed messages; idempotent order creation to avoid duplicates; health checks and circuit breakers; stateless functions so failures don’t leave bad in-memory state.
 
 ```mermaid
 flowchart LR
@@ -313,73 +321,94 @@ flowchart LR
     Retry --> DLQ["DLQ"]
 ```
 
-<!-- STAR: A -->
-<!-- RADIO: O -->
-<!-- Pacing: 2 minutes -->
-
----
-
-## Slide 12 — Deployment Model (Commerce)
-
-- Stateless Azure Functions
-- APIM as secure boundary
-- Canary deployments
-- Automated rollback
-
-<!-- STAR: A -->
-<!-- RADIO: O -->
-<!-- Pacing: 2 minutes -->
-
----
-
-## Slide 13 — Cross‑Functional Integration
-
-- Worked with commerce, SAP, SFCC, and Rithum teams
-- Managed API contracts
-- Ensured version control + reproducibility
-
-<!-- STAR: A -->
-<!-- RADIO: I -->
-<!-- Pacing: 1 minute -->
-
----
-
-## Slide 14 — Key Trade‑Offs
-
-- Latency vs accuracy
-- Batch vs streaming
-- Coupling vs maintainability
-- Observability cost vs depth
-
-```mermaid
-flowchart LR
-    T1["Latency vs accuracy"]
-    T2["Batch vs streaming"]
-    T3["Coupling vs maintainability"]
-    T4["Observability vs depth"]
-```
-
-<!-- STAR: A -->
-<!-- RADIO: Summary -->
-<!-- Pacing: 2 minutes -->
-
----
-
-## Slide 15 — Impact
-
-- Reliable, scalable, future‑proof adapter pipeline
-- Full provenance from TikTok → SAP → TikTok
-- Faster debugging via Loki
-- Reduced operational overhead
-- Enabled new social channels with minimal work
-
-<!-- STAR: R -->
-<!-- RADIO: O -->
+<!-- STAR: A — Scaling, data sync, security, fault tolerance per prompt -->
 <!-- Pacing: 3 minutes -->
 
 ---
 
-## Slide 16 — Closing
+## Slide 13 — Deployment Model (RADIO: O)
+
+- **Stateless Azure Functions** — Scale out without session affinity; safe horizontal scaling.
+- **APIM as secure boundary** — All external traffic (Rithum webhooks) through APIM; auth and policy in one place.
+- **Canary deployments** — Roll out adapter changes to a subset before full rollout.
+- **Automated rollback** — On failure or regression, roll back to last known good release.
+
+<!-- STAR: A — Deployment model -->
+<!-- Pacing: 2 minutes -->
+
+---
+
+## Slide 14 — Cross‑Functional Integration (RADIO: I + O)
+
+- **Authentication** — APIM as secure boundary; API keys and policies for Rithum webhooks; no customer SSO in this pipeline (TikTok/Columbia handle identity).
+- **APIs** — Versioned Rithum webhook and Rithum API contracts; SFCC cartridge API; clear request/response and error contracts.
+- **Version control & reproducibility** — Cartridge and adapter in Git; ADRs for major decisions; release tags and deployment automation.
+- **Data consistency** — Canonical mapping, idempotent order creation, and provenance chain so we can reconcile and debug across systems.
+- **Observability** — Unified logs (Loki), Grafana dashboards, structured logging; correlation IDs across Rithum → Azure → SFCC → EOS → SAP.
+- **External systems** — Rithum (orders, status), TikTok (source of truth for shop), SFCC (order creation), **EOS (Enterprise Order Service, order lifecycle and status)**, SAP (fulfillment). No file storage or push notifications in this flow; order/status flow only.
+
+<!-- STAR: A — Cross-functional integration per prompt -->
+<!-- Pacing: 3 minutes -->
+
+---
+
+## Slide 15 — Team Leadership & Delivery (Action)
+
+- **Guiding design decisions** — Led choice of Rithum over direct TikTok integration; drove canonical schema and single adapter for both downstream and upstream flows.
+- **Managing trade-offs** — Documented ADRs (e.g. Rithum vs direct); balanced latency vs consistency and observability cost vs depth with stakeholders.
+- **Leading implementation** — Owned adapter and cartridge design; coordinated with commerce, SAP, SFCC, and Rithum teams on contracts and rollout.
+- **Delivery approach** — Iterative delivery with clear milestones; canary deployments and rollback so we could ship without blocking fulfillment.
+
+<!-- STAR: A — Team leadership and delivery per prompt -->
+<!-- Pacing: 3 minutes -->
+
+---
+
+## Slide 16 — Risks, Trade‑Offs & Scaling Strategies (RADIO: O)
+
+**Risks & mitigations**
+
+- **Rithum or TikTok API changes** — Versioned contracts, adapter abstraction, and monitoring for contract drift.
+- **Peak load / bursty traffic** — Auto-scaling Azure Functions, Service Bus for buffering, DLQs for failed messages.
+- **Data inconsistency across systems** — Idempotency, provenance, and structured logging for audit and reconciliation.
+
+**Trade-offs**
+
+- **Latency vs accuracy** — Accept short delay for normalized, validated orders rather than pushing raw payloads straight to SFCC.
+- **Batch vs streaming** — Event-driven streaming (webhooks + Service Bus) for timeliness; no batch ETL in the hot path.
+- **Coupling vs maintainability** — Single canonical schema and one adapter to reduce per-network coupling while keeping the system maintainable.
+- **Observability cost vs depth** — Structured logs and Loki for depth; careful retention and sampling to control cost.
+
+**Scaling strategies**
+
+- **Horizontal scaling** — Stateless Azure Functions scale out with webhook and Service Bus load.
+- **Message buffering** — Service Bus absorbs spikes; retries and DLQs prevent loss and allow replay.
+- **Future channels** — Rithum’s canonical model means new social channels (e.g. Instagram) plug in with minimal adapter change.
+
+```mermaid
+flowchart LR
+    R1["Risks → Mitigations"]
+    T1["Trade-offs"]
+    S1["Scaling strategies"]
+```
+
+<!-- STAR: A — Risks, trade-offs, scaling per prompt -->
+<!-- Pacing: 4 minutes -->
+
+---
+
+## Slide 17 — Impact & Reflections (Result)
+
+- **Technical impact** — Reliable, scalable adapter pipeline; full order provenance TikTok → SAP → TikTok; faster debugging via Loki; reduced operational overhead.
+- **Organizational impact** — New social channels (e.g. Instagram) can be added with minimal work; clearer ownership between Columbia, Rithum, and SFCC/SAP.
+- **Reflections** — Canonical schema and one adapter paid off for maintainability; investing in observability early made incidents and contract issues easier to diagnose.
+
+<!-- STAR: R — Technical and organizational impact; reflections -->
+<!-- Pacing: 3 minutes -->
+
+---
+
+## Slide 18 — Closing
 
 I build systems that perform under real‑world constraints.  
 I'd bring the same rigor, clarity, and reliability to Echodyne's radar software platform.
@@ -389,7 +418,7 @@ I'd bring the same rigor, clarity, and reliability to Echodyne's radar software 
 
 ---
 
-## Slide 17 — Thank You
+## Slide 19 — Thank You
 
 Thank you for your time and consideration.  
 I look forward to the possibility of contributing to Echodyne.

@@ -58,9 +58,9 @@ export function Slide({ slide, slideIndex }: SlideProps): ReactElement {
   if (isTitleSlide) {
     const headingNodes = slide.content.filter((n): n is typeof n & { type: 'heading' } => n.type === 'heading')
     return (
-      <section className="relative flex flex-1 w-full min-h-0 overflow-hidden mt-4 sm:mt-8 px-4 sm:px-8 py-6 sm:py-12 rounded-xl flex-col items-center justify-center max-w-4xl gap-0">
+      <section className="relative flex flex-1 w-full min-h-0 overflow-hidden px-4 sm:px-8 py-6 sm:py-12 rounded-xl flex-col items-center justify-center max-w-4xl gap-0">
         <div className="relative z-10 flex flex-shrink-0 flex-col items-center text-center">
-          <h1 className="slide-title-h1 text-2xl sm:text-3xl md:text-4xl font-semibold tracking-wide text-white m-0 mb-2 sm:mb-3">
+          <h1 className="slide-title-h1 text-3xl sm:text-4xl md:text-5xl font-semibold tracking-wide text-white m-0 mb-2 sm:mb-3">
             {slide.title}
           </h1>
           {headingNodes.map((node, i) => {
@@ -81,8 +81,7 @@ export function Slide({ slide, slideIndex }: SlideProps): ReactElement {
             return (
               <h4
                 key={i}
-                className="slide-title-byline text-base sm:text-lg md:text-xl font-normal tracking-wide text-white m-0 mt-2 sm:mt-3 mb-4 sm:mb-6 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]"
-                style={{ textShadow: '0 1px 3px rgba(0,0,0,0.9), 0 0 1px rgba(0,0,0,1)' }}
+                className="slide-title-byline text-xs sm:text-sm md:text-base font-normal tracking-wide text-white m-0 mt-2 sm:mt-3 mb-4 sm:mb-6"
               >
                 {node.content}
               </h4>
@@ -112,13 +111,19 @@ export function Slide({ slide, slideIndex }: SlideProps): ReactElement {
       <div
         className={
           isDiagramSlide
-            ? 'flex-1 min-h-0 flex flex-col min-w-0'
+            ? fullSizeDiagram
+              ? 'flex-1 min-h-0 flex flex-col min-w-0'
+              : 'flex-none flex flex-col min-w-0'
             : `flex w-full gap-4 sm:gap-6 items-start flex-1 min-h-0 min-w-0 flex-col md:flex-row ${imagePosition === 'left' ? 'md:flex-row-reverse' : ''}`
         }
       >
         <div
           className={
-            isDiagramSlide ? 'flex-1 min-h-0 flex flex-col min-w-0' : 'flex-1 min-w-0'
+            isDiagramSlide
+              ? fullSizeDiagram
+                ? 'flex-1 min-h-0 flex flex-col min-w-0 gap-3'
+                : 'flex-none flex flex-col min-w-0 gap-3'
+              : 'flex-1 min-w-0'
           }
         >
           {slide.content.map((node, i) => (
@@ -129,6 +134,7 @@ export function Slide({ slide, slideIndex }: SlideProps): ReactElement {
               nodeIndex={i}
               isDiagramSlide={isDiagramSlide}
               fullSizeDiagram={fullSizeDiagram}
+              constrainDiagramHeight={isDiagramSlide && !fullSizeDiagram}
             />
           ))}
         </div>
@@ -156,15 +162,17 @@ interface SlideNodeProps {
   readonly nodeIndex: number
   readonly isDiagramSlide: boolean
   readonly fullSizeDiagram: boolean
+  readonly constrainDiagramHeight: boolean
 }
 
-function SlideNode({ node, slideIndex, nodeIndex, fullSizeDiagram }: SlideNodeProps): ReactElement | null {
+function SlideNode({ node, slideIndex, nodeIndex, fullSizeDiagram, constrainDiagramHeight }: SlideNodeProps): ReactElement | null {
   if (node.type === 'mermaid') {
     return (
       <MermaidSlide
         id={`${slideIndex}-${nodeIndex}`}
         code={node.code}
         fullSize={fullSizeDiagram}
+        constrainHeight={constrainDiagramHeight}
       />
     )
   }

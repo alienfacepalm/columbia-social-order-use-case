@@ -27,6 +27,8 @@ export interface MermaidSlideProps {
   readonly id: string
   /** When true, diagram fills available space (diagram-only slide). */
   readonly fullSize?: boolean
+  /** When true, limit diagram height so text below does not overlap (slide has diagram + other content). */
+  readonly constrainHeight?: boolean
 }
 
 const ZOOM_MIN = 50
@@ -98,7 +100,7 @@ interface DragState {
   startScrollTop: number
 }
 
-export function MermaidSlide({ code, id, fullSize = false }: MermaidSlideProps): ReactElement {
+export function MermaidSlide({ code, id, fullSize = false, constrainHeight = false }: MermaidSlideProps): ReactElement {
   const ref = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const dragRef = useRef<DragState | null>(null)
@@ -341,7 +343,9 @@ export function MermaidSlide({ code, id, fullSize = false }: MermaidSlideProps):
       className={
         fullSize
           ? 'flex-1 min-h-[320px] overflow-auto select-none cursor-grab active:cursor-grabbing'
-          : 'min-h-[320px] overflow-auto select-none cursor-grab active:cursor-grabbing'
+          : constrainHeight
+            ? 'h-[42vh] min-h-[200px] flex-shrink-0 overflow-auto select-none cursor-grab active:cursor-grabbing'
+            : 'min-h-[320px] overflow-auto select-none cursor-grab active:cursor-grabbing'
       }
       style={{ userSelect: isDragging ? 'none' : undefined }}
       onMouseDown={onContainerMouseDown}
@@ -416,7 +420,7 @@ export function MermaidSlide({ code, id, fullSize = false }: MermaidSlideProps):
   }
 
   return (
-    <div className="my-4 flex min-h-0 flex-col">
+    <div className="my-4 flex flex-shrink-0 flex-col min-h-0">
       {controls}
       {diagramContainer}
       {fullscreenOverlay}
