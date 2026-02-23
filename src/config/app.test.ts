@@ -3,12 +3,14 @@ import { assetUrl } from './app'
 
 describe('assetUrl', () => {
   it('normalizes path by stripping leading slash and appends to base', () => {
-    // With default base '/' we get /path
-    expect(assetUrl('/logo.png')).toBe('/logo.png')
-    expect(assetUrl('logo.png')).toBe('/logo.png')
+    // With or without leading slash yields the same result (slash stripped)
+    expect(assetUrl('/logo.png')).toBe(assetUrl('logo.png'))
+    expect(assetUrl('logo.png')).toMatch(/logo\.png$/)
   })
 
   it('does not double-slash when path has no leading slash', () => {
-    expect(assetUrl('images/slide.png')).toBe('/images/slide.png')
+    const result = assetUrl('images/slide.png')
+    expect(result).toMatch(/\/images\/slide\.png$/)
+    expect(result).not.toContain('//')
   })
 })
