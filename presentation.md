@@ -94,6 +94,22 @@ We evaluated two options:
 - Versioned API contracts
 - ADR‑documented decision
 
+```mermaid
+flowchart LR
+    subgraph direct["Direct SFCC to TikTok"]
+        D1[Fragile]
+        D2[No schema]
+        D3[Tight coupling]
+    end
+    subgraph rithum["Rithum Middleware"]
+        R1["Canonical schema"]
+        R2["Retries + DLQ"]
+        R3["Versioned API"]
+    end
+    direct -->|Rejected| X
+    rithum -->|Chosen| Y
+```
+
 <!-- STAR: T/A -->
 <!-- RADIO: I -->
 <!-- Pacing: 3 minutes -->
@@ -173,6 +189,17 @@ Result: one adapter that ingests from Rithum and pushes status back to Rithum, w
 - SFOMS orchestrates lifecycle
 - SAP fulfills
 
+```mermaid
+flowchart LR
+    R["Rithum"] --> APIM["APIM"]
+    APIM --> FA["Function App"]
+    FA --> SB["Service Bus"]
+    SB --> CART["SFCC Cartridge"]
+    CART --> SFCC["SFCC"]
+    SFCC --> SFOMS["SFOMS"]
+    SFOMS --> SAP["SAP"]
+```
+
 <!-- STAR: A -->
 <!-- RADIO: I -->
 <!-- Pacing: 3 minutes -->
@@ -187,6 +214,15 @@ Result: one adapter that ingests from Rithum and pushes status back to Rithum, w
 - SFOMS updates lifecycle
 - Events published to **Service Bus (Upstream)**
 - Function App transforms + updates Rithum API
+
+```mermaid
+flowchart LR
+    SAP["SAP"] --> SFOMS["SFOMS"]
+    SFOMS --> SB["Service Bus Upstream"]
+    SB --> FA["Function App"]
+    FA --> RAPI["Rithum API"]
+    RAPI --> TT["TikTok"]
+```
 
 <!-- STAR: A -->
 <!-- RADIO: I -->
@@ -203,6 +239,15 @@ Result: one adapter that ingests from Rithum and pushes status back to Rithum, w
   - `order.provenance.tiktok.id=...`
   - `order.sfcc.create.request=true`
   - `order.sap.fulfillment.status=created`
+
+```mermaid
+flowchart LR
+    TT["TikTok"] --> R["Rithum"]
+    R --> AZ["Azure"]
+    AZ --> SFCC["SFCC"]
+    SFCC --> SFOMS["SFOMS"]
+    SFOMS --> SAP["SAP"]
+```
 
 <!-- STAR: A -->
 <!-- RADIO: D -->

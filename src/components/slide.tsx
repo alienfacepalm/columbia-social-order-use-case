@@ -50,21 +50,19 @@ export function Slide({ slide, slideIndex }: SlideProps): ReactElement {
   const isTitleSlide = slideIndex === 0
 
   if (isTitleSlide) {
-    const [main, sub, byline] = slide.content
-    const mainText = main?.type === 'p' ? renderInline(main.content) : null
-    const subText = sub?.type === 'p' ? renderInline(sub.content) : null
-    const bylineText = byline?.type === 'p' ? renderInline(byline.content) : null
     return (
-      <section className="flex flex-1 w-full min-h-0 overflow-auto mt-8 px-8 py-12 bg-black/25 border border-white/20 rounded-xl flex-col items-center justify-center text-center max-w-4xl">
-        <h1 className="slide-title-main text-[clamp(2rem,5vw,3.25rem)] font-bold leading-tight mb-4 m-0 tracking-tight">
-          {mainText}
+      <section className="relative flex flex-1 w-full min-h-0 overflow-auto mt-8 px-8 py-12 rounded-xl flex-col items-center justify-center max-w-4xl">
+        <p className="text-lg md:text-xl font-medium tracking-wide text-white/95 text-center m-0 mb-4">
+          Columbia Sportswear: Social-Order Initiative
+        </p>
+        <img
+          src="/title.png"
+          alt="Presentation title"
+          className="block w-full max-w-2xl object-contain max-h-[65vh] scale-[0.81]"
+        />
+        <h1 className="slide-title-main absolute bottom-[70px] left-0 right-0 text-2xl md:text-3xl font-semibold tracking-wide text-center m-0 px-4 drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">
+          High‑Reliability Real‑Time System Design
         </h1>
-        <p className="slide-title-sub text-xl font-medium tracking-wide text-white/95 mb-6 m-0 border-b border-white/30 pb-1 inline-block">
-          {subText}
-        </p>
-        <p className="slide-title-byline text-base text-white/85 m-0 font-medium tracking-[0.04em]">
-          {bylineText}
-        </p>
       </section>
     )
   }

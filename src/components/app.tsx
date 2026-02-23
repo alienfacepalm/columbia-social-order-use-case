@@ -35,9 +35,19 @@ export function App(): ReactElement {
                   Social Order Use Case
                 </span>
               </div>
-              <span className="text-xs font-normal leading-none text-white/90">
-                🎯 Prepared for Echodyne Interview by Brandon Pliska
-              </span>
+              <div className="flex flex-col items-end gap-1">
+                <span className="text-xs font-normal leading-none text-white/90">
+                   Prepared for Echodyne Interview by Brandon Pliska
+                </span>
+                <a
+                  href="https://github.com/alienfacepalm/columbia-social-order-use-case"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs font-normal leading-none text-[#66a5e8] hover:text-[#99c4f0] underline"
+                >
+                  github.com/alienfacepalm/columbia-social-order-use-case
+                </a>
+              </div>
             </div>
             <Slide slide={slide} slideIndex={i} />
           </div>
