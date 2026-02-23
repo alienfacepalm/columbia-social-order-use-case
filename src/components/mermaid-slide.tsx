@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import type { ReactElement } from 'react'
 import mermaid from 'mermaid'
 
+import { useMermaidRender } from '../hooks/use-mermaid-render'
 import { FullscreenIcon, ZoomInIcon, ZoomOutIcon } from './mermaid-slide-icons'
 
 mermaid.initialize({
@@ -16,7 +17,6 @@ mermaid.initialize({
     primaryBorderColor: '#4a5568',
     lineColor: '#a0aec0',
     fontSize: '18px',
-    /** Edge label boxes (arrow labels) — use palette blue instead of gray */
     edgeLabelBackground: '#2d4a6f',
   },
   flowchart: {
@@ -29,17 +29,13 @@ mermaid.initialize({
 export interface IMermaidSlideProps {
   readonly code: string
   readonly id: string
-  /** When true, diagram fills available space (diagram-only slide). */
   readonly fullSize?: boolean
-  /** When true, limit diagram height so text below does not overlap (slide has diagram + other content). */
   readonly constrainHeight?: boolean
 }
 
 const ZOOM_MIN = 50
 const ZOOM_MAX = 250
 const ZOOM_STEP = 25
-
-const renderIdRef = { current: 0 }
 
 interface IDragState {
   readonly startX: number
@@ -48,75 +44,129 @@ interface IDragState {
   readonly startScrollTop: number
 }
 
+interface IMermaidDiagramControlsProps {
+  readonly hasSvg: boolean
+  readonly zoom: number
+  readonly setZoom: (fn: (z: number) => number) => void
+  readonly onFullscreen: () => void
+}
+
+function MermaidDiagramControls({
+  hasSvg,
+  zoom,
+  setZoom,
+  onFullscreen,
+}: IMermaidDiagramControlsProps): ReactElement {
+  return (
+    <div className="flex flex-shrink-0 items-center justify-end gap-1 pb-2">
+      <button
+        type="button"
+        onClick={onFullscreen}
+        disabled={!hasSvg}
+        className="rounded p-1 border bg-transparent border-white/30 text-white/80 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent inline-flex items-center justify-center"
+        aria-label="View diagram fullscreen"
+      >
+        <FullscreenIcon className="w-4 h-4" />
+      </button>
+      <button
+        type="button"
+        onClick={() => setZoom((z) => Math.max(ZOOM_MIN, z - ZOOM_STEP))}
+        disabled={zoom <= ZOOM_MIN}
+        className="rounded p-1 border bg-transparent border-white/30 text-white/80 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent inline-flex items-center justify-center"
+        aria-label="Zoom out"
+      >
+        <ZoomOutIcon className="w-4 h-4" />
+      </button>
+      <button
+        type="button"
+        onClick={() => setZoom((z) => Math.min(ZOOM_MAX, z + ZOOM_STEP))}
+        disabled={zoom >= ZOOM_MAX}
+        className="rounded p-1 border bg-transparent border-white/30 text-white/80 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent inline-flex items-center justify-center"
+        aria-label="Zoom in"
+      >
+        <ZoomInIcon className="w-4 h-4" />
+      </button>
+    </div>
+  )
+}
+
+interface IMermaidFullscreenOverlayProps {
+  readonly svg: string
+  readonly diagramSize: { width: number; height: number } | null
+  readonly fullscreenScale: number
+  readonly fullscreenWrapRef: React.RefObject<HTMLDivElement>
+  readonly onClose: () => void
+}
+
+function MermaidFullscreenOverlay({
+  svg,
+  diagramSize,
+  fullscreenScale,
+  fullscreenWrapRef,
+  onClose,
+}: IMermaidFullscreenOverlayProps): ReactElement {
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex flex-col bg-black/95 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Diagram fullscreen"
+      onClick={onClose}
+    >
+      <div
+        className="flex flex-shrink-0 items-center justify-end gap-2 p-3 border-b border-white/10"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <span className="text-sm text-white/70 mr-auto">Diagram — Esc or click outside to close</span>
+        <button
+          type="button"
+          onClick={onClose}
+          className="rounded-lg px-3 py-1.5 text-sm font-medium border border-white/30 bg-white/10 text-white hover:bg-white/20 transition-colors"
+          aria-label="Close fullscreen"
+        >
+          Close
+        </button>
+      </div>
+      <div
+        className="flex flex-1 min-h-0 min-w-0 items-center justify-center overflow-x-auto overflow-y-auto p-4"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div
+          ref={fullscreenWrapRef}
+          className="fullscreen-diagram-wrap inline-flex shrink-0 [&_svg]:block [&_svg]:max-w-full [&_svg]:max-h-full [&_svg]:w-auto [&_svg]:h-auto"
+          style={
+            diagramSize
+              ? {
+                  width: diagramSize.width,
+                  height: diagramSize.height,
+                  minWidth: diagramSize.width,
+                  minHeight: diagramSize.height,
+                  transform: `scale(${fullscreenScale})`,
+                  transformOrigin: 'center center',
+                }
+              : {
+                  width: '90vw',
+                  height: '80vh',
+                  minWidth: 400,
+                  minHeight: 300,
+                }
+          }
+          dangerouslySetInnerHTML={{ __html: svg }}
+        />
+      </div>
+    </div>
+  )
+}
+
 export function MermaidSlide({ code, id, fullSize = false, constrainHeight = false }: IMermaidSlideProps): ReactElement {
-  const ref = useRef<HTMLDivElement>(null)
+  const { result, error, svgRef, diagramSize, setDiagramSize } = useMermaidRender(code)
   const containerRef = useRef<HTMLDivElement>(null)
   const dragRef = useRef<IDragState | null>(null)
-  const uniqueId = useId()
-  const [zoom, setZoom] = useState<number>(100)
+  const fullscreenWrapRef = useRef<HTMLDivElement>(null)
+  const [zoom, setZoom] = useState(100)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
-  const [result, setResult] = useState<{
-    svg: string
-    bindFunctions: ((element: Element) => void) | undefined
-  } | null>(null)
-  const [diagramSize, setDiagramSize] = useState<{ width: number; height: number } | null>(null)
-  const [error, setError] = useState<string | null>(null)
   const [fullscreenScale, setFullscreenScale] = useState(1)
-  const fullscreenWrapRef = useRef<HTMLDivElement>(null)
-
-  useLayoutEffect(() => {
-    if (!code?.trim()) return
-    setError(null)
-    setResult(null)
-    let cancelled = false
-    const mermaidId = `mermaid-${uniqueId.replace(/:/g, '-')}-${++renderIdRef.current}`
-
-    mermaid
-      .render(mermaidId, code.trim())
-      .then(({ svg, bindFunctions }) => {
-        if (cancelled) return
-        setResult({ svg, bindFunctions })
-      })
-      .catch((err: unknown) => {
-        if (!cancelled) {
-          const message = err instanceof Error ? err.message : String(err)
-          console.error('Mermaid render failed:', err)
-          setError(message)
-        }
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [code, uniqueId])
-
-  useLayoutEffect(() => {
-    if (!result?.bindFunctions || !ref.current) return
-    result.bindFunctions(ref.current)
-    const svg = ref.current.querySelector('svg')
-    if (svg) {
-      const w = svg.getAttribute('width')
-      const h = svg.getAttribute('height')
-      const viewBox = svg.getAttribute('viewBox')
-      let width = 0
-      let height = 0
-      if (w != null && h != null) {
-        width = parseFloat(w) || 0
-        height = parseFloat(h) || 0
-      }
-      if ((width === 0 || height === 0) && viewBox) {
-        const parts = viewBox.trim().split(/\s+/)
-        if (parts.length >= 4) {
-          width = width || parseFloat(parts[2]) || 0
-          height = height || parseFloat(parts[3]) || 0
-        }
-      }
-      if (width > 0 && height > 0) {
-        setDiagramSize({ width, height })
-      }
-    }
-  }, [result])
 
   useLayoutEffect(() => {
     const el = containerRef.current
@@ -291,7 +341,7 @@ export function MermaidSlide({ code, id, fullSize = false, constrainHeight = fal
   const diagramContent =
     result?.svg != null ? (
       <div
-        ref={ref}
+        ref={svgRef}
         className="inline-flex flex-shrink-0 items-center justify-center [&_svg]:block [&_svg]:min-h-[280px]"
         style={{
           zoom: zoom / 100,
@@ -316,35 +366,12 @@ export function MermaidSlide({ code, id, fullSize = false, constrainHeight = fal
     )
 
   const controls = (
-    <div className="flex flex-shrink-0 items-center justify-end gap-1 pb-2">
-      <button
-        type="button"
-        onClick={() => setIsFullscreen(true)}
-        disabled={result?.svg == null}
-        className="rounded p-1 border bg-transparent border-white/30 text-white/80 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent inline-flex items-center justify-center"
-        aria-label="View diagram fullscreen"
-      >
-        <FullscreenIcon className="w-4 h-4" />
-      </button>
-      <button
-        type="button"
-        onClick={() => setZoom((z) => Math.max(ZOOM_MIN, z - ZOOM_STEP))}
-        disabled={zoom <= ZOOM_MIN}
-        className="rounded p-1 border bg-transparent border-white/30 text-white/80 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent inline-flex items-center justify-center"
-        aria-label="Zoom out"
-      >
-        <ZoomOutIcon className="w-4 h-4" />
-      </button>
-      <button
-        type="button"
-        onClick={() => setZoom((z) => Math.min(ZOOM_MAX, z + ZOOM_STEP))}
-        disabled={zoom >= ZOOM_MAX}
-        className="rounded p-1 border bg-transparent border-white/30 text-white/80 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent inline-flex items-center justify-center"
-        aria-label="Zoom in"
-      >
-        <ZoomInIcon className="w-4 h-4" />
-      </button>
-    </div>
+    <MermaidDiagramControls
+      hasSvg={result?.svg != null}
+      zoom={zoom}
+      setZoom={setZoom}
+      onFullscreen={() => setIsFullscreen(true)}
+    />
   )
 
   const diagramContainer = (
@@ -369,60 +396,15 @@ export function MermaidSlide({ code, id, fullSize = false, constrainHeight = fal
   )
 
   const fullscreenOverlay =
-    isFullscreen &&
-    result?.svg != null &&
-    typeof document !== 'undefined' &&
-    document.body != null
+    isFullscreen && result?.svg != null && typeof document !== 'undefined' && document.body != null
       ? createPortal(
-          <div
-            className="fixed inset-0 z-[100] flex flex-col bg-black/95 backdrop-blur-sm"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Diagram fullscreen"
-            onClick={() => setIsFullscreen(false)}
-          >
-            <div
-              className="flex flex-shrink-0 items-center justify-end gap-2 p-3 border-b border-white/10"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <span className="text-sm text-white/70 mr-auto">Diagram — Esc or click outside to close</span>
-              <button
-                type="button"
-                onClick={() => setIsFullscreen(false)}
-                className="rounded-lg px-3 py-1.5 text-sm font-medium border border-white/30 bg-white/10 text-white hover:bg-white/20 transition-colors"
-                aria-label="Close fullscreen"
-              >
-                Close
-              </button>
-            </div>
-            <div
-              className="flex flex-1 min-h-0 min-w-0 items-center justify-center overflow-x-auto overflow-y-auto p-4"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div
-                ref={fullscreenWrapRef}
-                className="fullscreen-diagram-wrap inline-flex shrink-0 [&_svg]:block [&_svg]:max-w-full [&_svg]:max-h-full [&_svg]:w-auto [&_svg]:h-auto"
-                style={
-                  diagramSize
-                    ? {
-                        width: diagramSize.width,
-                        height: diagramSize.height,
-                        minWidth: diagramSize.width,
-                        minHeight: diagramSize.height,
-                        transform: `scale(${fullscreenScale})`,
-                        transformOrigin: 'center center',
-                      }
-                    : {
-                        width: '90vw',
-                        height: '80vh',
-                        minWidth: 400,
-                        minHeight: 300,
-                      }
-                }
-                dangerouslySetInnerHTML={{ __html: result.svg }}
-              />
-            </div>
-          </div>,
+          <MermaidFullscreenOverlay
+            svg={result.svg}
+            diagramSize={diagramSize}
+            fullscreenScale={fullscreenScale}
+            fullscreenWrapRef={fullscreenWrapRef}
+            onClose={() => setIsFullscreen(false)}
+          />,
           document.body
         )
       : null

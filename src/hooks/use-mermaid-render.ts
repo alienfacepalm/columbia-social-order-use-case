@@ -17,12 +17,12 @@ export interface IDiagramSize {
 export interface IUseMermaidRenderReturn {
   readonly result: IMermaidRenderResult | null
   readonly error: string | null
-  readonly svgRef: React.RefObject<HTMLDivElement | null>
+  readonly svgRef: React.RefObject<HTMLDivElement>
   readonly diagramSize: IDiagramSize | null
   readonly setDiagramSize: Dispatch<SetStateAction<IDiagramSize | null>>
 }
 
-function measureSvgFromRef(svgRef: React.RefObject<HTMLDivElement | null>): IDiagramSize | null {
+function measureSvgFromRef(svgRef: React.RefObject<HTMLDivElement>): IDiagramSize | null {
   const svg = svgRef.current?.querySelector('svg')
   if (!svg) return null
   const w = svg.getAttribute('width')
