@@ -67,13 +67,13 @@ flowchart LR
 
 **Functional Requirements**
 
-- Ingest TikTok Shop orders via **Rithum posting to Social-Order Adapter webhook endpoints**
+- Ingest TikTok Shop orders via **Rithum (RCA) posting to Social-Order Adapter webhook endpoints** (e.g. order payment cleared); adapter maps to canonical/SFCC format and calls **SFCC Cartridge API** to create orders
 - Normalize into **canonical formats** for SFCC/SFOMS, **EOS (Enterprise Order Service — Columbia’s order API)**, and SAP — **SFCC** and **SFOMS** are two systems in the same suite that work together; they pass orders into **EOS**, which orchestrates lifecycle (New → Authorized → Confirmed → Shipped → Fulfilled) and sends to SAP
 - Maintain **order provenance** end‑to‑end
-- Support **bidirectional** status updates
+- Support **bidirectional** status updates (webhooks: Rithum → Adapter → SFCC/EOS; upstream: EOS → Service Bus → Adapter → Rithum API)
 - Authenticate via **APIM**
-- Use **Azure Service Bus** for downstream + upstream flows
-- Integrate via **custom SFCC cartridge**
+- Use **Azure Service Bus** for upstream status sync (EOS → Adapter → Rithum) and optionally for audit/tracking
+- Integrate via **custom SFCC cartridge** (API for order creation)
 
 **Non‑Functional Requirements**
 
@@ -131,12 +131,10 @@ flowchart LR
 ```mermaid
 flowchart LR
     subgraph inbound["Inbound: TikTok → Columbia"]
-        TT["TikTok Shop"] --> R["Rithum Middleware"]
+        TT["TikTok Shop"] --> R["Rithum (RCA / Channel Advisor API)"]
         R --> APIM["Azure API Management"]
         APIM --> AF["Social-Order Adapter"]
-        AF --> SB1["Azure Service Bus"]
-        SB1 --> CM["Canonical Mapping"]
-        CM --> CART["SFCC Cartridge"]
+        AF --> CART["SFCC Cartridge API"]
         CART --> SFCC["SFCC"]
         CART --> SFOMS["SFOMS"]
         SFCC --> EOS["EOS (Columbia’s Enterprise Order Service API)"]
@@ -184,10 +182,10 @@ flowchart LR
 
 The adapter controls **downstream** (Rithum → Columbia) and **upstream** (Columbia → Rithum) flows between Rithum and Columbia.
 
-- **APIM-secured webhook endpoints** — Rithum posts order and update payloads here; APIM handles auth and policy.
+- **APIM-secured webhook endpoints** — Rithum (RCA) posts order and status payloads here; adapter creates orders in SFCC via Cartridge API and updates status in EOS; APIM handles auth and policy.
 - **Service Bus triggers** — **EOS** (or SAP) lifecycle and fulfillment events are published to Service Bus; the same Function App consumes them and calls back to the **Rithum API** so Rithum stays in sync with Columbia’s fulfillment state.
 
-Result: one adapter that ingests from Rithum and pushes status back to Rithum, with automatic scale for both webhook and Service Bus traffic.
+Result: one adapter that ingests from Rithum (webhooks) and pushes status back to Rithum (Service Bus → Rithum API), with automatic scale for both webhook and Service Bus traffic.
 
 ```mermaid
 flowchart LR
@@ -233,21 +231,19 @@ flowchart LR
 
 **Flow**
 
-- Rithum posts to **Social-Order Adapter** webhook endpoints
+- **Rithum** (RCA / Channel Advisor API) posts to **Social-Order Adapter** webhook endpoints (e.g. order payment cleared)
 - APIM authenticates + applies policies
-- Adapter validates + normalizes → **Azure Service Bus**
-- **Canonical mapping** → SFCC Cartridge creates orders in **SFCC**; **SFCC** and **SFOMS** (same suite, two systems working together) pass orders into **EOS**
+- Adapter validates, normalizes, and maps to SFCC format (canonical mapping in adapter); calls **SFCC Cartridge API** to create orders in **SFCC**
+- **SFCC** and **SFOMS** (same suite, two systems working together) pass orders into **EOS**
 - **EOS (Columbia’s Enterprise Order Service API)** receives orders from SFCC/SFOMS, orchestrates lifecycle (New → Authorized → Confirmed → Shipped → Fulfilled), and sends to **SAP** for fulfillment
 
-**Key interfaces:** Rithum webhook (POST, order payload) → Adapter; Adapter → Service Bus (message contract); Cartridge API (order create request/response); SFCC/SFOMS → EOS → SAP (order lifecycle).
+**Key interfaces:** Rithum webhook (POST, order payload) → Adapter; Adapter → SFCC Cartridge API (order create request/response); SFCC/SFOMS → EOS → SAP (order lifecycle). *Service Bus is used for upstream status sync (Slide 10) and optionally for audit/tracking on the webhook path.*
 
 ```mermaid
 flowchart TB
-    R["Rithum"] --> APIM["APIM"]
+    R["Rithum (RCA)"] --> APIM["APIM"]
     APIM --> FA["Social-Order Adapter"]
-    FA --> SB["Service Bus"]
-    SB --> CM["Canonical Mapping"]
-    CM --> CART["SFCC Cartridge"]
+    FA --> CART["SFCC Cartridge API"]
     CART --> SFCC["SFCC"]
     CART --> SFOMS["SFOMS"]
     SFCC --> EOS["EOS"]
