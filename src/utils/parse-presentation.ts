@@ -25,6 +25,8 @@ export function parsePresentation(raw: string): Slide[] {
       }
       if (trimmed.startsWith('# ') || trimmed.startsWith('## ')) {
         title = trimmed.replace(/^#+\s*/, '').trim()
+        // Remove "Slide N — " / "Slide N – " / "Slide N - " prefix from titles
+        title = title.replace(/^Slide \d+\s*[—–\-]\s*/i, '').trim()
         bodyStart = lineIndex + 1
         break
       }

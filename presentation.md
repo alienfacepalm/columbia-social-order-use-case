@@ -8,7 +8,7 @@ HYBRID FORMAT NOTES
 
 # High‑Reliability Real‑Time System Design
 
-### Columbia TikTok ML Pipeline + Social‑Order Commerce Pipeline
+### Columbia Social‑Order Commerce Pipeline
 
 Buck — Senior Full Stack Engineer Candidate
 
@@ -17,7 +17,7 @@ Buck — Senior Full Stack Engineer Candidate
 ## Slide 1 — Title
 
 **High‑Reliability Real‑Time System Design**  
-Columbia TikTok ML Pipeline + Social‑Order Commerce Pipeline  
+Columbia Social‑Order Commerce Pipeline  
 Buck — Senior Full Stack Engineer Candidate
 
 <!-- STAR: S — Introduce the situation -->
@@ -26,28 +26,20 @@ Buck — Senior Full Stack Engineer Candidate
 
 ---
 
-## Slide 2 — Problem Domain (ML Pipeline)
+## Slide 2 – Problem Framing (Revised)
 
-The Columbia ML project required extracting meaningful signals from **high‑volume, noisy, user‑generated video data** in real time.
+Columbia wanted customers to purchase products directly inside [TikTok](copilot-action://composer-send?text=What%20is%20TikTok%20Shop) using their existing [TikTok accounts](copilot-action://composer-send?text=How%20do%20TikTok%20accounts%20work%20for%20commerce), and needed those orders to flow reliably into their [SFCC backend](copilot-action://composer-send?text=Explain%20Salesforce%20Commerce%20Cloud%20order%20flows).
 
-**Objectives**
+### Objectives
 
-- Build a reliable ingestion + processing pipeline
-- Deliver low‑latency insights
-- Maintain predictable behavior under inconsistent inputs
+- **[Build a robust ingestion + processing pipeline](copilot-action://composer-send?text=How%20do%20you%20design%20a%20robust%20ingestion%20pipeline%3F)**  
+  Normalize TikTok Shop order data and handle bursty, inconsistent payloads without breaking downstream systems.
 
-<!-- STAR: S -->
-<!-- RADIO: R -->
-<!-- Pacing: 2 minutes -->
+- **[Deliver timely, actionable order data](copilot-action://composer-send?text=What%20counts%20as%20timely%20order%20data%20for%20commerce)**  
+  Ensure orders, cancellations, and updates arrive quickly enough to support fulfillment, inventory, and customer service.
 
----
-
-## Slide 3 — Why This System Mattered
-
-- Supported research + operational decision‑making
-- Required production‑grade reliability
-- Needed to scale across unpredictable traffic patterns
-- Had real stakeholders and real deadlines
+- **[Maintain predictable behavior under inconsistent inputs](copilot-action://composer-send?text=How%20to%20design%20predictable%20behavior%20with%20inconsistent%20inputs)**  
+  Gracefully handle malformed, partial, or delayed TikTok payloads while preserving order integrity and provenance.
 
 <!-- STAR: S -->
 <!-- RADIO: R -->
@@ -55,109 +47,7 @@ The Columbia ML project required extracting meaningful signals from **high‑vol
 
 ---
 
-## Slide 4 — ML Architecture Overview
-
-```mermaid
-flowchart LR
-    A[Ingestion Layer] --> B[Preprocessing]
-    B --> C[Feature Extraction]
-    C --> D[ML Inference Service]
-    D --> E[Evaluation Loop]
-    E --> F[Storage Layer]
-    F --> G[Dashboards & APIs]
-```
-
-<!-- STAR: T -->
-<!-- RADIO: A -->
-<!-- Pacing: 2 minutes -->
-
----
-
-## Slide 5 — Frontend Overview (ML Dashboard)
-
-- React‑based operator dashboard
-- Real‑time metrics + system health
-- Visualization of ingestion rates, model outputs, and drift
-- Designed for clarity under noisy conditions
-
-<!-- STAR: A -->
-<!-- RADIO: I -->
-<!-- Pacing: 1 minute -->
-
----
-
-## Slide 6 — Backend Overview (ML Pipeline)
-
-- Async service architecture
-- Event‑driven processing
-- Queue‑based ingestion
-- Stateless inference services
-
-<!-- STAR: A -->
-<!-- RADIO: A/I -->
-<!-- Pacing: 1 minute -->
-
----
-
-## Slide 7 — Data & Storage (ML Pipeline)
-
-- Raw data store
-- Feature store
-- Model output store
-- Metadata + observability tables
-- Versioned schemas + validation gates
-
-<!-- STAR: A -->
-<!-- RADIO: D -->
-<!-- Pacing: 2 minutes -->
-
----
-
-## Slide 8 — Communication Protocols (ML Pipeline)
-
-- REST APIs
-- Internal gRPC‑style boundaries
-- Queue‑based ingestion
-- WebSockets for real‑time UI updates
-
-<!-- STAR: A -->
-<!-- RADIO: I -->
-<!-- Pacing: 1 minute -->
-
----
-
-## Slide 9 — Deployment Model (ML Pipeline)
-
-```mermaid
-flowchart TD
-    subgraph Cluster
-        A[Containerized Services]
-        B[Autoscaler]
-        C[Load Balancer]
-        D[Monitoring Stack]
-    end
-
-    C --> A
-    A --> B
-    A --> D
-```
-
-- Containerized services
-- Horizontal scaling
-- Canary deployments
-- Automated rollback paths
-
-<!-- STAR: A -->
-<!-- RADIO: O -->
-<!-- Pacing: 2 minutes -->
-
----
-
-# SECOND CASE STUDY — SOCIAL‑ORDER COMMERCE PIPELINE
-
----
-
-## Slide 10 — Requirements (Social‑Order Pipeline)
+## Slide 3 — Requirements (Social‑Order Pipeline)
 
 **Functional Requirements**
 
@@ -181,7 +71,7 @@ flowchart TD
 
 ---
 
-## Slide 11 — Why Rithum Won (Decision Architecture)
+## Slide 4 — Why Rithum Won (Decision Architecture)
 
 We evaluated two options:
 
@@ -208,29 +98,29 @@ We evaluated two options:
 
 ---
 
-## Slide 12 — Social‑Order Architecture Diagram
+## Slide 5 — Social‑Order Architecture Diagram
 
 ```mermaid
 flowchart LR
-    TT[TikTok Shop Webhooks] --> R[Rithum Middleware]
-    R --> APIM[Azure API Management]
-    APIM --> AF[Azure Function App (Stateless)]
-    AF --> SB1[Azure Service Bus (Downstream)]
-    SB1 --> CM[Canonical Mapping Layer]
-    CM --> CART[Custom SFCC Cartridge]
-    CART --> SFCC[Salesforce Commerce Cloud]
-    SFCC --> SFOMS[Salesforce Order Management System]
-    SFOMS --> SAP[SAP Fulfillment]
+    TT["TikTok Shop Webhooks"] --> R["Rithum Middleware"]
+    R --> APIM["Azure API Management"]
+    APIM --> AF["Azure Function App (Stateless)"]
+    AF --> SB1["Azure Service Bus (Downstream)"]
+    SB1 --> CM["Canonical Mapping Layer"]
+    CM --> CART["Custom SFCC Cartridge"]
+    CART --> SFCC["Salesforce Commerce Cloud"]
+    SFCC --> SFOMS["Salesforce Order Management System"]
+    SFOMS --> SAP["SAP Fulfillment"]
 
-    SAP --> SB2[Azure Service Bus (Upstream)]
-    SB2 --> AF2[Social-Order Function App]
-    AF2 --> RAPI[Rithum API (Status Update)]
+    SAP --> SB2["Azure Service Bus (Upstream)"]
+    SB2 --> AF2["Social-Order Function App"]
+    AF2 --> RAPI["Rithum API (Status Update)"]
 
     subgraph Observability
-        L[Loki (Unified Logs)]
-        K[KQL (Azure Logs)]
-        G[Grafana Dashboards]
-        T[Traces]
+        L["Loki (Unified Logs)"]
+        K["KQL (Azure Logs)"]
+        G["Grafana Dashboards"]
+        T["Traces"]
     end
 
     AF --> L
@@ -251,7 +141,26 @@ flowchart LR
 
 ---
 
-## Slide 13 — Downstream Order Creation
+## Slide 6 — Azure Function App: Auto-Scaling & Social-Order Adapter
+
+**Auto-Scaling**
+
+- Azure Function Apps **scale automatically** with incoming load, so the pipeline handles TikTok traffic spikes without over-provisioning.
+
+**Social-Order Adapter (single Function App)**
+
+- **APIM-secured webhook endpoints** — Rithum posts order and update payloads here; APIM handles auth and policy.
+- **Service Bus triggers** — Downstream (e.g. SAP/SFOMS) events are published to Service Bus; the same Function App consumes them and calls back to the **Rithum API** so Rithum stays in sync with Columbia’s fulfillment state.
+
+Result: one adapter that ingests from Rithum and pushes status back to Rithum, with automatic scale for both webhook and Service Bus traffic.
+
+<!-- STAR: A -->
+<!-- RADIO: I -->
+<!-- Pacing: 2–3 minutes -->
+
+---
+
+## Slide 7 — Downstream Order Creation
 
 **Flow**
 
@@ -269,7 +178,7 @@ flowchart LR
 
 ---
 
-## Slide 14 — Upstream Status Sync
+## Slide 8 — Upstream Status Sync
 
 **Flow**
 
@@ -284,7 +193,7 @@ flowchart LR
 
 ---
 
-## Slide 15 — Data: Provenance & Canonical Mapping
+## Slide 9 — Data: Provenance & Canonical Mapping
 
 - Canonical schema isolates upstream volatility
 - Provenance chain:
@@ -300,13 +209,13 @@ flowchart LR
 
 ---
 
-## Slide 16 — Observability: Grafana + Loki + KQL
+## Slide 10 — Observability: Grafana + Loki / KQL
 
 **Why Loki > KQL**
 
 - KQL was resource‑scoped, fragmented
 - Hard to correlate cross‑system events
-- Loki unified logs across all Azure projects
+- Loki unifies logs across all of Columbia (AWS, GCP, Salesforce, Azure, etc.) so we can piece together timelines and visualize an order's provenance or journey
 - Grafana dashboards gave a single pane of glass
 - Structured logging enabled provenance queries
 
@@ -316,7 +225,7 @@ flowchart LR
 
 ---
 
-## Slide 17 — Fault Tolerance & Reliability
+## Slide 11 — Fault Tolerance & Reliability
 
 - Retry + backoff
 - Dead‑letter queues
@@ -330,7 +239,7 @@ flowchart LR
 
 ---
 
-## Slide 18 — Deployment Model (Commerce)
+## Slide 12 — Deployment Model (Commerce)
 
 - Stateless Azure Functions
 - APIM as secure boundary
@@ -343,7 +252,7 @@ flowchart LR
 
 ---
 
-## Slide 19 — Cross‑Functional Integration
+## Slide 13 — Cross‑Functional Integration
 
 - Worked with commerce, SAP, SFCC, and Rithum teams
 - Managed API contracts
@@ -355,7 +264,7 @@ flowchart LR
 
 ---
 
-## Slide 20 — Key Trade‑Offs
+## Slide 14 — Key Trade‑Offs
 
 - Latency vs accuracy
 - Batch vs streaming
@@ -368,7 +277,7 @@ flowchart LR
 
 ---
 
-## Slide 21 — Impact
+## Slide 15 — Impact
 
 - Reliable, scalable, future‑proof pipeline
 - Full provenance from TikTok → SAP → TikTok
@@ -382,7 +291,7 @@ flowchart LR
 
 ---
 
-## Slide 22 — Why This Maps to Echodyne
+## Slide 16 — Why This Maps to Echodyne
 
 This work demonstrates:
 
@@ -399,10 +308,10 @@ This work demonstrates:
 
 ---
 
-## Slide 23 — Closing
+## Slide 17 — Closing
 
 I build systems that perform under real‑world constraints.  
-I’d bring the same rigor, clarity, and reliability to Echodyne’s radar software platform.
+I'd bring the same rigor, clarity, and reliability to Echodyne's radar software platform.
 
 <!-- STAR: R -->
 <!-- Pacing: 1 minute -->
