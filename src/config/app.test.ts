@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+
 import { assetUrl } from './app'
 
 describe('assetUrl', () => {

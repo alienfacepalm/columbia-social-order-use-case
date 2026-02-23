@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+
 import { truncateTitle } from './truncate-title'
 
 describe('truncateTitle', () => {

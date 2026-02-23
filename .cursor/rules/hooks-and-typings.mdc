@@ -1,0 +1,80 @@
+---
+description: Prefer business logic in hooks; put typings in typings/ in separate files
+alwaysApply: true
+---
+
+# Hooks and typings placement
+
+Apply to all file creation, refactoring, and code generation.
+
+## Business logic in hooks
+
+- **Prefer abstracting business logic into custom hooks** instead of keeping it in components or pages.
+- Put hooks in `hooks/` with kebab-case filenames: `use-order-status.ts`, `use-mermaid-render.ts`.
+- Keep components focused on rendering and composition; move state, side effects, and domain logic into hooks.
+- When a component has non-trivial logic (fetching, derived state, event handlers with domain rules), extract a hook first.
+
+```typescript
+// ❌ BAD — logic in component
+function OrderCard() {
+  const [order, setOrder] = useState(null);
+  useEffect(() => {
+    fetch(`/api/orders/${id}`).then(r => r.json()).then(setOrder);
+  }, [id]);
+  const isOverdue = order ? new Date(order.due) < new Date() : false;
+  // ...
+}
+
+// ✅ GOOD — logic in hook
+// hooks/use-order.ts
+export function useOrder(id: string) {
+  const [order, setOrder] = useState<IOrder | null>(null);
+  useEffect(() => { /* fetch */ }, [id]);
+  const isOverdue = order ? new Date(order.due) < new Date() : false;
+  return { order, isOverdue };
+}
+// component only composes
+function OrderCard() {
+  const { order, isOverdue } = useOrder(id);
+  // ...
+}
+```
+
+## Typings in typings/
+
+- **Put type definitions in the `typings/` directory** in dedicated files rather than in the file that uses them.
+- Use one file per domain or feature: `typings/order.ts`, `typings/api.ts`, `typings/slide.ts`.
+- In the file that uses the types, import from the typings file: `import type { IOrder } from '@/typings/order'` (or your project’s alias).
+- Keep `typings/` for shared interfaces and type aliases; very local one-off types can stay inline only when they are not reused.
+
+```typescript
+// ❌ BAD — types in consuming file
+// components/order-card.tsx
+interface IOrder {
+  id: string;
+  due: string;
+  status: TOrderStatus;
+}
+type TOrderStatus = 'pending' | 'shipped' | 'delivered';
+export function OrderCard({ order }: { order: IOrder }) { ... }
+
+// ✅ GOOD — types in typings/
+// typings/order.ts
+export interface IOrder {
+  id: string;
+  due: string;
+  status: TOrderStatus;
+}
+export type TOrderStatus = 'pending' | 'shipped' | 'delivered';
+
+// components/order-card.tsx
+import type { IOrder } from '@/typings/order';
+export function OrderCard({ order }: { order: IOrder }) { ... }
+```
+
+## Summary
+
+| Concern           | Prefer                          | Avoid                          |
+|------------------|----------------------------------|--------------------------------|
+| Business logic   | Custom hook in `hooks/`         | Logic in component or page     |
+| Type definitions | `typings/<domain>.ts`, then import | Inline in component/service file |

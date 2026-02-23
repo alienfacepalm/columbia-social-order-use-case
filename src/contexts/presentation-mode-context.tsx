@@ -2,11 +2,11 @@ import type { ReactNode } from 'react'
 import { createContext, useCallback, useContext, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 
-export type PresentationMode = 'simple' | 'advanced'
+export type TPresentationMode = 'simple' | 'advanced'
 
 const STORAGE_KEY = 'echodyne-presentation-mode'
 
-function getStoredMode(): PresentationMode {
+function getStoredMode(): TPresentationMode {
   if (typeof window === 'undefined') return 'advanced'
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY)
@@ -18,8 +18,8 @@ function getStoredMode(): PresentationMode {
 }
 
 interface IPresentationModeContextValue {
-  mode: PresentationMode
-  setMode: (mode: PresentationMode) => void
+  mode: TPresentationMode
+  setMode: (mode: TPresentationMode) => void
   toggle: () => void
   isSimple: boolean
 }
@@ -42,11 +42,11 @@ export function PresentationModeProvider({ children }: IPresentationModeProvider
   const { mode: paramMode, slideNum } = useParams<{ mode: string; slideNum?: string }>()
   const navigate = useNavigate()
 
-  const mode: PresentationMode =
+  const mode: TPresentationMode =
     paramMode === 'simple' || paramMode === 'advanced' ? paramMode : getStoredMode()
 
   const setMode = useCallback(
-    (next: PresentationMode) => {
+    (next: TPresentationMode) => {
       const slide = slideNum ?? '1'
       navigate(`/${next}/${slide}`, { replace: true })
       try {
