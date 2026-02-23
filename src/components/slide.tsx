@@ -115,7 +115,6 @@ export function Slide({ slide, slideIndex }: ISlideProps): ReactElement {
               node={node}
               slideIndex={slideIndex}
               nodeIndex={i}
-              isDiagramSlide={isDiagramSlide}
               fullSizeDiagram={fullSizeDiagram}
               constrainDiagramHeight={isDiagramSlide && !fullSizeDiagram}
             />

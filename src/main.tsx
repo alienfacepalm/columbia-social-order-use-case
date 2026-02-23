@@ -6,9 +6,12 @@ import { App } from './components/app'
 import { RootRedirect } from './components/root-redirect'
 import './styles/app.css'
 
+// Preserve GitHub Pages base path (e.g. /columbia-social-order-use-case); no trailing slash for React Router
+const basename = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '')
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename={basename}>
       <Routes>
         <Route path="/" element={<RootRedirect />} />
         <Route path="/:mode/:slideNum?" element={<App />} />

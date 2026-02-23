@@ -8,7 +8,6 @@ export interface ISlideNodeProps {
   readonly node: TSlideContentNode
   readonly slideIndex: number
   readonly nodeIndex: number
-  readonly isDiagramSlide: boolean
   readonly fullSizeDiagram: boolean
   readonly constrainDiagramHeight: boolean
 }
