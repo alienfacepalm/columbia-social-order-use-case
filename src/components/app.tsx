@@ -10,8 +10,8 @@ import { useSlideNav } from '../hooks/use-slide-nav'
 import { useMediaQuery } from '../hooks/use-media-query'
 import { useSwipeNavigation } from '../hooks/use-swipe-navigation'
 import { parsePresentation, mergePresentationWithSimple } from '../utils/parse-presentation'
-import presentationRaw from '../../presentation.md?raw'
-import presentationSimpleRaw from '../../presentation-simple.md?raw'
+import presentationRaw from '../../presentation/advanced.md?raw'
+import presentationSimpleRaw from '../../presentation/simple.md?raw'
 
 const slides = mergePresentationWithSimple(
   parsePresentation(presentationRaw),

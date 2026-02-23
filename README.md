@@ -4,7 +4,7 @@ Technical presentation: **High-Reliability Real-Time System Design** — use cas
 
 ## Slides (React SPA)
 
-The slide deck is a React SPA that reads `presentation.md` and renders slides with Mermaid diagrams.
+The slide deck is a React SPA that reads `presentation/advanced.md` (and `presentation/simple.md` for simplified slide content) and renders slides with Mermaid diagrams.
 
 - **Run:** `pnpm dev` then open the URL (e.g. http://localhost:5173)
 - **Build:** `pnpm build` → output in `dist/`
@@ -20,7 +20,7 @@ The slide deck is a React SPA that reads `presentation.md` and renders slides wi
 
 ### Editing
 
-Edit `presentation.md` and save; the dev server will hot-reload. Slide boundaries are `---`. Use `## Slide N — Title` for slide titles and ` ```mermaid ` code blocks for diagrams.
+Edit `presentation/advanced.md` or `presentation/simple.md` and save; the dev server will hot-reload. Slide boundaries are `---`. Use `## Slide N — Title` for slide titles and ` ```mermaid ` code blocks for diagrams.
 
 ### Static assets
 

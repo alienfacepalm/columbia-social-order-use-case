@@ -1,7 +1,7 @@
 import type { TInlineSpan, ISlide, TSlideContentNode } from '../models/slide'
 
 /**
- * Parses presentation.md content into slide objects.
+ * Parses presentation markdown (e.g. presentation/advanced.md) into slide objects.
  * Splits by ---, extracts ## title and body, and pulls out mermaid code blocks.
  */
 export function parsePresentation(raw: string): ISlide[] {

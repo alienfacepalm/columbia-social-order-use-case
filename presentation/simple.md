@@ -78,6 +78,7 @@ We compared two approaches:
 
 - One integration for TikTok (and future platforms).
 - We defined **our own** order format; Rithum’s format stays at the boundary.
+- **Security and PII** — Rithum handles **protection of social media accounts** and related data at the boundary, so we didn’t have to store or secure social credentials in our stack.
 - Retries and dead-letter queues built in.
 - Ready for Instagram, YouTube, etc.
 - Decision documented in an ADR.
@@ -243,7 +244,7 @@ flowchart LR
 
 **Keeping data in sync** — Orders flow in; status flows back. One data model and one adapter, with idempotent order creation, keep everything consistent. We can trace and reconcile via provenance.
 
-**Security** — One secure entry point (API gateway); auth at the edge; no raw TikTok credentials in our stack; minimal permissions for adapter calls.
+**Security** — One secure entry point (API gateway); auth at the edge; no raw TikTok credentials in our stack; minimal permissions for adapter calls. **PII security was considered**; Rithum’s handling of social account protection kept that data out of our domain.
 
 **Fault tolerance** — Retries with backoff; failed messages go to a dead-letter queue; idempotent creates avoid duplicates; health checks and circuit breakers; stateless so failures don’t leave bad state.
 
@@ -281,6 +282,7 @@ We tested in layers so the adapter behaves predictably with real and test data.
 
 **Integration and message bus**
 
+- **Golden payload in Postman** — We used a **golden payload** (one canonical sample) in **Postman** for **Rithum discovery** (webhook shape, auth) and **SFCC Cartridge development** (order-create requests); same sample for exploration and tests.
 - Scripts and test payloads for end-to-end flows. A local tester app and payloads drive the processors against real queues.
 
 **Result** — Unit tests protect mapping and boundaries; integration and message-bus tests validate flows before release; canary and rollback reduce risk.
@@ -321,7 +323,7 @@ flowchart LR
 - **Discovery** — I owned scoping, option evaluation (direct vs Rithum), and technical direction before build.
 - **Rithum adoption** — I led proof-of-concept and evidence so the org could commit to Rithum with confidence.
 - **Buy-in** — I aligned stakeholders on adapter tech, hosting (e.g. Azure), and patterns. I built it the “Columbia way” to speed approval.
-- **Design and delivery** — I drove the single data model and one adapter; wrote ADRs; coordinated with commerce, SAP, and the partner on contracts and rollout; used Azure DevOps with canary and rollback so we could ship safely.
+- **Design and delivery** — I drove the single data model and one adapter; wrote ADRs; coordinated with e-commerce department, SAP, and the partner on contracts and rollout; used Azure DevOps with canary and rollback so we could ship safely.
 
 ---
 

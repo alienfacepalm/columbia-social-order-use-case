@@ -1,6 +1,6 @@
 ---
 description: Generate Echodyne slide deck from Markdown presentation
-globs: "**/presentation.md"
+globs: "**/presentation/advanced.md,**/presentation/simple.md"
 alwaysApply: false
 ---
 

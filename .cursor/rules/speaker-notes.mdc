@@ -1,6 +1,6 @@
 ---
 description: Auto-generate speaker notes for slide decks
-globs: "**/presentation.md,**/*slides*"
+globs: "**/presentation/advanced.md,**/presentation/simple.md,**/*slides*"
 alwaysApply: false
 ---
 

@@ -13,9 +13,9 @@ Cursor AI configuration and rules for this project.
 |------|-----------------|
 | `pnpm.mdc` | Always — use pnpm for all package management. |
 | `code-standards.mdc` | Always — kebab-case, TypeScript, React and architecture standards. |
-| `speaker-notes.mdc` | When working with `presentation.md` or slide files — generating speaker notes. |
+| `speaker-notes.mdc` | When working with `presentation/advanced.md`, `presentation/simple.md`, or slide files — generating speaker notes. |
 | `mermaid.mdc` | When working with Markdown — generating Mermaid diagrams. |
-| `slide-deck.mdc` | When working with `presentation.md` — generating slide deck from Markdown. |
+| `slide-deck.mdc` | When working with `presentation/advanced.md` or `presentation/simple.md` — generating slide deck from Markdown. |
 
 ## Adding a rule
 

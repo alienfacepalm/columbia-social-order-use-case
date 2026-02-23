@@ -1,6 +1,6 @@
 ---
 description: Presentation must stay under 40 minutes total runtime
-globs: presentation.md
+globs: "**/presentation/advanced.md,**/presentation/simple.md"
 alwaysApply: false
 ---
 

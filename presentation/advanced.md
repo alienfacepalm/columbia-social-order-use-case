@@ -103,6 +103,7 @@ We evaluated two options:
 
 - Better pricing
 - **Single integration point** for TikTok (and future networks); we defined **our own canonical data model** and treated Rithum’s API as an external contract — mapping layer so their schema never leaked into our domain.
+- **PII and social-account security** — Rithum handles **protection of social media accounts** and related PII at the boundary; we didn’t store or secure TikTok/social credentials or account data in our stack — another reason the middleware helped.
 - Built‑in retries + DLQs
 - Future‑proof (Instagram, YouTube, etc.)
 - Versioned API contracts
@@ -300,7 +301,7 @@ flowchart LR
 
 **Data synchronization** — Bidirectional flow: Rithum → adapter → SFCC/SFOMS → EOS → SAP (orders) and EOS/SAP (lifecycle events) → Service Bus → adapter → Rithum (status). **Our canonical model and mapping layer** (Rithum as integration boundary) plus idempotent order creation keep systems in sync; SFCC and SFOMS (same suite) pass orders into EOS; EOS is the order-lifecycle authority into SAP; provenance chain supports reconciliation.
 
-**Security** — APIM as single secure boundary; auth and policy at the edge; no raw TikTok credentials in our stack; least-privilege for adapter → Rithum and SFCC/SFOMS.
+**Security** — APIM as single secure boundary; auth and policy at the edge; no raw TikTok credentials in our stack; least-privilege for adapter → Rithum and SFCC/SFOMS. **PII security was taken into account**; Rithum’s handling of social account protection kept sensitive identity data out of our domain.
 
 **Fault tolerance** — Retry + exponential backoff; dead-letter queues for failed messages; idempotent order creation to avoid duplicates; health checks and circuit breakers; stateless functions so failures don’t leave bad in-memory state.
 
@@ -345,6 +346,7 @@ We applied a **layered testing strategy** so the adapter and cartridge behave pr
 
 **Integration and Service Bus**
 
+- **Golden payload + Postman** — Used a **golden payload** (canonical sample request/response) with **Postman** for **Rithum discovery** (webhook payload shape, auth, retries) and **SFCC Cartridge development** (order-create requests, response handling); the same payload drove manual exploration and later automated tests.
 - **Integration:** Shell and PowerShell scripts plus C# helpers; **EOS test payloads** (new, authorized, confirmed, invoiced, shipped) and **output-examples** for API/order responses
 - **Service Bus:** LocalServiceBusTester app, **servicebus-test-payloads.json**, and scripts to drive OrderProcessor, ReturnOrderProcessor, and ShipmentProcessor against queues for end-to-end behavior
 
