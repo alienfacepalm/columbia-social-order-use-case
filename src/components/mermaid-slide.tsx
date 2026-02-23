@@ -208,18 +208,26 @@ export function MermaidSlide({ code, id, fullSize = false, constrainHeight = fal
 
   useEffect(() => {
     if (!isFullscreen) return
+    const navKeys = new Set(['ArrowRight', 'ArrowLeft', ' ', 'PageDown', 'PageUp', 'Home', 'End'])
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsFullscreen(false)
+      if (e.key === 'Escape') {
+        setIsFullscreen(false)
+        return
+      }
+      if (navKeys.has(e.key)) {
+        e.preventDefault()
+        e.stopPropagation()
+      }
     }
-    document.addEventListener('keydown', onKeyDown)
+    document.addEventListener('keydown', onKeyDown, true)
     document.body.style.overflow = 'hidden'
     return () => {
-      document.removeEventListener('keydown', onKeyDown)
+      document.removeEventListener('keydown', onKeyDown, true)
       document.body.style.overflow = ''
     }
   }, [isFullscreen])
 
-  // Scale diagram in fullscreen: use viewport so we don't depend on ref timing; never shrink below 1x
+  // Scale diagram in fullscreen to fit viewport; cap at 2x so it doesn't get too large
   const updateFullscreenScale = useCallback(() => {
     if (!diagramSize || diagramSize.width <= 0 || diagramSize.height <= 0) return
     const padding = 32
@@ -227,7 +235,7 @@ export function MermaidSlide({ code, id, fullSize = false, constrainHeight = fal
     const cw = Math.max(100, window.innerWidth - padding * 2)
     const ch = Math.max(100, window.innerHeight - headerH - padding * 2)
     const fitScale = Math.min(cw / diagramSize.width, ch / diagramSize.height)
-    const scale = Math.max(1, Math.min(fitScale, 5))
+    const scale = Math.min(fitScale, 2)
     setFullscreenScale(scale)
   }, [diagramSize])
 
