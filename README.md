@@ -1,6 +1,6 @@
 # Echodyne Presentation
 
-Technical presentation: **High-Reliability Real-Time System Design** — use case **Columbia Sportswear** (Social-Order Adapter — commerce integration).
+Technical presentation: **High-Reliability Real-Time System Design** — use case **Columbia Sportswear** (Social-Order Adapter — commerce integration). The Social-Order Adapter itself was deployed via **Azure DevOps pipelines** (CI config is in `.ignore/social-order/ci`).
 
 ## Slides (React SPA)
 

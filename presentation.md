@@ -328,6 +328,7 @@ flowchart LR
 
 ## Slide 13 — Deployment Model (RADIO: O)
 
+- **Deployment via Azure DevOps pipelines** — Build, test, and release of the Social-Order Adapter (Function App, Service Bus, storage, APIM) are automated in **Azure DevOps pipelines**; pipeline config and environment-specific settings live in the repo’s CI config (e.g. dev, perf, prod).
 - **Stateless Azure Functions** — Scale out without session affinity; safe horizontal scaling.
 - **APIM as secure boundary** — All external traffic (Rithum webhooks) through APIM; auth and policy in one place.
 - **Canary deployments** — Roll out adapter changes to a subset before full rollout.
@@ -403,7 +404,7 @@ flowchart LR
 - **Guiding design decisions** — Led choice of Rithum over direct TikTok integration; drove canonical schema and single adapter for both downstream and upstream flows.
 - **Managing trade-offs** — Documented ADRs (e.g. Rithum vs direct); balanced latency vs consistency and observability cost vs depth with stakeholders.
 - **Leading implementation** — Owned adapter and cartridge design; coordinated with commerce, SAP, SFCC/SFOMS, and Rithum teams on contracts and rollout.
-- **Delivery approach** — Iterative delivery with clear milestones; canary deployments and rollback so we could ship without blocking fulfillment.
+- **Delivery approach** — Iterative delivery with clear milestones; **deployment via Azure DevOps pipelines** (build, test, release to dev/perf/prod); canary deployments and rollback so we could ship without blocking fulfillment.
 
 <!-- STAR: A — Team leadership and delivery per prompt -->
 <!-- Pacing: 3 minutes -->
