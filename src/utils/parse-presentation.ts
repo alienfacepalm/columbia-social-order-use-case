@@ -1,4 +1,4 @@
-import type { TInlineSpan, ISlide, TSlideContentNode } from '../models/slide'
+import type { TInlineSpan, ISlide, TSlideContentNode, IUlItem } from '../models/slide'
 
 /**
  * Parses presentation markdown (e.g. presentation/advanced.md) into slide objects.
@@ -115,12 +115,30 @@ function parseBody(body: string, mermaidCharts: readonly string[]): TSlideConten
         i++
         continue
       }
-      const trimmedLine = line.trimStart()
-      if (trimmedLine.startsWith('- ')) {
-        const items: TInlineSpan[][] = []
-        while (i < lines.length && lines[i].trimStart().startsWith('- ')) {
-          items.push(parseInline(lines[i].trimStart().slice(2)))
+      const listMatch = line.match(/^(\s*)-\s(.*)$/)
+      if (listMatch) {
+        const baseIndent = listMatch[1].length
+        const items: IUlItem[] = []
+        let current: IUlItem | null = null
+        const children: TInlineSpan[][] = []
+        while (i < lines.length) {
+          const nextMatch = lines[i].match(/^(\s*)-\s(.*)$/)
+          if (!nextMatch) break
+          const indent = nextMatch[1].length
+          const content = parseInline(nextMatch[2].trim())
+          if (indent <= baseIndent) {
+            if (current) {
+              items.push(children.length > 0 ? { ...current, children: [...children] } : current)
+              children.length = 0
+            }
+            current = { content }
+          } else {
+            children.push(content)
+          }
           i++
+        }
+        if (current) {
+          items.push(children.length > 0 ? { ...current, children: [...children] } : current)
         }
         nodes.push({ type: 'ul', items })
         continue

@@ -4,13 +4,19 @@ export type TInlineSpan =
   | { readonly type: 'bold'; value: string }
   | { readonly type: 'link'; value: string; href: string }
 
+/** One list item: content and optional nested items (sub-bullets). */
+export interface IUlItem {
+  readonly content: readonly TInlineSpan[]
+  readonly children?: readonly TInlineSpan[][]
+}
+
 /** Content node for a single slide */
 export type TSlideContentNode =
   | { readonly type: 'mermaid'; code: string }
   | { readonly type: 'subtitle'; content: string }
   | { readonly type: 'heading'; level: 2 | 3 | 4; content: string }
   | { readonly type: 'p'; content: readonly TInlineSpan[] }
-  | { readonly type: 'ul'; items: readonly TInlineSpan[][] }
+  | { readonly type: 'ul'; items: readonly IUlItem[] }
 
 export interface ISlide {
   readonly title: string

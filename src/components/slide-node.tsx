@@ -60,9 +60,18 @@ export function SlideNode({
   }
   if (node.type === 'ul') {
     return (
-      <ul className="slide-content-list my-1.5 sm:my-2 mb-3 sm:mb-4 pl-5 sm:pl-6 list-disc m-0 space-y-0.5 sm:space-y-1 [&_li]:leading-relaxed [&_li]:text-white/92 [&_li]:text-base sm:[&_li]:text-[1rem]">
-        {node.items.map((inlines, j) => (
-          <li key={j}>{renderInline(inlines)}</li>
+      <ul className="slide-content-list my-1.5 sm:my-2 mb-3 sm:mb-4 pl-5 sm:pl-6 list-disc m-0 space-y-0.5 sm:space-y-1 [&_li]:leading-relaxed [&_li]:text-white/92 [&_li]:text-base sm:[&_li]:text-[1rem] [&_ul]:pl-5 [&_ul]:sm:pl-6 [&_ul]:mt-0.5 [&_ul]:list-disc">
+        {node.items.map((item, j) => (
+          <li key={j}>
+            {renderInline(item.content)}
+            {item.children && item.children.length > 0 ? (
+              <ul className="slide-content-list-nested mt-0.5 pl-5 sm:pl-6 list-disc space-y-0.5 sm:space-y-1 [&_li]:leading-relaxed [&_li]:text-white/92 [&_li]:text-base sm:[&_li]:text-[1rem]">
+                {item.children.map((inlines, k) => (
+                  <li key={k}>{renderInline(inlines)}</li>
+                ))}
+              </ul>
+            ) : null}
+          </li>
         ))}
       </ul>
     )

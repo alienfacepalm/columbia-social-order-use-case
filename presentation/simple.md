@@ -16,26 +16,20 @@
 
 **Two main threads:**
 
-- **System design** — How we built it:
-  - **R**equirements — What we had to do and why.
-  - **A**rchitecture — Main pieces (Rithum, API gateway, Adapter, message bus, Columbia’s commerce systems) and how they connect.
-  - **D**ata model — How we defined orders and tracked them end-to-end.
-  - **I**nterface — How systems talk (webhooks, APIs).
-  - **O**ptimizations — Scaling, monitoring, and staying reliable.
-- **Leadership** — How I led design, aligned teams, and shipped via pipelines.
-- **Outcomes** — What we achieved and what we’d do differently.
+- **System design (RADIO)** — Requirements, Architecture, Data model, Interface, Optimizations.
+- **Leadership & outcomes** — How I led design, coordinated teams (commerce, SAP, SFCC/SFOMS, Rithum), delivered via pipelines; STAR: impact, risks/trade-offs, reflections.
 
 ---
 
-## Slide 3 – Problem Domain & Objectives (RADIO: R — Requirements)
+## Slide 3 – Problem Domain & Objectives (RADIO: R)
 
-Columbia wanted to sell on **multiple social apps**; **TikTok Shop** was first. Customers buy inside TikTok; those orders had to reach Columbia’s systems reliably.
+Columbia needed to support **multiple social networks** for in-app commerce; **TikTok Shop** was first. Orders had to flow reliably into Columbia’s systems.
 
-### Objectives
+**Objectives:**
 
-- **Robust pipeline** — Turn TikTok orders into a consistent format and handle messy or bursty data without breaking anything.
-- **Timely data** — Get orders, cancellations, and updates to fulfillment and support quickly.
-- **Predictable behavior** — Handle bad or late data without losing orders or breaking the chain.
+- **Robust pipeline** — Normalize TikTok order data; handle bursty, inconsistent payloads without breaking downstream.
+- **Timely data** — Orders, cancellations, and updates in time for fulfillment, inventory, and support.
+- **Predictable behavior** — Handle malformed, partial, or delayed payloads while preserving order integrity and provenance.
 
 ```mermaid
 flowchart LR
@@ -47,41 +41,17 @@ flowchart LR
 
 ## Slide 4 — Requirements (RADIO: R — Functional & Non-Functional)
 
-**What the system must do**
+**Functional:** Ingest TikTok orders via Rithum → adapter webhooks; map to **our canonical format**; SFCC Cartridge API to create orders. Normalize for SFCC/SFOMS and **EOS (Columbia’s enterprise order service and source of truth for order lifecycle on the Columbia side)**, then SAP. Full **provenance**; **bidirectional** status (webhooks in; EOS → Service Bus → Adapter → Rithum API back). Auth via APIM; Azure Service Bus for upstream sync and audit.
 
-- **Bring in TikTok orders** — A partner (Rithum) sends orders to our adapter; we convert them to our format and create orders in Columbia’s commerce system.
-- **One format everywhere** — Same order shape for Columbia’s commerce, order service, and SAP. Orders move: New → Authorized → Confirmed → Shipped → Fulfilled.
-- **Full history** — We can trace every order from TikTok to SAP.
-- **Two-way updates** — Orders flow in; status (shipped, cancelled, etc.) flows back to TikTok.
-- **Secure** — All external traffic goes through an API gateway (APIM).
-- **Message bus** — We use Azure Service Bus to send status back to the partner and for auditing.
-
-**How it should behave**
-
-- Reliable, observable, easy to maintain.
-- Handles traffic spikes.
-- Auditable across systems.
+**Non-functional:** Reliable, observable, maintainable; scale under spikes; auditable.
 
 ---
 
 ## Slide 5 — Key Technology Decision: Why Rithum (RADIO: R → A)
 
-We compared two approaches:
+**Direct SFCC → TikTok:** Fragile; per-platform API; no single schema; no retries; tight coupling.
 
-**Columbia talks to TikTok directly**
-
-- Brittle and high maintenance.
-- Each platform has its own API; no single format.
-- No built-in retries; tight coupling.
-
-**Use Rithum in the middle**
-
-- One integration for TikTok (and future platforms).
-- We defined **our own** order format; Rithum’s format stays at the boundary.
-- **Security and PII** — Rithum handles **protection of social media accounts** and related data at the boundary, so we didn’t have to store or secure social credentials in our stack.
-- Retries and dead-letter queues built in.
-- Ready for Instagram, YouTube, etc.
-- Decision documented in an ADR.
+**Rithum middleware:** Single integration for TikTok (and future networks); **we defined our canonical data model**—Rithum’s API is an external contract we map to/from (schema never leaks in). Rithum handles PII/social-account protection at the boundary. Retries + DLQ; future-proof (Instagram, YouTube); versioned contracts; ADR-documented.
 
 ```mermaid
 flowchart LR
@@ -99,12 +69,12 @@ flowchart LR
 
 ---
 
-## Slide 6 — High‑Level Architecture (RADIO: A — Architecture)
+## Slide 6 — High‑Level Architecture (RADIO: A)
 
 ```mermaid
 sequenceDiagram
     participant TT as TikTok Shop
-    participant R as Rithum (RCA)
+    participant R as Rithum
     participant APIM as APIM
     participant AF as Social-Order Adapter
     participant CART as SFCC Cartridge API
@@ -134,16 +104,9 @@ sequenceDiagram
 
 ## Slide 7 — Backend, Scaling & Deployment (RADIO: A + O)
 
-**Auto-Scaling**
+**Auto-scaling:** Azure Function Apps scale with load; handle spikes without over-provisioning.
 
-- Azure Functions scale with load, so we handle spikes without over-provisioning.
-
-**One adapter for both directions**
-
-- **Inbound:** Partner sends orders and status to our webhooks; we create orders in Columbia’s system and update status. API gateway handles auth.
-- **Outbound:** When Columbia ships or cancels, events go to a message bus; the same app reads them and tells the partner so TikTok stays in sync.
-
-Result: one app that takes orders in and sends status back, and it scales for both.
+**Single adapter (one Function App):** **Downstream** — Rithum webhooks → APIM → adapter → SFCC Cartridge → orders in Columbia. **Upstream** — EOS/SAP lifecycle events → Service Bus → adapter → Rithum API. One app for both; scales for webhook and Service Bus traffic.
 
 ```mermaid
 flowchart LR
@@ -157,9 +120,9 @@ flowchart LR
 
 ## Slide 8 — Data Model: Provenance & Canonical Mapping (RADIO: D)
 
-- **Our data model** — We defined orders, line items, and status once. Columbia’s systems and SAP use that. The partner’s format is only at the boundary; we map to/from it.
-- **Provenance** — We can trace each order: TikTok → partner → Azure → Columbia commerce → order service → SAP.
-- **Structured logs** — We use consistent names (e.g. order.flow.webhook.received, order.flow.sfcc.create.request) so we can search and debug easily.
+- **Canonical model** — Order, line items, status defined once; normalized for SFCC, SFOMS, EOS, SAP. Rithum’s schema is an external contract we map to/from (volatility stays at boundary).
+- **Provenance chain** — TikTok → Rithum → Azure → SFCC/SFOMS → EOS → SAP.
+- **Structured logging** — e.g. `order.flow.webhook.paymentcleared.received`, `order.flow.sfcc.create.request`, `order.flow.servicebus.eosorderupdate.received`, `order.flow.rithum.updatestatus.request`.
 
 ```mermaid
 flowchart LR
@@ -175,18 +138,11 @@ flowchart LR
 
 ## Slide 9 — Interface: Downstream Order Creation (RADIO: I)
 
-**Flow**
-
-- Partner posts new orders to our webhook (e.g. when payment clears).
-- API gateway checks auth and forwards to the adapter.
-- Adapter converts to our format and calls Columbia’s API to create the order.
-- Columbia’s commerce and order service handle lifecycle; SAP handles fulfillment.
-
-**In short:** Partner webhook → Adapter → Columbia order API → commerce → order service → SAP.
+**Flow:** Rithum posts to adapter webhooks (e.g. payment cleared) → APIM auth → Adapter validates, maps to canonical format → SFCC Cartridge API → SFCC/SFOMS → EOS (Columbia’s order-lifecycle source of truth) → SAP. Upstream status sync is Slide 10.
 
 ```mermaid
 flowchart TB
-    R["Rithum (RCA)"] -->|"Webhook POST (order payload)"| APIM["APIM"]
+    R["Rithum"] -->|"Webhook POST (order payload)"| APIM["APIM"]
     APIM -->|"Auth + policy, forward to adapter"| FA["Social-Order Adapter"]
     FA -->|"Order create request (canonical)"| CART["SFCC Cartridge API"]
     CART -->|"Order payload"| SFCC["SFCC"]
@@ -199,12 +155,9 @@ flowchart TB
 
 ## Slide 10 — Interface: Upstream Status Sync (RADIO: I)
 
-**Flow**
+**Flow:** EOS holds lifecycle state; when SAP fulfills or cancels/refunds, EOS publishes to Service Bus → Adapter consumes, maps to Rithum semantics → Rithum API → TikTok updated.
 
-- Columbia’s order service holds lifecycle state. When SAP ships (or cancels/refunds), events go to the message bus.
-- Our adapter reads those events, maps status to the partner’s format, and calls the partner’s API so TikTok shows the right state.
-
-**In short:** SAP / order service → message bus → Adapter → partner API → TikTok.
+**Interfaces:** EOS/SAP → Service Bus; Service Bus → Adapter; Adapter → Rithum API (status update).
 
 ```mermaid
 flowchart LR
@@ -217,16 +170,11 @@ flowchart LR
 
 ---
 
-## Slide 11 — Observability: Grafana + Loki / KQL (RADIO: O)
+## Slide 11 — Observability: Grafana + Loki (RADIO: O)
 
-**Why we used Loki**
+**Why Loki:** KQL was resource-scoped and hard to correlate. Loki unifies logs across Columbia (AWS, GCP, Salesforce, Azure); we follow one order end-to-end. Grafana = single pane; structured logging for provenance queries.
 
-- Existing tools were per-system and hard to correlate.
-- Loki gives one place for logs across Columbia (AWS, GCP, Salesforce, Azure). We can follow one order across systems.
-- Grafana dashboards give a single view.
-- Structured logging made it easy to query and debug.
-
-**Flow:** Adapter (and Azure) send logs to Azure Monitor → Loki → we query and build dashboards in Grafana.
+**Flow:** Adapter (and Azure) → Azure Monitor Logs → Loki → Grafana.
 
 ```mermaid
 flowchart LR
@@ -238,15 +186,15 @@ flowchart LR
 
 ---
 
-## Slide 12 — How We Approached Key Challenges (RADIO: O) (Action)
+## Slide 12 — Key Challenges & Mitigations (RADIO: O) (Action)
 
-**Scaling** — Functions auto-scale; the message bus buffers status updates so we don’t drop messages or over-provision.
+**Scaling** — Functions auto-scale; Service Bus buffers upstream status; no over-provision or dropped messages.
 
-**Keeping data in sync** — Orders flow in; status flows back. One data model and one adapter, with idempotent order creation, keep everything consistent. We can trace and reconcile via provenance.
+**Data sync** — Canonical model + mapping layer + idempotent order creation; provenance for reconciliation.
 
-**Security** — One secure entry point (API gateway); auth at the edge; no raw TikTok credentials in our stack; minimal permissions for adapter calls. **PII security was considered**; Rithum’s handling of social account protection kept that data out of our domain.
+**Security** — APIM at edge; no TikTok credentials in our stack; least-privilege; Rithum holds social/PII at boundary.
 
-**Fault tolerance** — Retries with backoff; failed messages go to a dead-letter queue; idempotent creates avoid duplicates; health checks and circuit breakers; stateless so failures don’t leave bad state.
+**Fault tolerance** — Retry + backoff; DLQ for failures; idempotent creates; health checks and circuit breakers; stateless.
 
 ```mermaid
 flowchart LR
@@ -259,33 +207,23 @@ flowchart LR
 
 ## Slide 13 — Deployment Model (RADIO: O)
 
-- **Pipelines** — Build, test, and release (adapter, message bus, API gateway) are automated in Azure DevOps. Config lives in the repo.
-- **Stateless functions** — Scale out without sticky sessions.
-- **API gateway** — All external traffic goes through it; one place for auth and policy.
-- **Canary** — Roll out to a small set first, then full rollout.
-- **Rollback** — Automatically revert to last good release if something fails.
+- **Pipelines** — Azure DevOps: build, test, release (Adapter, Service Bus, APIM); config in repo (dev, perf, prod).
+- **Stateless functions** — Scale out without session affinity.
+- **APIM** — All external traffic through APIM; auth and policy in one place.
+- **Canary** — Roll out to subset, then full.
+- **Rollback** — Auto-revert to last known good on failure.
 
 ---
 
 ## Slide 14 — QA and Testing (RADIO: O)
 
-We tested in layers so the adapter behaves predictably with real and test data.
+**Unit (MSTest, .NET 8):** Processors (OrderProcessor, ReturnOrderProcessor, ShipmentProcessor) and services (EOS, OrderTransformationService, etc.) with Moq/FluentAssertions; HTTP mocked; JSON testdata. Coverage: coverlet + ReportGenerator.
 
-**Unit tests**
+**Validation:** ValidationService — order, contact, address, items; allowlisted statuses and order types; structured ValidationResult.
 
-- Processors and services with mocks; real-looking JSON for orders and returns. We check success paths, errors, and edge cases.
-- Coverage tracked; test data included in build for file-based tests.
+**Integration & Service Bus:** Golden payload + Postman for Rithum discovery and SFCC Cartridge development; scripts and EOS payloads; LocalServiceBusTester and servicebus-test-payloads for E2E.
 
-**Validation**
-
-- We validate orders, contact info, addresses, and items. We allowlist valid statuses and order types and return clear errors.
-
-**Integration and message bus**
-
-- **Golden payload in Postman** — We used a **golden payload** (one canonical sample) in **Postman** for **Rithum discovery** (webhook shape, auth) and **SFCC Cartridge development** (order-create requests); same sample for exploration and tests.
-- Scripts and test payloads for end-to-end flows. A local tester app and payloads drive the processors against real queues.
-
-**Result** — Unit tests protect mapping and boundaries; integration and message-bus tests validate flows before release; canary and rollback reduce risk.
+**Outcome:** Unit guards mapping and boundaries; integration + Service Bus validate flows; canary and rollback (Slide 13) reduce risk.
 
 ```mermaid
 flowchart LR
@@ -309,44 +247,30 @@ flowchart LR
 
 ## Slide 15 — Cross-Functional Integration (RADIO: I + O)
 
-- **Auth** — API gateway for partner webhooks; API keys and policies. No customer login in this pipeline.
-- **APIs** — Versioned contracts for partner webhook and partner API; clear request/response and errors for Columbia’s cartridge.
-- **Reproducibility** — Code in Git; ADRs for big decisions; tagged releases and automated deploy.
-- **Consistency** — One data model, idempotent creates, and full provenance for reconciliation and debugging.
-- **Observability** — One log store (Loki), Grafana, structured logs, and correlation IDs across the full path.
-- **Systems involved** — Partner (orders + status), TikTok (source of orders), Columbia commerce and order service, SAP (fulfillment). No file storage or push notifications; only order and status flow.
+- **Auth** — APIM for webhooks; API keys/policies; no customer SSO (TikTok/Columbia handle identity).
+- **APIs** — Versioned Rithum and cartridge contracts; clear request/response and errors.
+- **Reproducibility** — Git, ADRs, release tags, deployment automation.
+- **Consistency** — Canonical model, idempotency, provenance (Slides 8, 12); observability: Loki, Grafana, correlation IDs (Slide 11).
+- **Systems** — Rithum, TikTok, SFCC/SFOMS, EOS, SAP; order and status flow only.
 
 ---
 
 ## Slide 16 — Team Leadership & Delivery (Action)
 
-- **Discovery** — I owned scoping, option evaluation (direct vs Rithum), and technical direction before build.
-- **Rithum adoption** — I led proof-of-concept and evidence so the org could commit to Rithum with confidence.
-- **Buy-in** — I aligned stakeholders on adapter tech, hosting (e.g. Azure), and patterns. I built it the “Columbia way” to speed approval.
-- **Design and delivery** — I drove the single data model and one adapter; wrote ADRs; coordinated with e-commerce department, SAP, and the partner on contracts and rollout; used Azure DevOps with canary and rollback so we could ship safely.
+- **Discovery** — Scoped problem, evaluated direct vs Rithum, shaped technical direction.
+- **Rithum adoption** — PoC and evidence so the org could commit to Rithum.
+- **Buy-in** — Aligned stakeholders on adapter tech, hosting (Azure), and patterns; built the “Columbia way” to speed approval.
+- **Design & delivery** — Drove canonical data model and single adapter; ADRs; coordinated commerce, SAP, SFCC/SFOMS, Rithum on contracts and rollout; Azure DevOps with canary and rollback.
 
 ---
 
-## Slide 17 — Risks, Trade‑Offs & Scaling Strategies (RADIO: O)
+## Slide 17 — Risks, Trade‑Offs & Scaling (RADIO: O)
 
-**Risks and what we did**
+**Risks:** API changes → versioned contracts, adapter abstraction, drift monitoring. Traffic spikes → auto-scale + Service Bus + DLQ. Data inconsistency → idempotency, provenance, structured logs.
 
-- **Partner or TikTok API changes** — Versioned contracts, adapter in the middle, and monitoring for drift.
-- **Traffic spikes** — Auto-scaling and message bus to buffer; dead-letter for failures.
-- **Data inconsistency** — Idempotency, provenance, and structured logs for audit and reconciliation.
+**Trade-offs:** Latency vs accuracy (normalize/validate first). Streaming (webhooks + Service Bus; no batch ETL). Coupling (canonical model + one adapter). Observability cost (retention/sampling).
 
-**Trade-offs**
-
-- **Latency vs accuracy** — We accept a short delay to normalize and validate instead of pushing raw payloads.
-- **Streaming** — We use events (webhooks + message bus) for speed; no batch ETL in the hot path.
-- **Coupling** — One data model and one adapter to keep things maintainable as we add channels.
-- **Observability cost** — We use structured logs and Loki for depth; we control cost with retention and sampling.
-
-**Scaling**
-
-- **Horizontal** — Stateless functions scale out with load.
-- **Buffering** — Message bus absorbs spikes; retries and dead-letter prevent loss and allow replay.
-- **New channels** — Same data model and mapping mean new platforms (e.g. Instagram) need minimal adapter change.
+**Scaling:** Horizontal (stateless functions); buffering (Service Bus + retries/DLQ); new channels (same model → minimal adapter change).
 
 ```mermaid
 flowchart LR
@@ -359,16 +283,19 @@ flowchart LR
 
 ## Slide 18 — Impact & Reflections (Result)
 
-- **Technical** — Reliable, scalable pipeline; full order trail TikTok → SAP → TikTok; faster debugging with Grafana (querying Loki with LogQL); less operational overhead.
-- **Organizational** — New channels (e.g. Instagram) can be added with less work; clearer ownership between Columbia, partner, and SAP.
-- **Reflections** — One data model and one adapter paid off. Keeping the partner as an external contract we map to kept schema churn isolated. Investing in observability early made incidents and contract issues easier to fix.
+**Technical:** Reliable, scalable pipeline; full provenance TikTok → SAP → TikTok; faster debugging (Grafana/LogQL); less operational overhead.
+
+**Organizational:** New channels (e.g. Instagram) with minimal work; clearer ownership (Columbia, Rithum, SFCC/SFOMS, SAP).
+
+**Reflections:** Canonical model + one adapter paid off; Rithum as mapped external contract isolated schema churn; early observability made incidents and contract issues easier to fix.
 
 ---
 
 ## Slide 19 — Closing
 
-I build systems that perform under real‑world constraints.  
-I'd bring the same rigor, clarity, and reliability to Echodyne's radar software platform.
+I build high‑reliability, real‑time systems: clear requirements and architecture, a canonical data model that keeps integration volatility at the boundary, and observability that turns incidents into fast fixes. I led that design and delivery across Columbia, Rithum, SFCC, and SAP.
+
+I’d bring the same discipline—requirements‑driven design, maintainable boundaries, and operational clarity—to Echodyne’s mission‑critical systems.
 
 ---
 

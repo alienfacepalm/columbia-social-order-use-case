@@ -1,5 +1,5 @@
 import type { ReactElement } from 'react'
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 
 import { Slide } from './slide'
@@ -22,6 +22,7 @@ const slides = mergePresentationWithSimple(
 export function App(): ReactElement {
   const { mode, slideNum } = useParams<{ mode: string; slideNum?: string }>()
   const navigate = useNavigate()
+  const [isTimerVisible, setIsTimerVisible] = useState(false)
 
   useEffect(() => {
     if (mode !== 'simple' && mode !== 'advanced') {
@@ -36,6 +37,19 @@ export function App(): ReactElement {
     onSwipeLeft: useCallback(() => go(1), [go]),
     onSwipeRight: useCallback(() => go(-1), [go]),
   })
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent): void => {
+      // Shift+T toggles the speaker timer visibility
+      if (event.shiftKey && (event.key === 't' || event.key === 'T')) {
+        event.preventDefault()
+        setIsTimerVisible((visible) => !visible)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   return (
     <PresentationModeProvider>
@@ -59,7 +73,7 @@ export function App(): ReactElement {
           ))}
         </div>
 
-        {slides[index] ? (
+        {slides[index] && isTimerVisible ? (
           <SpeakerTimer
             key={index}
             durationSeconds={slides[index].durationSeconds}

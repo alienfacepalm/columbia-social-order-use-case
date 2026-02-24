@@ -109,6 +109,25 @@ Text after.`
     expect(ul).toBeDefined()
     if (ul && ul.type === 'ul') {
       expect(ul.items).toHaveLength(3)
+      expect(ul.items[0].content).toBeDefined()
+      expect(ul.items[0].children).toBeUndefined()
+    }
+  })
+
+  it('parses nested bullet lists by indent', () => {
+    const raw = `## Nested List
+- Parent one
+    - Child A
+    - Child B
+- Parent two`
+    const slides = parsePresentation(raw)
+    expect(slides).toHaveLength(1)
+    const ul = slides[0].content.find((n) => n.type === 'ul')
+    expect(ul).toBeDefined()
+    if (ul && ul.type === 'ul') {
+      expect(ul.items).toHaveLength(2)
+      expect(ul.items[0].children).toHaveLength(2)
+      expect(ul.items[1].children).toBeUndefined()
     }
   })
 
