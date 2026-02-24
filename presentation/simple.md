@@ -106,7 +106,7 @@ sequenceDiagram
 
 **Auto-scaling:** Azure Function Apps scale with load; handle spikes without over-provisioning.
 
-**Single adapter (one Function App):** **Downstream** — Rithum webhooks → APIM → adapter → SFCC Cartridge → orders in Columbia. **Upstream** — EOS/SAP lifecycle events → Service Bus → adapter → Rithum API. One app for both; scales for webhook and Service Bus traffic.
+**Single adapter (one Function App):** The Social-Order Adapter is the **bridge and boundary** between Rithum and Columbia’s SFCC/SFOMS/EOS systems. **Downstream** — Rithum webhooks → APIM → adapter → SFCC Cartridge → orders in Columbia. **Upstream** — EOS/SAP lifecycle events → Service Bus → adapter → Rithum API. One app for both; scales for webhook and Service Bus traffic.
 
 ```mermaid
 flowchart LR

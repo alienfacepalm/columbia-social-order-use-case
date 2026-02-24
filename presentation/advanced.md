@@ -166,6 +166,7 @@ sequenceDiagram
 
 The adapter controls **downstream** (Rithum → Columbia) and **upstream** (Columbia → Rithum) flows between Rithum and Columbia.
 
+- **Integration boundary** — The Social-Order Adapter is the **explicit boundary** between Rithum middleware and Columbia’s existing SFCC/SFOMS/EOS systems; all mappings between Rithum’s schema and our canonical model happen here.
 - **APIM-secured webhook endpoints** — Rithum posts order and status payloads here; adapter creates orders in SFCC via Cartridge API and updates status in EOS; APIM handles auth and policy.
 - **Service Bus triggers** — **EOS** (or SAP) lifecycle and fulfillment events are published to Service Bus; the same Function App consumes them and calls back to the **Rithum API** so Rithum stays in sync with Columbia’s fulfillment state.
 
