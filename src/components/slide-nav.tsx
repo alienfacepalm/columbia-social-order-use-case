@@ -32,7 +32,7 @@ export function SlideNav({
       <select
         value={currentIndex}
         onChange={(e) => onGoTo(Number(e.target.value))}
-        className="min-h-[44px] min-w-0 h-11 sm:h-10 max-w-[50vw] sm:max-w-none rounded-md border border-[#66a5e8] bg-[rgba(43,65,106,0.8)] pl-3 pr-10 sm:pr-12 text-sm text-white cursor-pointer hover:bg-[#3385e2] focus:outline-none focus:ring-2 focus:ring-[#66a5e8] appearance-none bg-[length:1.25rem_1.25rem] bg-[right_0.5rem_center] sm:bg-[right_0.75rem_center] bg-no-repeat [background-image:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2024%2024%22%20stroke%3D%22%2366a5e8%22%3E%3Cpath%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%222%22%20d%3D%22M19%209l-7%207-7-7%22%2F%3E%3C%2Fsvg%3E')] touch-manipulation"
+        className="min-h-[44px] min-w-0 h-11 sm:h-10 max-w-[70vw] sm:max-w-none rounded-md border border-[#66a5e8] bg-[rgba(43,65,106,0.8)] pl-3 pr-10 sm:pr-12 text-sm text-white cursor-pointer hover:bg-[#3385e2] focus:outline-none focus:ring-2 focus:ring-[#66a5e8] appearance-none bg-[length:1.25rem_1.25rem] bg-[right_0.5rem_center] sm:bg-[right_0.75rem_center] bg-no-repeat [background-image:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2024%2024%22%20stroke%3D%22%2366a5e8%22%3E%3Cpath%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%222%22%20d%3D%22M19%209l-7%207-7-7%22%2F%3E%3C%2Fsvg%3E')] touch-manipulation"
         aria-label="Go to slide"
       >
         {slides.map((slide, i) => {

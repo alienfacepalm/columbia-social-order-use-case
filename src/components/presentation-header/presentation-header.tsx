@@ -7,16 +7,16 @@ export function PresentationHeader(): ReactElement {
   const { toggle, isSimple } = usePresentationMode()
 
   return (
-    <div className="flex shrink-0 flex-col items-center sm:flex-row sm:items-center sm:justify-between w-full gap-2 py-2 pt-3 sm:py-3 sm:pt-4">
-      <div className="flex flex-col items-center gap-0.5 sm:items-start sm:gap-1">
+    <div className="flex shrink-0 flex-col items-center sm:flex-row sm:items-center sm:justify-between w-full gap-2 py-1.5 pt-2 sm:py-2 sm:pt-3">
+      <div className="flex shrink-0 flex-col items-center gap-0 sm:items-start">
         <img
           src={assetUrl('columbia.png')}
           alt="Columbia Sportswear"
-          className="block h-12 w-auto sm:h-14 md:h-[6.67rem] m-0 align-middle brightness-0 invert"
+          className="block h-10 w-auto sm:h-12 md:h-14 m-0 align-middle brightness-0 invert"
           width={320}
           height={68}
         />
-        <span className="text-[0.7rem] sm:text-[0.8rem] font-medium uppercase tracking-widest leading-tight text-white/95 text-center sm:text-left">
+        <span className="text-[0.65rem] sm:text-[0.75rem] font-medium uppercase tracking-widest leading-tight text-white/95 text-center sm:text-left mt-0.5">
           Social-Order Adapter Use Case
         </span>
       </div>
