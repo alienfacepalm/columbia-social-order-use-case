@@ -7,7 +7,7 @@ export function PresentationHeader(): ReactElement {
   const { toggle, isSimple } = usePresentationMode()
 
   return (
-    <div className="flex flex-shrink-0 flex-col items-center sm:flex-row sm:items-center sm:justify-between w-full gap-2 py-2 pt-3 sm:py-3 sm:pt-4">
+    <div className="flex shrink-0 flex-col items-center sm:flex-row sm:items-center sm:justify-between w-full gap-2 py-2 pt-3 sm:py-3 sm:pt-4">
       <div className="flex flex-col items-center gap-0.5 sm:items-start sm:gap-1">
         <img
           src={assetUrl('columbia.png')}
@@ -16,7 +16,7 @@ export function PresentationHeader(): ReactElement {
           width={320}
           height={68}
         />
-        <span className="text-[0.7rem] sm:text-[0.8rem] font-medium uppercase tracking-[0.1em] leading-tight text-white/95 text-center sm:text-left">
+        <span className="text-[0.7rem] sm:text-[0.8rem] font-medium uppercase tracking-widest leading-tight text-white/95 text-center sm:text-left">
           Social-Order Adapter Use Case
         </span>
       </div>
@@ -25,7 +25,7 @@ export function PresentationHeader(): ReactElement {
           type="button"
           role="switch"
           onClick={toggle}
-          className="relative flex h-8 w-[7.5rem] sm:h-9 sm:w-[8.5rem] rounded-full border border-white/25 bg-white/10 p-1 sm:p-1.5 backdrop-blur-sm hover:bg-white/15 hover:border-white/35 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+          className="relative flex h-8 w-30 sm:h-9 sm:w-34 rounded-full border border-white/25 bg-white/10 p-1 sm:p-1.5 backdrop-blur-sm hover:bg-white/15 hover:border-white/35 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
           title={isSimple ? 'Switch to advanced (detailed) text' : 'Switch to simple (easier) text'}
           aria-checked={!isSimple}
           aria-label="Presentation mode: Advanced or Simple"
