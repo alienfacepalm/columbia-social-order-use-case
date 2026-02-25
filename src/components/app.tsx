@@ -60,15 +60,15 @@ export function App(): ReactElement {
   return (
     <PresentationModeProvider>
       <div
-        className="flex h-full w-full max-w-full min-w-0 flex-col bg-[linear-gradient(135deg,#1d3356_0%,#1d3356_45%,#3385e2_100%)] text-white overflow-x-hidden overflow-y-hidden"
+        className="relative flex h-full w-full max-w-full min-w-0 flex-col bg-[linear-gradient(135deg,#1d3356_0%,#1d3356_45%,#3385e2_100%)] text-white overflow-x-hidden overflow-y-hidden"
       >
-        <div className="flex w-full justify-center px-4 pt-4 sm:px-8 sm:pt-6 md:px-16 md:pt-8 box-border">
-          <div className="w-full max-w-6xl">
+        <header className="pointer-events-none fixed inset-x-0 top-0 z-20 flex w-full justify-center px-4 pt-4 sm:px-8 sm:pt-6 md:px-16 md:pt-8 box-border">
+          <div className="pointer-events-auto w-full max-w-6xl">
             <PresentationHeader />
           </div>
-        </div>
+        </header>
         <div
-          className="flex min-h-0 flex-1 w-full min-w-0 transition-transform duration-300 ease-out touch-pan-y"
+          className="flex min-h-0 flex-1 w-full min-w-0 pt-24 sm:pt-28 md:pt-32 transition-transform duration-300 ease-out touch-pan-y"
           style={{ transform: `translateX(-${slideOffset * 100}%)` }}
           onTouchStart={onTouchStart}
           onTouchEnd={onTouchEnd}

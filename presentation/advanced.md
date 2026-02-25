@@ -8,7 +8,7 @@
 
 ###
 
-#### Brandon Pliska — Senior Full Stack Engineer Candidate
+#### Brandon Pliska — Principal Engineer Candidate
 
 ---
 
