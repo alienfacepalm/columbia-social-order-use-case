@@ -1,0 +1,15 @@
+---
+description: Require unit tests for components and core logic
+alwaysApply: true
+---
+
+# Unit test requirements
+
+- **React components**: Every `.tsx` component (including `components/`, `pages/`, and layout-like shells) must have a colocated unit test file `<name>.test.tsx` in the same directory.
+- **Hooks and utilities**: Shared hooks in `hooks/` and shared helpers in `utils/` must have unit tests (`<name>.test.ts` or `<name>.test.tsx` as appropriate).
+- **Services and clients**: API clients, services, and mappers must be covered by unit tests when they contain branching logic, data transformations, or error handling.
+- **New code**: When adding new components or core logic, add or extend unit tests in the same change.
+- **Refactors**: When modifying existing code that lacks tests, add or extend unit tests alongside the refactor.
+- **Exceptions**: Trivial barrel files, type-only modules, and constant-only config files can omit tests; otherwise assume tests are required.
+- **Placement**: When a file has a test, follow the "Tested files must live in a directory" rule by colocating the source and its test in a dedicated folder named for that unit.
+
