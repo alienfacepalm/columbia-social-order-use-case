@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import type { ReactElement } from 'react'
-import mermaid from 'mermaid'
 
 import type {
   IMermaidSlideProps,
@@ -11,26 +10,6 @@ import type {
 } from '../../typings/mermaid'
 import { useMermaidRender } from '../hooks/use-mermaid-render'
 import { FullscreenIcon, ZoomInIcon, ZoomOutIcon } from './mermaid-slide-icons'
-
-mermaid.initialize({
-  startOnLoad: false,
-  theme: 'dark',
-  securityLevel: 'loose',
-  deterministicIds: true,
-  themeVariables: {
-    primaryColor: '#2d3748',
-    primaryTextColor: '#e2e8f0',
-    primaryBorderColor: '#4a5568',
-    lineColor: '#a0aec0',
-    fontSize: '18px',
-    edgeLabelBackground: '#2d4a6f',
-  },
-  flowchart: {
-    nodeSpacing: 70,
-    rankSpacing: 70,
-    wrappingWidth: 180,
-  },
-})
 
 const ZOOM_MIN = 50
 const ZOOM_MAX = 250

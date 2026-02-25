@@ -1,10 +1,10 @@
-import type { Dispatch, SetStateAction } from 'react'
 import { useLayoutEffect, useId, useRef, useState } from 'react'
-import mermaid from 'mermaid'
 
 import type { IDiagramSize, IMermaidRenderResult, IUseMermaidRenderReturn } from '../../typings/mermaid'
+import { renderMermaidDiagram } from '../services/mermaid-client'
 
 const renderIdRef = { current: 0 }
+const renderCache = new Map<string, IMermaidRenderResult>()
 
 function measureSvgFromRef(svgRef: React.RefObject<HTMLDivElement>): IDiagramSize | null {
   const svg = svgRef.current?.querySelector('svg')
@@ -36,23 +36,33 @@ export function useMermaidRender(code: string): IUseMermaidRenderReturn {
   const [diagramSize, setDiagramSize] = useState<IDiagramSize | null>(null)
 
   useLayoutEffect(() => {
-    if (!code?.trim()) return
+    const trimmed = code.trim()
+    if (!trimmed) return
     setError(null)
     setResult(null)
     setDiagramSize(null)
     let cancelled = false
+    const cacheKey = trimmed
     const mermaidId = `mermaid-${uniqueId.replace(/:/g, '-')}-${++renderIdRef.current}`
 
-    mermaid
-      .render(mermaidId, code.trim())
-      .then(({ svg, bindFunctions }) => {
+    const cached = renderCache.get(cacheKey)
+    if (cached) {
+      setResult(cached)
+      return
+    }
+
+    renderMermaidDiagram(mermaidId, trimmed)
+      .then((renderResult) => {
         if (cancelled) return
-        setResult({ svg, bindFunctions })
+        renderCache.set(cacheKey, renderResult)
+        setResult(renderResult)
       })
       .catch((err: unknown) => {
         if (!cancelled) {
           const message = err instanceof Error ? err.message : String(err)
-          console.error('Mermaid render failed:', err)
+          if (import.meta.env.DEV) {
+            console.error('Mermaid render failed:', err)
+          }
           setError(message)
         }
       })

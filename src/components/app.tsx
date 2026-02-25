@@ -33,6 +33,12 @@ export function App(): ReactElement {
   const { index, go, goTo } = useSlideNav({ total: slides.length })
   const isMobile = useMediaQuery('(max-width: 640px)')
 
+  const visibleRadius = 1
+  const startIndex = Math.max(0, index - visibleRadius)
+  const endIndex = Math.min(slides.length - 1, index + visibleRadius)
+  const visibleSlides = slides.slice(startIndex, endIndex + 1)
+  const slideOffset = index - startIndex
+
   const { onTouchStart, onTouchEnd } = useSwipeNavigation({
     onSwipeLeft: useCallback(() => go(1), [go]),
     onSwipeRight: useCallback(() => go(-1), [go]),
@@ -58,19 +64,23 @@ export function App(): ReactElement {
       >
         <div
           className="flex min-h-0 flex-1 w-full min-w-0 transition-transform duration-300 ease-out touch-pan-y"
-          style={{ transform: `translateX(-${index * 100}%)` }}
+          style={{ transform: `translateX(-${slideOffset * 100}%)` }}
           onTouchStart={onTouchStart}
           onTouchEnd={onTouchEnd}
+          aria-live="polite"
         >
-          {slides.map((slide, i) => (
-            <div
-              key={slide.index}
-              className="flex flex-shrink-0 flex-grow-0 w-full basis-full flex-col items-center px-4 pb-4 sm:px-8 sm:pb-6 md:px-16 md:pb-8 h-full box-border min-w-0 max-w-full"
-            >
-              <PresentationHeader />
-              <Slide slide={slide} slideIndex={i} />
-            </div>
-          ))}
+          {visibleSlides.map((slide, localIndex) => {
+            const absoluteIndex = startIndex + localIndex
+            return (
+              <div
+                key={slide.index}
+                className="flex shrink-0 grow-0 w-full basis-full flex-col items-center px-4 pb-4 sm:px-8 sm:pb-6 md:px-16 md:pb-8 h-full box-border min-w-0 max-w-full"
+              >
+                <PresentationHeader />
+                <Slide slide={slide} slideIndex={absoluteIndex} />
+              </div>
+            )
+          })}
         </div>
 
         {slides[index] && isTimerVisible ? (
@@ -83,8 +93,8 @@ export function App(): ReactElement {
         <SlideNav
           slides={slides}
           currentIndex={index}
-          onPrevious={() => go(-1)}
-          onNext={() => go(1)}
+          onPrevious={useCallback(() => go(-1), [go])}
+          onNext={useCallback(() => go(1), [go])}
           onGoTo={goTo}
           isMobile={isMobile}
         />

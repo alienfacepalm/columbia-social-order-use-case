@@ -5,13 +5,20 @@ import { parseInline } from './parse-presentation'
 
 /**
  * Renders inline spans (text, bold, links) to React elements.
+ * Guards against pathological nesting by limiting bold recursion depth.
  */
-export function renderInline(inlines: readonly TInlineSpan[]): ReactElement[] {
+function renderInlineInternal(inlines: readonly TInlineSpan[], depth: number): ReactElement[] {
+  if (depth > 4) {
+    return inlines.map((span, j) => (
+      <span key={j}>{span.value}</span>
+    ))
+  }
+
   return inlines.map((span, j) => {
     if (span.type === 'bold') {
       return (
         <strong key={j}>
-          {renderInline(parseInline(span.value))}
+          {renderInlineInternal(parseInline(span.value), depth + 1)}
         </strong>
       )
     }
@@ -34,4 +41,8 @@ export function renderInline(inlines: readonly TInlineSpan[]): ReactElement[] {
     }
     return <span key={j}>{span.value}</span>
   })
+}
+
+export function renderInline(inlines: readonly TInlineSpan[]): ReactElement[] {
+  return renderInlineInternal(inlines, 0)
 }

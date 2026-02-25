@@ -33,12 +33,17 @@ export function Slide({ slide, slideIndex }: ISlideProps): ReactElement {
   const imagePosition = getSlideImagePosition(slideIndex)
   const fullSizeDiagram = getFullSizeDiagram(content)
   const isTitleSlide = slideIndex === 0
+  const sectionId = `slide-${slideIndex}`
 
   if (isTitleSlide) {
     const headingNodes = slide.content.filter((n): n is typeof n & { type: 'heading' } => n.type === 'heading')
     return (
-      <section className="relative flex flex-1 w-full min-w-0 max-w-full min-h-0 overflow-hidden px-4 sm:px-8 py-6 sm:py-12 rounded-xl flex-col sm:flex-row items-center sm:items-center justify-center gap-6 sm:gap-10 md:gap-12 max-w-6xl">
-        <div className="relative z-10 flex flex-shrink-0 flex-col items-center sm:items-start text-center sm:text-left min-w-0 flex-[1.5_1_0%] sm:min-w-[min(55%,28rem)]">
+      <section
+        id={sectionId}
+        aria-label={slide.title}
+        className="relative flex flex-1 w-full min-w-0 max-w-6xl min-h-0 overflow-hidden px-4 sm:px-8 py-6 sm:py-12 rounded-xl flex-col sm:flex-row-reverse items-center sm:items-center justify-center gap-6 sm:gap-10 md:gap-12"
+      >
+        <div className="relative z-10 flex shrink-0 flex-col items-center sm:items-start text-center sm:text-left min-w-0 flex-[1.5_1_0%] sm:min-w-[min(55%,28rem)]">
           <h1 className="slide-title-h1 text-3xl sm:text-4xl md:text-5xl font-semibold tracking-wide text-white m-0 mb-2 sm:mb-3">
             {slide.title}
           </h1>
@@ -70,7 +75,7 @@ export function Slide({ slide, slideIndex }: ISlideProps): ReactElement {
         <img
           src={assetUrl('title.png')}
           alt="Presentation title"
-          className="relative z-0 block flex-shrink-0 object-contain w-full max-w-[280px] sm:max-w-[320px] md:max-w-[380px] max-h-[40vh] sm:max-h-[65vh]"
+          className="relative z-0 block shrink-0 object-contain w-full max-w-[280px] sm:max-w-[320px] md:max-w-[380px] max-h-[40vh] sm:max-h-[65vh]"
         />
       </section>
     )
@@ -78,10 +83,12 @@ export function Slide({ slide, slideIndex }: ISlideProps): ReactElement {
 
   return (
     <section
-      className={`flex flex-1 w-full min-w-0 max-w-full min-h-0 overflow-auto mt-4 sm:mt-8 px-4 sm:px-8 py-4 sm:py-7 bg-black/20 border border-white/15 rounded-lg flex-col ${isDiagramSlide ? 'max-w-6xl' : 'max-w-4xl'}`}
+      id={sectionId}
+      className={`flex flex-1 w-full min-w-0 min-h-0 overflow-auto mt-4 sm:mt-8 px-4 sm:px-8 py-4 sm:py-7 bg-black/20 border border-white/15 rounded-lg flex-col ${isDiagramSlide ? 'max-w-6xl' : 'max-w-4xl'}`}
+      aria-label={typeof slide.title === 'string' ? slide.title : undefined}
     >
       {slide.title && (
-        <div className="flex justify-center mb-2 flex-shrink-0">
+        <div className="flex justify-center mb-2 shrink-0">
           <h2 className="slide-section-title text-sm sm:text-base font-semibold leading-tight text-white/95 m-0 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm">
             {renderInline(parseInline(slide.title))}
           </h2>
@@ -117,7 +124,7 @@ export function Slide({ slide, slideIndex }: ISlideProps): ReactElement {
           ))}
         </div>
         {imageConfig && (
-          <div className="slide-illustration-wrap flex-shrink-0 w-full max-w-[280px] md:w-[280px] min-h-[160px] sm:min-h-[200px] flex items-center justify-center">
+          <div className="slide-illustration-wrap shrink-0 w-full max-w-[280px] md:w-[280px] min-h-[160px] sm:min-h-[200px] flex items-center justify-center">
             <img
               src={assetUrl(imageConfig.src)}
               alt={imageConfig.alt}

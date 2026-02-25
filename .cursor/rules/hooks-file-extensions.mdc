@@ -1,0 +1,42 @@
+---
+description: Ensure React hooks use .ts files unless they render JSX
+globs: **/hooks/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Hooks file extensions
+
+- **Default to `.ts` for hooks**: Files that export React hooks (e.g. `use-*.ts`) should use the `.ts` extension when they **do not render JSX**.
+- **Use `.tsx` only when necessary**: If a hook file actually renders JSX (for example, it exports a hook *and* a visual component, or returns JSX directly), then `.tsx` is acceptable.
+- **Keep rendering out of hooks**: Prefer to keep hooks focused on logic (state, effects, data, event handlers) and move any JSX rendering into components under `components/`.
+
+## Examples
+
+```ts
+// ✅ GOOD — logic-only hook, .ts file
+// src/hooks/use-user.ts
+export function useUser() {
+  // state, effects, data fetching
+}
+```
+
+```tsx
+// ✅ GOOD — file needs JSX, so .tsx is allowed
+// src/hooks/use-animated-counter.tsx
+export function useAnimatedCounter() {
+  // logic...
+}
+
+export function AnimatedCounter() {
+  // JSX rendering that uses the hook
+}
+```
+
+```tsx
+// ❌ AVOID — JSX-free hook living in a .tsx file
+// Prefer renaming to .ts
+export function useFeatureFlag() {
+  // logic only, no JSX here
+}
+```
+
