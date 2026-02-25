@@ -7,12 +7,12 @@ alwaysApply: true
 
 Apply to all file creation, refactoring, and code generation.
 
-## Business logic in hooks
+## Business logic must be abstracted
 
-- **Prefer abstracting business logic into custom hooks** instead of keeping it in components or pages.
+- **Never keep business/domain rules directly in components or pages.** They must live in custom hooks (in `hooks/`) or dedicated services.
+- Components and pages should focus on **rendering and composition only**: mapping props/state to JSX, wiring callbacks, and styling/layout.
 - Put hooks in `hooks/` with kebab-case filenames: `use-order-status.ts`, `use-mermaid-render.ts`.
-- Keep components focused on rendering and composition; move state, side effects, and domain logic into hooks.
-- When a component has non-trivial logic (fetching, derived state, event handlers with domain rules), extract a hook first.
+- Treat any non-trivial logic (fetching, derived state, branching based on domain rules, timers, side effects) as a signal to **extract or extend a hook/service first**, then use it from the component.
 
 ```typescript
 // ❌ BAD — logic in component

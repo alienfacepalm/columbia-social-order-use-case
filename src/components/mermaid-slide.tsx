@@ -337,7 +337,7 @@ export function MermaidSlide({ code, id, fullSize = false, constrainHeight = fal
         fullSize
           ? 'flex-1 min-h-[320px] overflow-auto select-none cursor-grab active:cursor-grabbing'
           : constrainHeight
-            ? 'h-[42vh] min-h-[200px] flex-shrink-0 overflow-auto select-none cursor-grab active:cursor-grabbing'
+            ? 'max-h-[60vh] min-h-[200px] shrink-0 overflow-auto select-none cursor-grab active:cursor-grabbing'
             : 'min-h-[320px] overflow-auto select-none cursor-grab active:cursor-grabbing'
       }
       style={{ userSelect: isDragging ? 'none' : undefined }}
