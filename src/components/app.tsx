@@ -26,7 +26,7 @@ export function App(): ReactElement {
 
   useEffect(() => {
     if (mode !== 'simple' && mode !== 'advanced') {
-      navigate(`/advanced/${slideNum ?? '1'}`, { replace: true })
+      navigate(`/simple/${slideNum ?? '1'}`, { replace: true })
     }
   }, [mode, slideNum, navigate])
 

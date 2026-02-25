@@ -10,14 +10,14 @@ import type {
 const STORAGE_KEY = 'columbia-presentation-mode'
 
 function getStoredMode(): TPresentationMode {
-  if (typeof window === 'undefined') return 'advanced'
+  if (typeof window === 'undefined') return 'simple'
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY)
     if (stored === 'simple' || stored === 'advanced') return stored
   } catch {
     // ignore
   }
-  return 'advanced'
+  return 'simple'
 }
 
 const PresentationModeContext = createContext<IPresentationModeContextValue | null>(null)

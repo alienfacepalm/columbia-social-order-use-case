@@ -17,7 +17,7 @@ export function RootRedirect(): null {
     const slideMatch = hash.match(/^#slide-(\d+)$/)
 
     const mode =
-      modeParam === 'simple' || modeParam === 'advanced' ? modeParam : 'advanced'
+      modeParam === 'simple' || modeParam === 'advanced' ? modeParam : 'simple'
     const slideNum = slideMatch ? slideMatch[1] : '1'
 
     navigate(`/${mode}/${slideNum}`, { replace: true })

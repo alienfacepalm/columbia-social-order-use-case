@@ -15,7 +15,7 @@ createRoot(document.getElementById('root')!).render(
       <Routes>
         <Route path="/" element={<RootRedirect />} />
         <Route path="/:mode/:slideNum?" element={<App />} />
-        <Route path="*" element={<Navigate to="/advanced/1" replace />} />
+        <Route path="*" element={<Navigate to="/simple/1" replace />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>
