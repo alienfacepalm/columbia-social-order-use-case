@@ -22,7 +22,7 @@ function MermaidDiagramControls({
   onFullscreen,
 }: IMermaidDiagramControlsProps): ReactElement {
   return (
-    <div className="flex flex-shrink-0 items-center justify-end gap-1 pb-2">
+    <div className="flex shrink-0 items-center justify-end gap-1 pb-2">
       <button
         type="button"
         onClick={onFullscreen}
@@ -63,14 +63,14 @@ function MermaidFullscreenOverlay({
 }: IMermaidFullscreenOverlayProps): ReactElement {
   return (
     <div
-      className="fixed inset-0 z-[100] flex flex-col bg-black/95 backdrop-blur-sm"
+      className="fixed inset-0 z-100 flex flex-col bg-black/95 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-label="Diagram fullscreen"
       onClick={onClose}
     >
       <div
-        className="flex flex-shrink-0 items-center justify-end gap-2 p-3 border-b border-white/10"
+        className="flex shrink-0 items-center justify-end gap-2 p-3 border-b border-white/10"
         onClick={(e) => e.stopPropagation()}
       >
         <span className="text-sm text-white/70 mr-auto">Diagram — Esc or click outside to close</span>
@@ -298,7 +298,7 @@ export function MermaidSlide({ code, id, fullSize = false, constrainHeight = fal
     result?.svg != null ? (
       <div
         ref={svgRef}
-        className="inline-flex flex-shrink-0 items-center justify-center [&_svg]:block [&_svg]:min-h-[280px]"
+        className="inline-flex shrink-0 items-center justify-center [&_svg]:block [&_svg]:min-h-[280px]"
         style={{
           zoom: zoom / 100,
           ...(diagramSize && {
@@ -376,7 +376,7 @@ export function MermaidSlide({ code, id, fullSize = false, constrainHeight = fal
   }
 
   return (
-    <div className="my-4 flex flex-shrink-0 flex-col min-h-0">
+    <div className="my-4 flex shrink-0 flex-col min-h-0">
       {controls}
       {diagramContainer}
       {fullscreenOverlay}
