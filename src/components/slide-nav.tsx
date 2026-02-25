@@ -1,7 +1,6 @@
 import type { ReactElement } from 'react'
 
 import type { ISlideNavProps } from '../../typings/slide'
-import type { ISlide } from '../models/slide'
 import { MOBILE_TITLE_MAX_LENGTH } from '../config/app/app'
 import { truncateTitle } from '../utils/truncate-title/truncate-title'
 
