@@ -6,8 +6,6 @@
 
 ### Project: Social‑Order Adapter
 
-###
-
 #### Brandon Pliska — Senior Full Stack Engineer Candidate
 
 ---
@@ -295,11 +293,11 @@ flowchart LR
 
 I build high‑reliability, real‑time systems: clear requirements and architecture, a canonical data model that keeps integration volatility at the boundary, and observability that turns incidents into fast fixes. I led that design and delivery across Columbia, Rithum, SFCC, and SAP.
 
-I’d bring the same discipline—requirements‑driven design, maintainable boundaries, and operational clarity—to Echodyne’s mission‑critical systems.
+I’d bring the same discipline—requirements‑driven design, maintainable boundaries, and operational clarity—to Columbia’s mission‑critical systems.
 
 ---
 
 ## Slide 20 — Thank You
 
 Thank you for your time and consideration.  
-I look forward to the possibility of contributing to Echodyne.
+I look forward to the possibility of contributing to the team.

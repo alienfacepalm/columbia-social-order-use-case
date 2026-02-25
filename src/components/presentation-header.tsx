@@ -46,7 +46,7 @@ export function PresentationHeader(): ReactElement {
           </span>
         </button>
         <span className="text-[0.65rem] sm:text-xs font-normal leading-tight text-white/90">
-          Prepared for Echodyne Interview by Brandon Pliska
+          Columbia Sportswear — Social-Order Adapter by Brandon Pliska
         </span>
         <a
           href="https://github.com/alienfacepalm/columbia-social-order-use-case"

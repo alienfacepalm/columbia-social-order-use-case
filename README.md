@@ -1,4 +1,4 @@
-# Echodyne Presentation
+# Columbia Social Order — Presentation
 
 Technical presentation: **High-Reliability Real-Time System Design** — use case **Columbia Sportswear** (Social-Order Adapter — commerce integration). The Social-Order Adapter itself was deployed via **Azure DevOps pipelines** (CI config is in `.ignore/social-order/ci`).
 
@@ -24,10 +24,10 @@ Edit `presentation/advanced.md` or `presentation/simple.md` and save; the dev se
 
 ### Static assets
 
-Put logos, favicons, and other static files in **`public/`**. They are served at the site root (e.g. `public/columbia-logo.svg` → `/columbia-logo.svg`). The title slide shows the Columbia Sportswear logo from `public/columbia-logo.svg`; replace that file with the official logo if desired.
+Put logos, favicons, and other static files in **`public/`**. They are served at the site root (e.g. `public/columbia-logo.svg` → `/columbia-logo.svg`). The header uses `public/columbia.png` and the title slide uses `public/title.png`; replace with official assets if desired.
 
 ### Publishing to GitHub Pages
 
 The site is built and deployed as a **GitHub Pages static site** via the workflow in **`.github/workflows/deploy-pages.yml`**. On push to `main` or `master`, it installs dependencies, runs unit tests (`pnpm test`), then builds (`pnpm build`); deploy is skipped if tests fail. The `dist/` output is deployed to GitHub Pages.
 
-**One-time setup:** In the repo on GitHub go to **Settings → Pages**, set **Source** to **GitHub Actions**, then push to `main`. The site will be at **`https://<owner>.github.io/<repo>/`** (e.g. `https://alienfacepalm.github.io/echodyne-presentation/`).
+**One-time setup:** In the repo on GitHub go to **Settings → Pages**, set **Source** to **GitHub Actions**, then push to `main`. The site will be at **`https://<owner>.github.io/<repo>/`** (e.g. `https://<owner>.github.io/columbia-social-order-use-case/`).

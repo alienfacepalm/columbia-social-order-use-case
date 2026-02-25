@@ -443,7 +443,7 @@ flowchart LR
 
 What you’ve seen today is how I approach **high‑reliability, real‑time systems**: clear requirements and architecture, a **canonical data model** that keeps integration volatility at the boundary, and **observability** that turns incidents into fast, precise fixes. I led that design and delivery across Columbia, Rithum, SFCC, and SAP—without cutting corners or leaking external schemas into the domain.
 
-I would bring that same discipline—**requirements‑driven design**, **maintainable boundaries**, and **operational clarity**—to the kind of mission‑critical systems Echodyne builds.
+I would bring that same discipline—**requirements‑driven design**, **maintainable boundaries**, and **operational clarity**—to the kind of mission‑critical systems Columbia (and your organization) build.
 
 <!-- STAR: R -->
 <!-- Pacing: 1 minute -->
@@ -453,4 +453,4 @@ I would bring that same discipline—**requirements‑driven design**, **maintai
 ## Slide 20 — Thank You
 
 Thank you for your time and consideration.  
-I look forward to the possibility of contributing to Echodyne.
+I look forward to the possibility of contributing to the team.

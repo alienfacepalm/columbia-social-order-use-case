@@ -2,12 +2,12 @@ import type { ISlideImageConfig, TSlideImageSize } from '../../typings/slide-ima
 
 /** Only non-diagram slides get an image. Order matches slide indices: 1, 3, 12, 13, 15, 16. */
 const SLIDE_IMAGES: readonly ISlideImageConfig[] = [
-  { src: '/slide-images/slide-1.png', alt: 'Welcome', size: 'm' },
+  { src: '/slide-images/slide-1.png', alt: 'Presentation structure', size: 'm' },
   { src: '/slide-images/slide-3.png', alt: 'Requirements and pipeline', size: 's' },
-  { src: '/slide-images/slide-12.png', alt: 'Deployment model (Commerce)', size: 'm' },
-  { src: '/slide-images/slide-13.png', alt: 'Cross-functional integration', size: 'l' },
-  { src: '/slide-images/slide-15.png', alt: 'Impact', size: 'm' },
-  { src: '/slide-images/slide-16.png', alt: 'Closing / Thank you', size: 'l' },
+  { src: '/slide-images/slide-12.png', alt: 'Deployment model', size: 'm' },
+  { src: '/slide-images/slide-13.png', alt: 'QA and testing', size: 'l' },
+  { src: '/slide-images/slide-15.png', alt: 'Cross-functional integration', size: 'm' },
+  { src: '/slide-images/slide-16.png', alt: 'Team leadership and delivery', size: 'l' },
 ]
 
 /** Slide indices that display a sidebar image (non-diagram slides only). */

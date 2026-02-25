@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo } from 'react'
+import { createContext, useCallback, useContext, useMemo, type ReactElement } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 
 import type {
@@ -7,7 +7,7 @@ import type {
   IPresentationModeProviderProps,
 } from '../../typings/presentation-mode'
 
-const STORAGE_KEY = 'echodyne-presentation-mode'
+const STORAGE_KEY = 'columbia-presentation-mode'
 
 function getStoredMode(): TPresentationMode {
   if (typeof window === 'undefined') return 'advanced'
@@ -32,7 +32,7 @@ export function usePresentationMode(): IPresentationModeContextValue {
 
 export function PresentationModeProvider({
   children,
-}: IPresentationModeProviderProps): React.ReactNode {
+}: IPresentationModeProviderProps): ReactElement {
   const { mode: paramMode, slideNum } = useParams<{ mode: string; slideNum?: string }>()
   const navigate = useNavigate()
 
