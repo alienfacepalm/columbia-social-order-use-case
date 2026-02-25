@@ -15,3 +15,4 @@ describe('assetUrl', () => {
     expect(result).not.toContain('//')
   })
 })
+

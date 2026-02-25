@@ -27,3 +27,4 @@ describe('truncateTitle', () => {
     expect(truncateTitle('', 10)).toBe('')
   })
 })
+

@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 
 import { useSwipeNavigation } from './use-swipe-navigation'
-import { SWIPE_THRESHOLD_PX } from '../config/app'
+import { SWIPE_THRESHOLD_PX } from '../../config/app/app'
 
 describe('useSwipeNavigation', () => {
   it('calls onSwipeLeft when swipe exceeds threshold to the left', () => {

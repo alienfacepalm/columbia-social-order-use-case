@@ -193,3 +193,4 @@ export function parseInline(text: string): TInlineSpan[] {
   out.push(...parseLinkSegment(text.slice(lastIndex)))
   return out.length > 0 ? out : [{ type: 'text', value: text }]
 }
+

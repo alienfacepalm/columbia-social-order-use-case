@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react'
 
-import { assetUrl } from '../config/app'
-import { usePresentationMode } from '../contexts/presentation-mode-context'
+import { assetUrl } from '../config/app/app'
+import { usePresentationMode } from '../contexts/presentation-mode-context/presentation-mode-context'
 
 export function PresentationHeader(): ReactElement {
   const { toggle, isSimple } = usePresentationMode()

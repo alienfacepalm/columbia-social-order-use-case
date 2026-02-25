@@ -3,11 +3,11 @@ import { useMemo } from 'react'
 
 import type { ISlideProps } from '../../typings/slide'
 import type { TSlideContentNode } from '../models/slide'
-import { assetUrl } from '../config/app'
+import { assetUrl } from '../config/app/app'
 import { getSlideImage, getSlideImagePosition, IMAGE_SIZE_PX } from '../config/slide-images'
-import { usePresentationMode } from '../contexts/presentation-mode-context'
+import { usePresentationMode } from '../contexts/presentation-mode-context/presentation-mode-context'
 import { SlideNode } from './slide-node'
-import { parseInline } from '../utils/parse-presentation'
+import { parseInline } from '../utils/parse-presentation/parse-presentation'
 import { renderInline } from '../utils/render-inline'
 
 function hasDiagram(content: readonly TSlideContentNode[]): boolean {

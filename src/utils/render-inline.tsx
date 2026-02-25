@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react'
 
 import type { TInlineSpan } from '../models/slide'
-import { parseInline } from './parse-presentation'
+import { parseInline } from './parse-presentation/parse-presentation'
 
 /**
  * Renders inline spans (text, bold, links) to React elements.

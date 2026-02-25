@@ -1,0 +1,41 @@
+---
+description: Ensure files with tests live in their own directory alongside their tests
+alwaysApply: true
+---
+
+# Tested files must live in a directory
+
+When a source file has a corresponding test file, **do not leave them as loose siblings at the same level as unrelated files**. Instead, **put the source + its test into their own directory**.
+
+This keeps each logical unit (component, hook, util, context, etc.) self-contained and easier to move or refactor.
+
+## Convention
+
+- **If a file has a test (e.g. `*.test.ts` / `*.test.tsx`), move both into a dedicated folder.**
+- The folder is named after the unit’s base name:
+  - `src/components/slide.tsx` + `src/components/slide.test.tsx` → `src/components/slide/slide.tsx` and `src/components/slide/slide.test.tsx`
+  - `src/hooks/use-media-query.ts` + `src/hooks/use-media-query.test.ts` → `src/hooks/use-media-query/use-media-query.ts` and `src/hooks/use-media-query/use-media-query.test.ts`
+  - `src/utils/truncate-title.ts` + `src/utils/truncate-title.test.ts` → `src/utils/truncate-title/truncate-title.ts` and `src/utils/truncate-title/truncate-title.test.ts`
+
+## Relationship to unit test placement rule
+
+- **Unit tests still live next to their source file in the same directory** (as described by the existing “Unit test placement” rule).
+- This rule adds: **if a source file has a test**, that pair should be isolated in **its own directory named for that unit**, not mixed as loose files in a broader folder.
+
+## Examples
+
+- ✅ **GOOD**
+  - `src/components/button/button.tsx`
+  - `src/components/button/button.test.tsx`
+  - `src/hooks/use-swipe-navigation/use-swipe-navigation.ts`
+  - `src/hooks/use-swipe-navigation/use-swipe-navigation.test.ts`
+  - `src/utils/parse-presentation/parse-presentation.ts`
+  - `src/utils/parse-presentation/parse-presentation.test.ts`
+
+- ❌ **AVOID**
+  - `src/components/button.tsx` with `src/components/button.test.tsx` at the same level
+  - `src/hooks/use-swipe-navigation.ts` with `src/hooks/use-swipe-navigation.test.ts` at the same level
+  - `src/utils/truncate-title.ts` with `src/utils/truncate-title.test.ts` at the same level
+
+Whenever you introduce or detect a `*.test.ts` / `*.test.tsx` for a given unit, **create or use the corresponding directory** and colocate both files there.
+

@@ -1,12 +1,11 @@
 import React from 'react'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { renderHook, act } from '@testing-library/react'
 
 import { useSlideNav } from './use-slide-nav'
 
 function renderUseSlideNav(initialEntry: string, total: number) {
-  const navigateMock = vi.fn()
   window.history.pushState({}, '', initialEntry)
 
   const wrapper = ({ children }: { children: React.ReactNode }) =>
@@ -24,7 +23,7 @@ function renderUseSlideNav(initialEntry: string, total: number) {
     )
 
   const { result } = renderHook(() => useSlideNav({ total }), { wrapper })
-  return { result, navigateMock }
+  return { result }
 }
 
 describe('useSlideNav', () => {
