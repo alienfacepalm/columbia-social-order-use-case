@@ -5,7 +5,7 @@ import type {
   TPresentationMode,
   IPresentationModeContextValue,
   IPresentationModeProviderProps,
-} from '../../../typings/presentation-mode'
+} from '@/typings/presentation-mode'
 
 const STORAGE_KEY = 'columbia-presentation-mode'
 

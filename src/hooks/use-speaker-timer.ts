@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import type {
   IUseSpeakerTimerOptions,
   IUseSpeakerTimerReturn,
-} from '../../typings/speaker-timer'
+} from '@/typings/speaker-timer'
 
 export function useSpeakerTimer({
   durationSeconds,

@@ -1,8 +1,8 @@
 import type { ReactElement } from 'react'
 
-import type { ISlideNodeProps } from '../../typings/slide'
-import type { TSlideContentNode } from '../models/slide'
-import { renderInline } from '../utils/render-inline'
+import type { ISlideNodeProps } from '@/typings/slide'
+import type { TSlideContentNode } from '@/models/slide'
+import { renderInline } from '@/utils/render-inline'
 import { MermaidSlide } from './mermaid-slide'
 
 export function SlideNode({

@@ -1,7 +1,7 @@
 import { useLayoutEffect, useId, useRef, useState } from 'react'
 
-import type { IDiagramSize, IMermaidRenderResult, IUseMermaidRenderReturn } from '../../typings/mermaid'
-import { renderMermaidDiagram } from '../services/mermaid-client'
+import type { IDiagramSize, IMermaidRenderResult, IUseMermaidRenderReturn } from '@/typings/mermaid'
+import { renderMermaidDiagram } from '@/services/mermaid-client'
 
 const renderIdRef = { current: 0 }
 const renderCache = new Map<string, IMermaidRenderResult>()

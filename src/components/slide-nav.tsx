@@ -1,8 +1,8 @@
 import type { ReactElement } from 'react'
 
-import type { ISlideNavProps } from '../../typings/slide'
-import { MOBILE_TITLE_MAX_LENGTH } from '../config/app/app'
-import { truncateTitle } from '../utils/truncate-title/truncate-title'
+import type { ISlideNavProps } from '@/typings/slide'
+import { MOBILE_TITLE_MAX_LENGTH } from '@/config/app/app'
+import { truncateTitle } from '@/utils/truncate-title/truncate-title'
 
 const NAV_BUTTON_CLASS =
   'flex min-h-[44px] min-w-[44px] h-11 w-11 sm:h-10 sm:w-10 items-center justify-center rounded-md border border-[#66a5e8] bg-[rgba(43,65,106,0.8)] text-2xl leading-none text-white cursor-pointer hover:bg-[#3385e2] hover:border-[#66a5e8] disabled:opacity-40 disabled:cursor-not-allowed touch-manipulation'

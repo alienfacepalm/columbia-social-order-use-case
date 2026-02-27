@@ -1,2 +1,2 @@
 /** Re-export slide content types from typings (consumed by parse-presentation, slide, slide-node, slide-nav, render-inline). */
-export type { TInlineSpan, TSlideContentNode, ISlide, IUlItem } from '../../typings/slide'
+export type { TInlineSpan, TSlideContentNode, ISlide, IUlItem } from '@/typings/slide'

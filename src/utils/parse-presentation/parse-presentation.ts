@@ -1,4 +1,4 @@
-import type { TInlineSpan, ISlide, TSlideContentNode, IUlItem } from '../models/slide'
+import type { TInlineSpan, ISlide, TSlideContentNode, IUlItem } from '@/models/slide'
 
 /**
  * Parses presentation markdown (e.g. presentation/advanced.md) into slide objects.

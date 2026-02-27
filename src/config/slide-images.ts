@@ -1,4 +1,4 @@
-import type { ISlideImageConfig, TSlideImageSize } from '../../typings/slide-images'
+import type { ISlideImageConfig, TSlideImageSize } from '@/typings/slide-images'
 
 /** Only non-diagram slides get an image. Order matches slide indices: 1, 3, 12, 13, 15, 16. */
 const SLIDE_IMAGES: readonly ISlideImageConfig[] = [

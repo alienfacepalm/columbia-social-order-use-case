@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
-import { PresentationModeProvider } from '../../contexts/presentation-mode-context/presentation-mode-context'
+import { PresentationModeProvider } from '@/contexts/presentation-mode-context/presentation-mode-context'
 import { PresentationHeader } from './presentation-header'
 
 function renderWithProviders(initialEntry = '/simple/1') {

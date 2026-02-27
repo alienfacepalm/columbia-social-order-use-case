@@ -7,8 +7,8 @@ import type {
   IDragState,
   IMermaidDiagramControlsProps,
   IMermaidFullscreenOverlayProps,
-} from '../../typings/mermaid'
-import { useMermaidRender } from '../hooks/use-mermaid-render'
+} from '@/typings/mermaid'
+import { useMermaidRender } from '@/hooks/use-mermaid-render'
 import { FullscreenIcon, ZoomInIcon, ZoomOutIcon } from './mermaid-slide-icons'
 
 const ZOOM_MIN = 50

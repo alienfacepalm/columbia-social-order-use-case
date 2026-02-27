@@ -1,4 +1,4 @@
-import type { IMermaidRenderResult } from '../../typings/mermaid'
+import type { IMermaidRenderResult } from '@/typings/mermaid'
 
 type MermaidModule = typeof import('mermaid')
 

@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 
-import type { IUseSlideNavOptions, IUseSlideNavReturn } from '../../../typings/slide-nav'
+import type { IUseSlideNavOptions, IUseSlideNavReturn } from '@/typings/slide-nav'
 
 function parseSlideIndex(slideNum: string | undefined, total: number): number {
   if (slideNum == null || slideNum === '') return 0

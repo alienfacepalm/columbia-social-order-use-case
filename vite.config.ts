@@ -1,6 +1,7 @@
 /// <reference types="vitest/config" />
 import { copyFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
+import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
@@ -29,6 +30,11 @@ function githubPagesSpaFallback() {
 export default defineConfig({
   base,
   plugins: [react(), tailwindcss(), githubPagesSpaFallback()],
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
   server: {
     open: true,
   },
