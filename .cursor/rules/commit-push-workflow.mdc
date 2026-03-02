@@ -1,0 +1,24 @@
+---
+description: Before commit and push always run tests, fix errors, then commit and push. $$cp triggers this workflow.
+alwaysApply: true
+---
+
+# Commit and push workflow (agent)
+
+When the user asks to **commit and push** (or uses the trigger below), the agent must:
+
+1. **Run unit tests** with `pnpm test --run`. Do not skip this step.
+2. **Find and fix failures** — if tests fail or there are linter errors in changed files, fix them and re-run tests until they pass. Do not commit or push until tests pass.
+3. **Then** stage changes, commit with a clear message, and push.
+
+Do not commit or push if tests fail. Fix errors first, then commit and push.
+
+## Trigger: $$cp
+
+The string **`$$cp`** is a command to run this workflow. When you see `$$cp` in a user message:
+
+1. Run `pnpm test --run`.
+2. If tests fail or linter reports errors in modified files: fix the issues, re-run tests, repeat until passing.
+3. Stage relevant changes, commit (descriptive message), and push.
+
+Treat `$$cp` as shorthand for: "run tests, fix any errors, then commit and push."

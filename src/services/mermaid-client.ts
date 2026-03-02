@@ -1,13 +1,14 @@
 import type { IMermaidRenderResult } from '@/typings/mermaid'
 
-type MermaidModule = typeof import('mermaid')
+/** Default export from 'mermaid' (has initialize, render, etc.). */
+type MermaidInstance = (typeof import('mermaid'))['default']
 
-let mermaidPromise: Promise<MermaidModule> | null = null
+let mermaidPromise: Promise<MermaidInstance> | null = null
 
-async function loadMermaid(): Promise<MermaidModule> {
+async function loadMermaid(): Promise<MermaidInstance> {
   if (mermaidPromise == null) {
     mermaidPromise = import('mermaid').then((mod) => {
-      const mermaid = (mod as unknown as { default?: MermaidModule }).default ?? (mod as MermaidModule)
+      const mermaid = (mod as { default: MermaidInstance }).default
 
       mermaid.initialize({
         startOnLoad: false,
