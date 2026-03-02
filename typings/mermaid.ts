@@ -1,5 +1,8 @@
 import type { Dispatch, SetStateAction } from 'react'
 
+/** Default export from 'mermaid' (has initialize, render, etc.). */
+export type MermaidInstance = (typeof import('mermaid'))['default']
+
 export interface IMermaidSlideProps {
   readonly code: string
   readonly id: string

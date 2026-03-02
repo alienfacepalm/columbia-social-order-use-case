@@ -1,61 +1,37 @@
 import type { ReactElement } from 'react'
-import { useCallback, useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-
+import { useCallback } from 'react'
 import { Slide } from './slide'
 import { PresentationHeader } from './presentation-header'
 import { SlideNav } from './slide-nav'
 import { SpeakerTimer } from './speaker-timer'
 import { PresentationModeProvider } from '@/contexts/presentation-mode-context/presentation-mode-context'
 import { useSlideNav } from '@/hooks/use-slide-nav/use-slide-nav'
-import { useMediaQuery } from '@/hooks/use-media-query'
+import { useMediaQuery } from '@/hooks/use-media-query/use-media-query'
 import { useSwipeNavigation } from '@/hooks/use-swipe-navigation/use-swipe-navigation'
-import { parsePresentation, mergePresentationWithSimple } from '@/utils/parse-presentation/parse-presentation'
+import { usePresentationSlides } from '@/hooks/use-presentation-slides/use-presentation-slides'
+import { usePresentationRouteRedirect } from '@/hooks/use-presentation-route-redirect/use-presentation-route-redirect'
+import { useSpeakerTimerShortcut } from '@/hooks/use-speaker-timer-shortcut/use-speaker-timer-shortcut'
+import { useVisibleSlides } from '@/hooks/use-visible-slides/use-visible-slides'
 import presentationRaw from '../../presentation/advanced.md?raw'
 import presentationSimpleRaw from '../../presentation/simple.md?raw'
 
-const slides = mergePresentationWithSimple(
-  parsePresentation(presentationRaw),
-  parsePresentation(presentationSimpleRaw),
-)
-
 export function App(): ReactElement {
-  const { mode, slideNum } = useParams<{ mode: string; slideNum?: string }>()
-  const navigate = useNavigate()
-  const [isTimerVisible, setIsTimerVisible] = useState(false)
+  usePresentationRouteRedirect()
 
-  useEffect(() => {
-    if (mode !== 'simple' && mode !== 'advanced') {
-      navigate(`/simple/${slideNum ?? '1'}`, { replace: true })
-    }
-  }, [mode, slideNum, navigate])
-
+  const slides = usePresentationSlides(presentationRaw, presentationSimpleRaw)
   const { index, go, goTo } = useSlideNav({ total: slides.length })
   const isMobile = useMediaQuery('(max-width: 640px)')
-
-  const visibleRadius = 1
-  const startIndex = Math.max(0, index - visibleRadius)
-  const endIndex = Math.min(slides.length - 1, index + visibleRadius)
-  const visibleSlides = slides.slice(startIndex, endIndex + 1)
-  const slideOffset = index - startIndex
+  const [isTimerVisible] = useSpeakerTimerShortcut()
+  const { visibleSlides, slideOffset, startIndex } = useVisibleSlides({
+    slides,
+    currentIndex: index,
+    visibleRadius: 1,
+  })
 
   const { onTouchStart, onTouchEnd } = useSwipeNavigation({
     onSwipeLeft: useCallback(() => go(1), [go]),
     onSwipeRight: useCallback(() => go(-1), [go]),
   })
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent): void => {
-      // Shift+T toggles the speaker timer visibility
-      if (event.shiftKey && (event.key === 't' || event.key === 'T')) {
-        event.preventDefault()
-        setIsTimerVisible((visible) => !visible)
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [])
 
   return (
     <PresentationModeProvider>
