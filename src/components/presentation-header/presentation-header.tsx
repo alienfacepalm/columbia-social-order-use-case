@@ -7,31 +7,42 @@ export function PresentationHeader(): ReactElement {
   const { toggle, isSimple } = usePresentationMode()
 
   return (
-    <div className="flex shrink-0 flex-col items-center sm:flex-row sm:items-start sm:justify-between w-full gap-2 py-1.5 pt-2 sm:py-2 sm:pt-3">
+    <div className="flex shrink-0 flex-col items-center sm:flex-row sm:items-start sm:justify-between w-full gap-1.5 py-1 sm:gap-2 sm:py-2 sm:pt-3">
       <div className="flex shrink-0 flex-col items-center gap-0 sm:items-start">
         <img
           src={assetUrl('columbia.png')}
           alt="Columbia Sportswear"
-          className="block h-12 w-auto sm:h-16 md:h-18 m-0 align-middle brightness-0 invert"
+          className="block h-9 w-auto sm:h-16 md:h-18 m-0 align-middle brightness-0 invert"
           width={416}
           height={88}
         />
-        <span className="text-[0.65rem] sm:text-[0.75rem] font-medium uppercase tracking-widest leading-tight text-white/95 text-center sm:text-left mt-0.5">
+        <span className="text-[0.6rem] sm:text-[0.75rem] font-medium uppercase tracking-widest leading-tight text-white/95 text-center sm:text-left mt-0.5">
           Social-Order Adapter Use Case
         </span>
       </div>
-      <div className="flex flex-col items-center gap-1.5 sm:items-end sm:gap-1 text-center sm:text-right">
+      <div className="flex flex-col items-center gap-1 sm:items-end sm:gap-1 text-center sm:text-right">
+        <span className="order-1 sm:order-2 text-[0.65rem] sm:text-xs font-normal leading-tight text-white/90">
+          Columbia Sportswear — Social-Order Adapter by Brandon Pliska
+        </span>
+        <a
+          href="https://github.com/alienfacepalm/columbia-social-order-use-case"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="order-2 sm:order-3 text-[0.65rem] sm:text-xs font-normal leading-tight text-[#66a5e8] hover:text-[#99c4f0] underline break-all"
+        >
+          GitHub
+        </a>
         <button
           type="button"
           role="switch"
           onClick={toggle}
-          className="relative flex h-8 w-30 sm:h-9 sm:w-34 rounded-full border border-white/25 bg-white/10 p-1 sm:p-1.5 backdrop-blur-sm hover:bg-white/15 hover:border-white/35 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+          className="order-3 sm:order-1 relative flex h-7 w-28 sm:h-9 sm:w-34 rounded-full border border-white/25 bg-white/10 p-1 sm:p-1.5 backdrop-blur-sm hover:bg-white/15 hover:border-white/35 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent mt-2 sm:mt-0"
           title={isSimple ? 'Switch to advanced (detailed) text' : 'Switch to simple (easier) text'}
           aria-checked={!isSimple}
           aria-label="Presentation mode: Advanced or Simple"
         >
           <span
-            className="absolute top-1 bottom-1 sm:top-1.5 sm:bottom-1.5 w-[calc(50%-2px)] rounded-full bg-white/90 shadow-md transition-all duration-200 ease-out"
+            className="absolute top-0.5 bottom-0.5 sm:top-1.5 sm:bottom-1.5 w-[calc(50%-2px)] rounded-full bg-white/90 shadow-md transition-all duration-200 ease-out"
             style={{ left: isSimple ? 'calc(50% + 2px)' : '4px' }}
           />
           <span
@@ -49,17 +60,6 @@ export function PresentationHeader(): ReactElement {
             Simple
           </span>
         </button>
-        <span className="text-[0.65rem] sm:text-xs font-normal leading-tight text-white/90">
-          Columbia Sportswear — Social-Order Adapter by Brandon Pliska
-        </span>
-        <a
-          href="https://github.com/alienfacepalm/columbia-social-order-use-case"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-[0.65rem] sm:text-xs font-normal leading-tight text-[#66a5e8] hover:text-[#99c4f0] underline break-all"
-        >
-          GitHub
-        </a>
       </div>
     </div>
   )

@@ -41,23 +41,23 @@ export function Slide({ slide, slideIndex }: ISlideProps): ReactElement {
       <section
         id={sectionId}
         aria-label={slide.title}
-        className="relative flex flex-1 w-full min-w-0 max-w-6xl min-h-0 overflow-hidden px-4 sm:px-8 py-6 sm:py-12 rounded-xl flex-col sm:flex-row-reverse items-center sm:items-center justify-center gap-6 sm:gap-10 md:gap-12"
+        className="relative flex flex-1 w-full min-w-0 max-w-6xl min-h-0 overflow-auto sm:overflow-hidden px-3 py-4 sm:px-8 sm:py-12 rounded-xl flex-col sm:flex-row-reverse items-center sm:items-center justify-center gap-4 sm:gap-10 md:gap-12"
       >
-        <div className="relative z-10 flex shrink-0 flex-col items-center sm:items-start text-center sm:text-left min-w-0 flex-[1.5_1_0%] sm:min-w-[min(55%,28rem)]">
-          <h1 className="slide-title-h1 text-3xl sm:text-4xl md:text-5xl font-semibold tracking-wide text-white m-0 mb-2 sm:mb-3">
+        <div className="relative z-10 flex shrink-0 flex-col items-center sm:items-start text-center sm:text-left min-w-0 w-full flex-[1.5_1_0%] sm:min-w-[min(55%,28rem)] gap-0">
+          <h1 className="slide-title-h1 text-2xl leading-tight sm:text-4xl sm:leading-snug md:text-5xl font-semibold tracking-wide text-white m-0 mb-2 sm:mb-3 wrap-break-word">
             {slide.title}
           </h1>
           {headingNodes.map((node, i) => {
             if (node.level === 2) {
               return (
-                <h2 key={i} className="slide-title-h2 text-xl sm:text-2xl md:text-3xl font-medium tracking-wide text-white/95 m-0 mb-1 sm:mb-2">
+                <h2 key={i} className="slide-title-h2 text-lg sm:text-2xl md:text-3xl font-medium tracking-wide text-white/95 m-0 mb-1 sm:mb-2 leading-snug wrap-break-word">
                   {node.content}
                 </h2>
               )
             }
             if (node.level === 3) {
               return (
-                <h3 key={i} className="slide-title-h3 text-base sm:text-lg md:text-xl font-medium tracking-wide text-white/90 m-0 mb-2 sm:mb-3">
+                <h3 key={i} className="slide-title-h3 text-sm sm:text-lg md:text-xl font-medium tracking-wide text-white/90 m-0 mb-2 sm:mb-3 leading-snug wrap-break-word">
                   {node.content}
                 </h3>
               )
@@ -65,7 +65,7 @@ export function Slide({ slide, slideIndex }: ISlideProps): ReactElement {
             return (
               <h4
                 key={i}
-                className="slide-title-byline text-xs sm:text-sm md:text-base font-normal tracking-wide text-white m-0 mt-2 sm:mt-3 mb-4 sm:mb-6"
+                className="slide-title-byline text-xs sm:text-sm md:text-base font-normal tracking-wide text-white m-0 mt-3 sm:mt-3 mb-4 sm:mb-6 leading-relaxed wrap-break-word"
               >
                 {node.content}
               </h4>
@@ -75,7 +75,7 @@ export function Slide({ slide, slideIndex }: ISlideProps): ReactElement {
         <img
           src={assetUrl('title.png')}
           alt="Presentation title"
-          className="relative z-0 block shrink-0 object-contain w-full max-w-[280px] sm:max-w-[320px] md:max-w-[380px] max-h-[40vh] sm:max-h-[65vh]"
+          className="relative z-0 block shrink-0 object-contain w-full max-w-[240px] sm:max-w-[320px] md:max-w-[380px] max-h-[35vh] sm:max-h-[65vh]"
         />
       </section>
     )

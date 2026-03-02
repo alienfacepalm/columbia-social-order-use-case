@@ -62,29 +62,37 @@ export function App(): ReactElement {
       <div
         className="relative flex h-full w-full max-w-full min-w-0 flex-col bg-[linear-gradient(135deg,#1d3356_0%,#1d3356_45%,#3385e2_100%)] text-white overflow-x-hidden overflow-y-hidden"
       >
-        <header className="pointer-events-none fixed inset-x-0 top-0 z-20 flex w-full justify-center px-4 pt-4 sm:px-8 sm:pt-6 md:px-16 md:pt-8 box-border">
+        <header className="pointer-events-none fixed inset-x-0 top-0 z-20 flex w-full justify-center px-3 pt-3 sm:px-8 sm:pt-6 md:px-16 md:pt-8 box-border safe-area-pt">
           <div className="pointer-events-auto w-full max-w-6xl">
             <PresentationHeader />
           </div>
         </header>
-        <div
-          className="flex min-h-0 flex-1 w-full min-w-0 pt-24 sm:pt-28 md:pt-32 transition-transform duration-300 ease-out touch-pan-y"
-          style={{ transform: `translateX(-${slideOffset * 100}%)` }}
-          onTouchStart={onTouchStart}
-          onTouchEnd={onTouchEnd}
-          aria-live="polite"
-        >
-          {visibleSlides.map((slide, localIndex) => {
-            const absoluteIndex = startIndex + localIndex
-            return (
-              <div
-                key={slide.index}
-                className="flex shrink-0 grow-0 w-full basis-full flex-col items-center px-4 pb-4 sm:px-8 sm:pb-6 md:px-16 md:pb-8 h-full box-border min-w-0 max-w-full"
-              >
-                <Slide slide={slide} slideIndex={absoluteIndex} />
-              </div>
-            )
-          })}
+        <div className="flex min-h-0 flex-1 min-w-0 overflow-hidden slide-content-pt">
+          <div className="w-full h-full overflow-hidden">
+            <div
+              className="flex flex-nowrap h-full transition-transform duration-300 ease-out touch-pan-y"
+              style={{
+                width: `${visibleSlides.length * 100}%`,
+                transform: `translateX(-${(slideOffset / visibleSlides.length) * 100}%)`,
+              }}
+              onTouchStart={onTouchStart}
+              onTouchEnd={onTouchEnd}
+              aria-live="polite"
+            >
+              {visibleSlides.map((slide, localIndex) => {
+                const absoluteIndex = startIndex + localIndex
+                return (
+                  <div
+                    key={slide.index}
+                    className="flex shrink-0 grow-0 flex-col items-center px-4 pb-4 sm:px-8 sm:pb-6 md:px-16 md:pb-8 h-full box-border min-w-0"
+                    style={{ width: `${100 / visibleSlides.length}%` }}
+                  >
+                    <Slide slide={slide} slideIndex={absoluteIndex} />
+                  </div>
+                )
+              })}
+            </div>
+          </div>
         </div>
 
         {slides[index] && isTimerVisible ? (

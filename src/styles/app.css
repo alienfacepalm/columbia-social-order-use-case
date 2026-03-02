@@ -34,6 +34,26 @@
   padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
 }
 
+/* Header: respect safe area at top on notched devices */
+.safe-area-pt {
+  padding-top: max(0.75rem, env(safe-area-inset-top));
+}
+
+/* Main content: clear fixed header; extra margin below header; account for safe area on notched devices */
+.slide-content-pt {
+  padding-top: max(8.5rem, calc(8.5rem + env(safe-area-inset-top)));
+}
+@media (min-width: 640px) {
+  .slide-content-pt {
+    padding-top: max(8rem, calc(8rem + env(safe-area-inset-top)));
+  }
+}
+@media (min-width: 768px) {
+  .slide-content-pt {
+    padding-top: max(9rem, calc(9rem + env(safe-area-inset-top)));
+  }
+}
+
 /* Allow vertical scroll only on slide container (enables horizontal swipe without browser gestures) */
 .touch-pan-y {
   touch-action: pan-y;
